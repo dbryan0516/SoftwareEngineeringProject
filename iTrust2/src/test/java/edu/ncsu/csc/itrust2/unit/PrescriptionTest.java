@@ -48,13 +48,14 @@ public class PrescriptionTest {
         prescriptionForm.setNumRenewals( 1000 );
         prescriptionForm.setDosage( 50000 );
 
+        int numPrescriptions = Prescription.getForPatient( "patient" ).size();
         try {
             Prescription prescription = new Prescription( prescriptionForm );
             prescription.save();
             fail( "Invalid NDC should have failed." );
         }
         catch ( Exception e ) {
-            assertEquals( 0, Prescription.getForPatient( "patient" ).size() );
+            assertEquals( numPrescriptions, Prescription.getForPatient( "patient" ).size() );
         }
     }
 
@@ -69,13 +70,14 @@ public class PrescriptionTest {
         prescriptionForm.setNumRenewals( 1000 );
         prescriptionForm.setDosage( 50000 );
 
+        int numPrescriptions = Prescription.getForPatient( "patient" ).size();
         try {
             Prescription prescription = new Prescription( prescriptionForm );
             prescription.save();
             fail( "Invalid Patient should have failed." );
         }
         catch ( Exception e ) {
-            assertEquals( 0, Prescription.getForPatient( "patient" ).size() );
+            assertEquals( numPrescriptions, Prescription.getForPatient( "patient" ).size() );
         }
     }
 
@@ -90,12 +92,13 @@ public class PrescriptionTest {
         prescriptionForm.setNumRenewals( 1000 );
         prescriptionForm.setDosage( 50000 );
 
+        int numPrescriptions = Prescription.getForPatient( "patient" ).size();
         try {
             new Prescription( prescriptionForm );
             fail( "Invalid StartDate should have failed." );
         }
         catch ( ParseException e ) {
-            assertEquals( 0, Prescription.getForPatient( "patient" ).size() );
+            assertEquals( numPrescriptions, Prescription.getForPatient( "patient" ).size() );
         }
     }
 
@@ -110,12 +113,13 @@ public class PrescriptionTest {
         prescriptionForm.setNumRenewals( 1000 );
         prescriptionForm.setDosage( 50000 );
 
+        int numPrescriptions = Prescription.getForPatient( "patient" ).size();
         try {
             new Prescription( prescriptionForm );
             fail( "Invalid EndDate should have failed." );
         }
         catch ( ParseException e ) {
-            assertEquals( 0, Prescription.getForPatient( "patient" ).size() );
+            assertEquals( numPrescriptions, Prescription.getForPatient( "patient" ).size() );
         }
     }
 
@@ -130,13 +134,14 @@ public class PrescriptionTest {
         prescriptionForm.setNumRenewals( null );
         prescriptionForm.setDosage( 50000 );
 
+        int numPrescriptions = Prescription.getForPatient( "patient" ).size();
         try {
             Prescription prescription = new Prescription( prescriptionForm );
             prescription.save();
             fail( "Invalid NumRenewals should have failed." );
         }
         catch ( Exception e ) {
-            assertEquals( 0, Prescription.getForPatient( "patient" ).size() );
+            assertEquals( numPrescriptions, Prescription.getForPatient( "patient" ).size() );
         }
     }
 
@@ -151,13 +156,14 @@ public class PrescriptionTest {
         prescriptionForm.setNumRenewals( 1000 );
         prescriptionForm.setDosage( null );
 
+        int numPrescriptions = Prescription.getForPatient( "patient" ).size();
         try {
             Prescription prescription = new Prescription( prescriptionForm );
             prescription.save();
             fail( "Invalid Dosage should have failed." );
         }
         catch ( Exception e ) {
-            assertEquals( 0, Prescription.getForPatient( "patient" ).size() );
+            assertEquals( numPrescriptions, Prescription.getForPatient( "patient" ).size() );
         }
     }
 }
