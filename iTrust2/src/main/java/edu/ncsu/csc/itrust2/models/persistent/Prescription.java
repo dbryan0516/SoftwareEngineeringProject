@@ -93,10 +93,8 @@ import java.util.*;
         if ( form.getOfficeVisit() != null )
             setVisit( OfficeVisit.getById( Long.parseLong( form.getOfficeVisit() ) ) );
         final SimpleDateFormat sdf = new SimpleDateFormat( "MM/dd/yyyy", Locale.ENGLISH );
-        final Date startDate = sdf.parse( form.getStartDate() );
-        final Date endDate = sdf.parse( form.getEndDate() );
-        setStartDate( startDate );
-        setEndDate( endDate );
+        setStartDate( sdf.parse( form.getStartDate() ) );
+        setEndDate( sdf.parse( form.getEndDate() ) );
         setNumRenewals( form.getNumRenewals() );
         setDosage( form.getDosage() );
     }
