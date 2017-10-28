@@ -1,0 +1,156 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:include="layout :: head(title=~{::title},links=~{})">
+<title>Modify Database</title>
+</head>
+<body th:include="layout :: body" th:with="content=~{::content}">
+	<div th:fragment="content">
+		<script th:inline="javascript">
+				/* Otherwise Thymeleaf tries to parse Javascript as XML and breaks itself sometimes.  Sigh */
+				/*<![CDATA[*/
+	
+				var app = angular.module('myApp', []);
+				app
+						.controller(
+								'modifyDatabaseCtrl',
+								function($scope, $http) {
+									$scope.formTypes = {
+											addNDCForm: false,
+											editNDCForm: false,
+											addICDForm: false,
+											editICDForm: false
+									};
+									
+									/* Changes whether the form is for adding/editing NDC/ICD codes */
+									$scope.changeForm = function(form) {
+										
+										// Choose the right mode 
+										for(var prop in $scope.formTypes) {
+											if (prop === form) {
+												$scope.formTypes [prop] = true;
+											}
+											else {
+												$scope.formTypes [prop] = false;
+											}
+										}
+										
+										// Reset the form
+										$scope.medCodeType = (form.indexOf("NDC") != -1)? "NDC" : "ICD";
+										$scope.formMode = (form.indexOf("add") != -1)? "add" : "edit";
+										$scope.medCode = {};
+										
+										// Switch to list of NDC or ICD codes depending on what the form is being used for
+										$scope.medCodes = ($scope.medCodeType === "NDC")? $scope.NDCCodes : $scope.ICDCodes;
+
+									};
+									
+									/* Set the medical code for editing */
+									$scope.selectCode = function(code) {
+										$scope.medCode = code;
+									};
+									
+									$scope.submit = function() {
+										var url = "iTrust2/api/v1/" + $scope.medCodeType;
+										var httpVerb = ($scope.formMode === "add")? "POST" : "PUT";
+										console.log("Submitting to " + url + " via " + httpVerb);
+										console.log($scope.medCode);
+										
+										/*
+										$http({
+											method : httpVerb,
+											url : url,
+											data : $scope.medCode
+										}).then(function(response) {
+											$scope.message="Office visit created successfully";
+											console.log(response);
+										}, function(rejection) {
+											$scope.message="Error occurred creating office visit";
+											console.log(rejection);
+										});*/
+									};
+									
+									$scope.medCode = {};
+									$scope.ICDCodes = [
+										{name: "Strep-throat", code: "12-122-12345"}
+								    ];
+									$scope.NDCCodes = [
+										{name: "Oxycontin", code: "A00.B3"}
+									];
+									$scope.medCodes = [];
+								});
+	</script>
+		<div ng-app="myApp" ng-controller="modifyDatabaseCtrl">
+			<nav class="navbar navbar-default">
+				<div class="container-fluid">
+					<ul class="nav navbar-nav">
+						<li class="dropdown"><a class="dropdown-toggle"
+							data-toggle="dropdown" href="#">Admin<span class="caret"></span></a>
+							<ul class="dropdown-menu">
+								<li><a href="/iTrust2/admin/addHospital" id="addhospital">Add
+										Hospital</a></li>
+								<li><a href="/iTrust2/admin/addUser" id="addnewuser">Add
+										User</a></li>
+								<li><a href="/iTrust2/admin/deleteUser" id="deleteuser">Delete
+										User</a></li>
+								<li><a href="/iTrust2/admin/deleteHospital"
+									id="deletehospital">Delete Hospital</a></li>
+								<li><a href="/iTrust2/admin/modifyDatabase"
+									id="modifyDatabase">Modify Database</a></li>
+							</ul></li>
+						<li class="dropdown"><a class="dropdown-toggle"
+							data-toggle="dropdown" href="#">Edit<span class="caret"></span></a>
+							<ul class="dropdown-menu">
+								<li><a href="/iTrust2/personnel/editDemographics"
+									id="editdemographics">Edit Demographics</a></li>
+							</ul></li>
+					</ul>
+				</div>
+			</nav>
+			<h1>Modify Database</h1>
+			<button class="addNDC" ng-click="changeForm('addNDCForm')">Add NDC Code</button>
+			<button class="editNDC" ng-click="changeForm('editNDCForm')">Edit NDC Code</button>
+			<button class="addICD" ng-click="changeForm('addICDForm')">Add ICD Code</button>
+			<button class="editICD" ng-click="changeForm('editICDForm')">Edit ICD Code</button>
+			
+			<br />
+			<br />
+			<br />
+			
+			<div class="existingCodes" ng-show="formTypes.editNDCForm || formTypes.editICDForm">
+				Select the code to edit:
+				<br />
+				<ul>
+					<li ng-repeat="code in medCodes">
+						<input type="radio" ng-model="medCode" 
+						name="medCode" ng-change="selectCode(code)" value="{{code.code}}" />
+						{{code.name}}
+					</li>
+				</ul>
+				<br />
+				<br />
+				<br />
+			</div>
+						
+			<div class="commonForm" ng-show="formTypes.addNDCForm || formTypes.editNDCForm || formTypes.addICDForm || formTypes.editICDForm">
+				<h3 ng-show="formTypes.addNDCForm || formTypes.addICDForm">Adding new {{medCodeType}} code</h3>
+				<h3 ng-show="formTypes.editNDCForm || formTypes.editICDForm">Editing {{medCode.name}} ({{medCode.code}})</h3>
+				<table>
+					<tr>
+						<td>Name:</td>
+						<td>
+							<input type="text" class="name" value="{{medCode.name}}" ng-model="medCode.name" placeholder="Name of medication">
+						</td>
+						<td class="name-errors"></td>
+					</tr>
+					<tr>
+						<td>Code:</td>
+						<td>
+							 <input type="text" class="code" value="{{medCode.code}}" ng-model="medCode.code" placeholder="Code of medication">
+						 </td>
+					 </tr>
+				 </table>
+				<button ng-click="submit()">Submit</button>
+			</div>
+		</div>
+	</div>
+</body>
+</html>
