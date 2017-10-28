@@ -165,4 +165,15 @@ import java.util.List;
      * The NDC description.
      */
     @NotEmpty private String description;
+
+    /**
+     * Checks if the given object is equal to this.
+     *
+     * @param o The object on which to test.
+     * @return Returns true if the other object has the same id, code, and description, otherwise false.
+     */
+    @Override public boolean equals ( Object o ) {
+        return o != null && o instanceof NDC && this.id.equals( ( (NDC) o ).getId() ) && this.code
+                .equals( ( (NDC) o ).getCode() ) && this.description.equals( ( (NDC) o ).getDescription() );
+    }
 }

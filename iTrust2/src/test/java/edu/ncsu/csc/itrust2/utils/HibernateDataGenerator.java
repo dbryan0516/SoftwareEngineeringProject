@@ -2,6 +2,7 @@ package edu.ncsu.csc.itrust2.utils;
 
 import java.util.Calendar;
 
+import edu.ncsu.csc.itrust2.models.persistent.NDC;
 import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.boot.spi.MetadataImplementor;
@@ -102,6 +103,11 @@ public class HibernateDataGenerator {
         final User admin = new User( "admin", "$2a$10$EblZqNptyYvcLm/VwDCVAuBjzZOI7khzdyGPBr08PpIi0na624b8.",
                 Role.ROLE_ADMIN, 1 );
         admin.save();
+
+        final NDC ndc = new NDC();
+        ndc.setCode( "0832-0086" );
+        ndc.setDescription( "Androxy" );
+        ndc.save();
     }
 
     /**
