@@ -165,4 +165,15 @@ import java.util.List;
      * The ICD description.
      */
     @NotEmpty private String description;
+
+    /**
+     * Checks if the given object is equal to this.
+     *
+     * @param o The object on which to test.
+     * @return Returns true if the other object has the same id, code, and description, otherwise false.
+     */
+    @Override public boolean equals ( Object o ) {
+        return o != null && o instanceof ICD && this.id.equals( ( (ICD) o ).getId() ) && this.code
+                .equals( ( (ICD) o ).getCode() ) && this.description.equals( ( (ICD) o ).getDescription() );
+    }
 }
