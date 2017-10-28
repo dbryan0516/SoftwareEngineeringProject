@@ -1,17 +1,16 @@
 package edu.ncsu.csc.itrust2.utils;
 
+import java.text.ParseException;
 import java.util.Calendar;
 
-import edu.ncsu.csc.itrust2.models.persistent.NDC;
+import edu.ncsu.csc.itrust2.forms.admin.PrescriptionForm;
+import edu.ncsu.csc.itrust2.models.persistent.*;
 import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.boot.spi.MetadataImplementor;
 import org.hibernate.tool.hbm2ddl.SchemaExport;
 
 import edu.ncsu.csc.itrust2.models.enums.Role;
-import edu.ncsu.csc.itrust2.models.persistent.Hospital;
-import edu.ncsu.csc.itrust2.models.persistent.Patient;
-import edu.ncsu.csc.itrust2.models.persistent.User;
 
 /**
  * Newly revamped Test Data Generator. This class is used to generate database
@@ -108,6 +107,29 @@ public class HibernateDataGenerator {
         ndc.setCode( "0832-0086" );
         ndc.setDescription( "Androxy" );
         ndc.save();
+
+        final ICD icd = new ICD();
+        icd.setCode("A00");
+        icd.setDescription( "Cholera" );
+        icd.save();
+
+        final PrescriptionForm prescriptionForm = new PrescriptionForm();
+        prescriptionForm.setNdc( "Androxy" );
+        prescriptionForm.setPatient( "patient" );
+        prescriptionForm.setOfficeVisit( null );
+        prescriptionForm.setStartDate( "01/01/2017" );
+        prescriptionForm.setEndDate( "01/01/2035" );
+        prescriptionForm.setNumRenewals( 1000 );
+        prescriptionForm.setDosage( 50000 );
+
+        try {
+            final Prescription prescription = new Prescription( prescriptionForm );
+            prescription.save();
+        }
+        catch ( ParseException e ) {
+            e.printStackTrace();
+        }
+
     }
 
     /**
