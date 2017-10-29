@@ -20,22 +20,23 @@ import java.util.List;
 public class APIDatabaseController extends APIController{
 
     @GetMapping ( BASE_PATH + "/addICD" )
-    public void addICDEntry(@RequestBody final ICDForm icdf){
-
+    public ResponseEntity addICDEntry(@RequestBody final ICDForm icdf){
+        return new ResponseEntity( null, HttpStatus.OK );
     }
 
     @GetMapping ( BASE_PATH + "/updateICD/{id}" )
-    public void updateICDEntry(@PathVariable ("id") final Long id, @RequestBody final ICDForm icdf){
-
+    public ResponseEntity updateICDEntry(@PathVariable ("id") final Long id, @RequestBody final ICDForm icdf){
+        return new ResponseEntity( null, HttpStatus.OK );
     }
 
     @GetMapping (BASE_PATH + "/addNDC")
-    public void addNDCEntry(@RequestBody final NDCForm ndcf){
-
+    public ResponseEntity addNDCEntry(@RequestBody final NDCForm ndcf){
+        return new ResponseEntity( null, HttpStatus.OK );
     }
 
     @GetMapping (BASE_PATH + "/updateNDC/{id}")
-    public void updateNDCEntry(@PathVariable ("id") final Long id, @RequestBody final NDCForm ndcf){
+    public ResponseEntity updateNDCEntry(@PathVariable ("id") final Long id, @RequestBody final NDCForm ndcf){
+        return new ResponseEntity( null, HttpStatus.OK );
 
     }
 
