@@ -113,7 +113,7 @@ public class APIDatabaseController extends APIController{
         return ICD.getICDs();
     }
 
-    @GetMapping (BASE_PATH + "/ICDEntries")
+    @GetMapping (BASE_PATH + "/NDCEntries")
     public List<NDC> getNDCEntries(){
         return NDC.getNDCs();
     }
