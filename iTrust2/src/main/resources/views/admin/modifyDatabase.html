@@ -22,7 +22,7 @@
 											editICDForm: false
 									};
 									
-									/* Either "add" or "edit" */
+									/* Either "add" or "update" */
 									$scope.formMode;
 									
 									/* Either "NDC" or "ICD" */
@@ -50,7 +50,7 @@
 									$scope.getNDCCodes = function() {
 										$http({
 											method : "GET",
-											url : baseUrl + "/NDC",
+											url : baseUrl + "/NDCEntries",
 										}).then(function(response) {
 											$scope.NDCCodes = response.data;
 										}, function(rejection) {
@@ -62,7 +62,7 @@
 									$scope.getICDCodes = function() {
 										$http({
 											method : "GET",
-											url : baseUrl + "/ICD",
+											url : baseUrl + "/ICDEntries",
 										}).then(function(response) {
 											$scope.ICDCodes = response.data;
 										}, function(rejection) {
@@ -85,7 +85,7 @@
 										
 										// Reset the form
 										$scope.medCodeType = (form.indexOf("NDC") != -1)? "NDC" : "ICD";
-										$scope.formMode = (form.indexOf("add") != -1)? "add" : "edit";
+										$scope.formMode = (form.indexOf("add") != -1)? "add" : "update";
 										$scope.medCode = {};
 										$scope.medCodeEdited = {};
 										$scope.message = "";
@@ -106,14 +106,18 @@
 									};
 									
 									$scope.submit = function() {
-										var url = "iTrust2/api/v1/" + $scope.medCodeType;
+										var url = baseUrl + "/" + $scope.formMode + $scope.medCodeType;
 										var requestType;
 										if ($scope.formMode === "add") {
 											requestType = "POST";
 										}
 										else {
 											requestType = "PUT";
+											
+											// The id has to be added as a URL parameter
+											url += "/" + $scope.medCodeEdited.id;
 										}
+										console.log(url);
 										console.log($scope.medCodeEdited);
 										$http({
 											method : requestType,
@@ -160,10 +164,10 @@
 				</div>
 			</nav>
 			<h1>Modify Database</h1>
-			<button class="addNDC" ng-click="changeForm('addNDCForm')">Add NDC Code</button>
-			<button class="editNDC" ng-click="changeForm('editNDCForm')">Edit NDC Code</button>
-			<button class="addICD" ng-click="changeForm('addICDForm')">Add ICD Code</button>
-			<button class="editICD" ng-click="changeForm('editICDForm')">Edit ICD Code</button>
+			<button id="addNDC" ng-click="changeForm('addNDCForm')">Add NDC Code</button>
+			<button id="editNDC" ng-click="changeForm('editNDCForm')">Edit NDC Code</button>
+			<button id="addICD" ng-click="changeForm('addICDForm')">Add ICD Code</button>
+			<button id="editICD" ng-click="changeForm('editICDForm')">Edit ICD Code</button>
 			
 			<br />
 			<br />
