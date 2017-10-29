@@ -2,6 +2,7 @@ package edu.ncsu.csc.itrust2.controllers.api;
 
 import edu.ncsu.csc.itrust2.forms.admin.ICDForm;
 import edu.ncsu.csc.itrust2.forms.admin.NDCForm;
+import edu.ncsu.csc.itrust2.models.enums.TransactionType;
 import edu.ncsu.csc.itrust2.models.persistent.ICD;
 import edu.ncsu.csc.itrust2.models.persistent.NDC;
 import edu.ncsu.csc.itrust2.utils.LoggerUtil;
@@ -29,8 +30,8 @@ public class APIDatabaseController extends APIController{
                         HttpStatus.CONFLICT );
             }
             icd.save();
-            //TODO: ADD LOG
-//            LoggerUtil.log( TransactionType.APPOINTMENT_REQUEST_SUBMITTED, request.getPatient(), request.getHcp() );
+            //TODO: get admin user
+//            LoggerUtil.log( TransactionType.ICD_CREATE, adminUser );
             return new ResponseEntity( icd, HttpStatus.OK );
         }
         catch ( final Exception e ) {
@@ -55,7 +56,8 @@ public class APIDatabaseController extends APIController{
             }
 
             icd.save();
-//            LoggerUtil.log( TransactionType.APPOINTMENT_REQUEST_UPDATED, request.getPatient(), request.getHcp() );
+            //TODO: get admin user
+//            LoggerUtil.log( TransactionType.ICD_UPDATE, adminUser );
             return new ResponseEntity( icd, HttpStatus.OK );
         }
         catch ( final Exception e ) {
@@ -74,7 +76,7 @@ public class APIDatabaseController extends APIController{
         }
         ndc.save();
         //TODO: ADD LOG
-//            LoggerUtil.log( TransactionType.APPOINTMENT_REQUEST_SUBMITTED, request.getPatient(), request.getHcp() );
+//            LoggerUtil.log( TransactionType.NDC_CREATE, adminUser );
         return new ResponseEntity( ndc, HttpStatus.OK );
     }
     catch ( final Exception e ) {
@@ -99,7 +101,7 @@ public class APIDatabaseController extends APIController{
             }
 
             ndc.save();
-//            LoggerUtil.log( TransactionType.APPOINTMENT_REQUEST_UPDATED, request.getPatient(), request.getHcp() );
+//            LoggerUtil.log( TransactionType.NDC_UPDATE, adminUser );
             return new ResponseEntity( ndc, HttpStatus.OK );
         }
         catch ( final Exception e ) {
