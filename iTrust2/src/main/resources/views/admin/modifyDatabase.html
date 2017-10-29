@@ -13,6 +13,8 @@
 						.controller(
 								'modifyDatabaseCtrl',
 								function($scope, $http) {
+									var baseUrl = "iTrust2/api/v1";
+									/* Determines if the UI should say add/edit and what the button should do */
 									$scope.formTypes = {
 											addNDCForm: false,
 											editNDCForm: false,
@@ -20,10 +22,58 @@
 											editICDForm: false
 									};
 									
+									/* Either "add" or "edit" */
+									$scope.formMode;
+									
+									/* Either "NDC" or "ICD" */
+									$scope.medCodeType;
+									
+									/* The selected medical code, for displaying in UI */
+									$scope.medCode = {};
+									
+									/* The edited version of the code */
+									$scope.medCodeEdited = {};
+									
+									/* The list of med codes currently in the DB */
+									$scope.medCodes = [];
+									
+									
+									/* Just for testing */
+									$scope.ICDCodes = [
+										{id: 1, name: "Strep-throat", code: "12-122-12345"}
+								    ];
+									$scope.NDCCodes = [
+										{id: 1, name: "Oxycontin", code: "A00.B3"}
+									];
+									
+									/* Fetches the NDC codes from DB */
+									$scope.getNDCCodes = function() {
+										$http({
+											method : "GET",
+											url : baseUrl + "/NDC",
+										}).then(function(response) {
+											$scope.NDCCodes = response.data;
+										}, function(rejection) {
+											console.log(rejection);
+										});
+									};
+									
+									/* Fetches the ICD codes from DB */
+									$scope.getICDCodes = function() {
+										$http({
+											method : "GET",
+											url : baseUrl + "/ICD",
+										}).then(function(response) {
+											$scope.ICDCodes = response.data;
+										}, function(rejection) {
+											console.log(rejection);
+										});
+									}
+									
 									/* Changes whether the form is for adding/editing NDC/ICD codes */
 									$scope.changeForm = function(form) {
 										
-										// Choose the right mode 
+										// Choose the right form type 
 										for(var prop in $scope.formTypes) {
 											if (prop === form) {
 												$scope.formTypes [prop] = true;
@@ -37,6 +87,8 @@
 										$scope.medCodeType = (form.indexOf("NDC") != -1)? "NDC" : "ICD";
 										$scope.formMode = (form.indexOf("add") != -1)? "add" : "edit";
 										$scope.medCode = {};
+										$scope.medCodeEdited = {};
+										$scope.message = "";
 										
 										// Switch to list of NDC or ICD codes depending on what the form is being used for
 										$scope.medCodes = ($scope.medCodeType === "NDC")? $scope.NDCCodes : $scope.ICDCodes;
@@ -46,36 +98,38 @@
 									/* Set the medical code for editing */
 									$scope.selectCode = function(code) {
 										$scope.medCode = code;
+										
+										// Deep copy of object
+										$scope.medCodeEdited.id = code.id;
+										$scope.medCodeEdited.name = code.name;
+										$scope.medCodeEdited.code = code.code;
 									};
 									
 									$scope.submit = function() {
 										var url = "iTrust2/api/v1/" + $scope.medCodeType;
-										var httpVerb = ($scope.formMode === "add")? "POST" : "PUT";
-										console.log("Submitting to " + url + " via " + httpVerb);
-										console.log($scope.medCode);
-										
-										/*
+										var requestType;
+										if ($scope.formMode === "add") {
+											requestType = "POST";
+										}
+										else {
+											requestType = "PUT";
+										}
+										console.log($scope.medCodeEdited);
 										$http({
-											method : httpVerb,
+											method : requestType,
 											url : url,
-											data : $scope.medCode
+											data : $scope.medCodeEdited
 										}).then(function(response) {
-											$scope.message="Office visit created successfully";
+											$scope.message="Database modification successful";
 											console.log(response);
 										}, function(rejection) {
-											$scope.message="Error occurred creating office visit";
+											$scope.message="Database modification failed";
 											console.log(rejection);
-										});*/
+										});
 									};
 									
-									$scope.medCode = {};
-									$scope.ICDCodes = [
-										{name: "Strep-throat", code: "12-122-12345"}
-								    ];
-									$scope.NDCCodes = [
-										{name: "Oxycontin", code: "A00.B3"}
-									];
-									$scope.medCodes = [];
+									$scope.getNDCCodes();
+									$scope.getICDCodes();
 								});
 	</script>
 		<div ng-app="myApp" ng-controller="modifyDatabaseCtrl">
@@ -122,7 +176,7 @@
 					<li ng-repeat="code in medCodes">
 						<input type="radio" ng-model="medCode" 
 						name="medCode" ng-change="selectCode(code)" value="{{code.code}}" />
-						{{code.name}}
+						{{code.name}} ({{code.code}})
 					</li>
 				</ul>
 				<br />
@@ -137,18 +191,20 @@
 					<tr>
 						<td>Name:</td>
 						<td>
-							<input type="text" class="name" value="{{medCode.name}}" ng-model="medCode.name" placeholder="Name of medication">
+							<input type="text" name="name" class="name" value="{{medCodeEdited.name}}" ng-model="medCodeEdited.name" placeholder="Name of medication">
 						</td>
 						<td class="name-errors"></td>
 					</tr>
 					<tr>
 						<td>Code:</td>
 						<td>
-							 <input type="text" class="code" value="{{medCode.code}}" ng-model="medCode.code" placeholder="Code of medication">
+							 <input type="text" name="code" class="code" value="{{medCodeEdited.code}}" ng-model="medCodeEdited.code" placeholder="Code of medication">
 						 </td>
+						 <td class="code-errors"></td>
 					 </tr>
 				 </table>
 				<button ng-click="submit()">Submit</button>
+				<p id="status">{{message}}</p>
 			</div>
 		</div>
 	</div>
