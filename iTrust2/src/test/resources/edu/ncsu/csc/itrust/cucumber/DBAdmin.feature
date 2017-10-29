@@ -12,7 +12,7 @@ Scenario Outline: Create valid NDC code for a prescription
 Given An admin is authenticated
 And   The admin is at the update database page
 When I fill out the fields with code <NDC_code>, name <NDC_name>
-And I select NDC in the dropdown
+And I select NDC in the list
 And I click submit
 Then I see a success message
 And the code is added to the NDC database 
