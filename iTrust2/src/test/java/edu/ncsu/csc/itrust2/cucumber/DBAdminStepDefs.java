@@ -51,30 +51,171 @@ public class AddHospitalStepDefs {
                 "document.get('http://localhost:8080/iTrust2/modifyDatabase.html');" );
     }
 
+
+
+
+
+
     /**
-     * Fill code forms
+     * Pick add NDC in list
      */
-    @When ( "I fill out the fields with code <NDC_code>, name <NDC_name>" )
+    @When ( "I select add NDC in the list" )
+    public void selectAddNDC () {
+        WebElement radioBtn = driver.findElement(By.id("addNDC"));
+        radioBtn.click();
+    }
+
+    /**
+     * Pick edit NDC in list
+     */
+    @When ( "I select edit NDC in the list" )
+    public void selectEditNDC () {
+        WebElement radioBtn = driver.findElement(By.id("editNDC"));
+        radioBtn.click();
+    }
+
+    /**
+     * Pick add IDC in list
+     */
+    @When ( "I select add IDC in the list" )
+    public void selectAddIDC () {
+        WebElement radioBtn = driver.findElement(By.id("addIDC"));
+        radioBtn.click();
+    }
+
+    /**
+     * Pick edit IDC in list
+     */
+    @When ( "I select edit IDC in the list" )
+    public void selectEditIDC () {
+        WebElement radioBtn = driver.findElement(By.id("editIDC"));
+        radioBtn.click();
+    }
+
+
+
+
+
+
+
+
+
+    /**
+     * Oxycotin Exists
+     */
+    @Given ( "NDC code 16590-616-30 exists" )
+    public void oxycotinExists () {
+        try {
+            final WebElement code = driver.findElement(By.value("16590-616-30"));
+        }catch ( final Exception e ) {
+            /* Assume the code already exists & carry on */
+        }
+    }
+
+    /**
+     * Cholera Exists
+     */
+    @Given ( "ICD code A00 exists" )
+    public void choleraExists () {
+        try {
+            final WebElement code = driver.findElement(By.value("A00"));
+        }catch ( final Exception e ) {
+            /* Assume the code already exists & carry on */ //This was in DocOfficeVisit Step deffs, so I'm not 100% on what to do here.
+        }
+    }
+
+
+
+    /**
+     * Select Oxycotin
+     */
+    @When ( "I select code 16590-616-30" )
+    public void selectOxycotin () {
+        WebElement radioBtn = driver.findElement(By.value("16590-616-30"));
+        radioBtn.click();
+    }
+
+
+    /**
+     * Select Cholera
+     */
+    @When ( "I select code A00" )
+    public void selectCholera () {
+        WebElement radioBtn = driver.findElement(By.value("A00"));
+        radioBtn.click();
+    }
+
+
+
+
+
+
+    /**
+     * Fill NDC code forms
+     */
+    @When ( "I fill out the fields with code, name <NDC_name>" )
     public void fillNDCfields () {
-        final WebElement name = driver.findElement( By.id( "code" ) );
+        final WebElement code = driver.findElement( By.id( "code" ) );
         code.clear();
         code.sendKeys( "<NDC_code>" );
 
-        final WebElement address = driver.findElement( By.id( "name" ) );
+        final WebElement name = driver.findElement( By.id( "name" ) );
         name.clear();
         name.sendKeys( "<NDC_name>" );
 
     }
 
+    /**
+     * Fill IDC code forms
+     */
+    @When ( "I fill out the fields with code <IDC_code>, name <IDC_name>" )
+    public void fillIDCfields () {
+        final WebElement code = driver.findElement( By.id( "code" ) );
+        code.clear();
+        code.sendKeys( "<IDC_code>" );
+
+        final WebElement name = driver.findElement( By.id( "name" ) );
+        name.clear();
+        name.sendKeys( "<IDC_name>" );
+
+    }
 
     /**
-     * Pick NDC in list
+     * Fill in new form for Oxycotin
      */
-    @When ( "I select NDC in the list" )
-    public void selectNDC () {
-        WebElement radioBtn = driver.findElement(By.id("NDC"));
-        radioBtn.click();
+    @When ( "I fill out the fields with code 66666-616-30, name Oxycodone" )
+    public void fillCotinToCodonefields () {
+        final WebElement code = driver.findElement( By.id( "code" ) );
+        code.clear();
+        code.sendKeys( "66666-616-30" );
+
+        final WebElement name = driver.findElement( By.id( "name" ) );
+        name.clear();
+        name.sendKeys( "Oxycodone" );
+
     }
+
+    /**
+     * Fill in new form for Oxycotin incorrectly
+     */
+    @When ( "And I fill out the fields with code <NDC_new_code>, name Oxycontin Drugs" )
+    public void fillCotinToCodonefieldsIncorrect () {
+        final WebElement code = driver.findElement( By.id( "code" ) );
+        code.clear();
+        code.sendKeys( "<NDC_new_code>" );
+
+        final WebElement name = driver.findElement( By.id( "name" ) );
+        name.clear();
+        name.sendKeys( "Oxycontin Drugs" );
+
+    }
+
+
+
+
+
+
+
 
     /**
      * Click submit
@@ -86,7 +227,6 @@ public class AddHospitalStepDefs {
 
     }
 
-
     /**
      * See Success message
      */
@@ -95,31 +235,105 @@ public class AddHospitalStepDefs {
         assertTrue( driver.getPageSource().contains( "Database modification successful" ) );
     }
 
+    /**
+     * See fail message
+     */
+    @Then ( "I see an error message" )
+    public void createdSuccessfully () {
+        assertTrue( driver.getPageSource().contains( "Database modification failed" ) );
+    }
+
+
+
+
+
+
+
+
 
     /**
      * The NDC code is added
      */
-    @Then ( "the code is added to the NDC database" )
-    public void codeAdded () {
-        BasicHealthMetrics actualBhm = null;
-        for ( int i = 1; i <= 10; i++ ) {
-            try {
-                actualBhm = BasicHealthMetrics.getBasicHealthMetrics().get( 0 );
-                break;
-            }
-            catch ( final Exception e ) {
-                if ( i == 10 && actualBhm == null ) {
-                    fail( "Could not get basic health metrics out of database" );
-                }
-                Thread.sleep( 1000 );
-            }
-        }
-        assertEquals( expectedBhm.getWeight(), actualBhm.getWeight() );
-        assertEquals( expectedBhm.getHeight(), actualBhm.getHeight() );
-        assertEquals( expectedBhm.getSystolic(), actualBhm.getSystolic() );
-        assertEquals( expectedBhm.getDiastolic(), actualBhm.getDiastolic() );
-        assertEquals( expectedBhm.getHouseSmokingStatus(), actualBhm.getHouseSmokingStatus() );
+    @Then ( "the code: code <NDC_code>, name <NDC_name> is added to the NDC database" )
+    public void ndcCodeAdded () {
+
 
     }
+
+    /**
+     * The NDC code is NOT added
+     */
+    @Then ( "the code: code <NDC_code>, name <NDC_name> is not added to the NDC database" )
+    public void ndcCodeNotAdded () {
+
+
+    }
+
+    /**
+     * The IDC code is added
+     */
+    @Then ( "the code: code <ICD_code>, name <ICD_name> is added to the ICD database " )
+    public void idcCodeAdded () {
+
+
+    }
+
+    /**
+     * The IDC code is NOT added
+     */
+    @Then ( "the code: code <IDC_code>, name <IDC_name> is not added to the IDC database" )
+    public void idcCodeNotAdded () {
+
+
+    }
+
+    /**
+     * Oxycotin becomes oxycodone
+     */
+    @Then ( "the code becomes: code 66666-616-30, name Oxycodone instead of: code 16590-616-30, name Oxycontin" )
+    public void cotinToCodone () {
+
+
+    }
+
+    /**
+     * Oxycotin stays the same
+     */
+    @Then ( "the code stays as: code 16590-616-30, name Oxycontin" )
+    public void cotinNoChange () {
+
+
+    }
+
+
+
+
+
+
+
+
+
+
+    /**
+     * The NDC database is cleared
+     */
+    @Then ( "the NDC database is cleared" )
+    public void ndcCleared () {
+
+
+    }
+
+    /**
+     * The IDC database is cleared
+     */
+    @Then ( "the IDC database is cleared" )
+    public void idcCleared () {
+
+
+    }
+
+
+
+
 
 }

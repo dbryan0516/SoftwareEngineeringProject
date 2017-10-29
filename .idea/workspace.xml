@@ -84,9 +84,57 @@
       <file leaf-file-name="DBAdminStepDefs.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/iTrust2/src/test/java/edu/ncsu/csc/itrust2/cucumber/DBAdminStepDefs.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="314">
-              <caret line="106" column="35" lean-forward="false" selection-start-line="106" selection-start-column="35" selection-end-line="106" selection-end-column="35" />
-              <folding />
+            <state relative-caret-position="166">
+              <caret line="150" column="0" lean-forward="true" selection-start-line="150" selection-start-column="0" selection-end-line="150" selection-end-column="0" />
+              <folding>
+                <element signature="docComment;method#authenticateAdmin#0;class#AddHospitalStepDefs#0" expanded="false" />
+                <element signature="method#authenticateAdmin#0;class#AddHospitalStepDefs#0" expanded="false" />
+                <element signature="docComment;method#updateDatabasePage#0;class#AddHospitalStepDefs#0" expanded="false" />
+                <element signature="method#updateDatabasePage#0;class#AddHospitalStepDefs#0" expanded="false" />
+                <element signature="docComment;method#selectAddNDC#0;class#AddHospitalStepDefs#0" expanded="false" />
+                <element signature="method#selectAddNDC#0;class#AddHospitalStepDefs#0" expanded="false" />
+                <element signature="docComment;method#selectEditNDC#0;class#AddHospitalStepDefs#0" expanded="false" />
+                <element signature="method#selectEditNDC#0;class#AddHospitalStepDefs#0" expanded="false" />
+                <element signature="docComment;method#selectAddIDC#0;class#AddHospitalStepDefs#0" expanded="false" />
+                <element signature="method#selectAddIDC#0;class#AddHospitalStepDefs#0" expanded="false" />
+                <element signature="docComment;method#selectEditIDC#0;class#AddHospitalStepDefs#0" expanded="false" />
+                <element signature="method#selectEditIDC#0;class#AddHospitalStepDefs#0" expanded="false" />
+                <element signature="method#oxycotinExists#0;class#AddHospitalStepDefs#0" expanded="false" />
+                <element signature="docComment;method#selectOxycotin#0;class#AddHospitalStepDefs#0" expanded="false" />
+                <element signature="method#selectOxycotin#0;class#AddHospitalStepDefs#0" expanded="false" />
+                <element signature="method#fillNDCfields#0;class#AddHospitalStepDefs#0" expanded="false" />
+                <element signature="docComment;method#fillIDCfields#0;class#AddHospitalStepDefs#0" expanded="false" />
+                <element signature="method#fillCotinToCodonefields#0;class#AddHospitalStepDefs#0" expanded="false" />
+                <element signature="method#fillCotinToCodonefieldsIncorrect#0;class#AddHospitalStepDefs#0" expanded="false" />
+                <element signature="method#createdSuccessfully#0;class#AddHospitalStepDefs#0" expanded="false" />
+                <element signature="docComment;method#ndcCodeAdded#0;class#AddHospitalStepDefs#0" expanded="false" />
+                <element signature="method#ndcCodeAdded#0;class#AddHospitalStepDefs#0" expanded="false" />
+                <element signature="docComment;method#idcCodeAdded#0;class#AddHospitalStepDefs#0" expanded="false" />
+                <element signature="method#idcCodeAdded#0;class#AddHospitalStepDefs#0" expanded="false" />
+                <element signature="docComment;method#cotinToCodone#0;class#AddHospitalStepDefs#0" expanded="false" />
+                <element signature="method#cotinToCodone#0;class#AddHospitalStepDefs#0" expanded="false" />
+                <element signature="docComment;method#cotinNoChange#0;class#AddHospitalStepDefs#0" expanded="false" />
+                <element signature="docComment;method#ndcCleared#0;class#AddHospitalStepDefs#0" expanded="false" />
+                <element signature="method#ndcCleared#0;class#AddHospitalStepDefs#0" expanded="false" />
+                <marker date="1509313151000" expanded="false" signature="2991:3271" ph="{...}" />
+                <marker date="1509313151000" expanded="false" signature="3507:3540" ph="/**...*/" />
+                <marker date="1509313151000" expanded="false" signature="3608:3708" ph="{...}" />
+                <marker date="1509313151000" expanded="false" signature="3719:3757" ph="/**...*/" />
+                <marker date="1509313151000" expanded="false" signature="4562:4610" ph="/**...*/" />
+                <marker date="1509313151000" expanded="false" signature="5011:5071" ph="/**...*/" />
+                <marker date="1509313151000" expanded="false" signature="5508:5539" ph="/**...*/" />
+                <marker date="1509313151000" expanded="false" signature="5602:5713" ph="{...}" />
+                <marker date="1509313151000" expanded="false" signature="5719:5757" ph="/**...*/" />
+                <marker date="1509313151000" expanded="false" signature="5943:5978" ph="/**...*/" />
+                <marker date="1509313151000" expanded="false" signature="6057:6153" ph="{...}" />
+                <marker date="1509313151000" expanded="false" signature="6343:6387" ph="/**...*/" />
+                <marker date="1509313151000" expanded="false" signature="6515:6524" ph="{...}" />
+                <marker date="1509313151000" expanded="false" signature="6707:6751" ph="/**...*/" />
+                <marker date="1509313151000" expanded="false" signature="6879:6888" ph="{...}" />
+                <marker date="1509313151000" expanded="false" signature="7247:7256" ph="{...}" />
+                <marker date="1509313151000" expanded="false" signature="7407:7453" ph="/**...*/" />
+                <marker date="1509313151000" expanded="false" signature="7528:7537" ph="{...}" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -94,8 +142,8 @@
       <file leaf-file-name="DBAdmin.feature" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/iTrust2/src/test/resources/edu/ncsu/csc/itrust/cucumber/DBAdmin.feature">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="345">
-              <caret line="23" column="25" lean-forward="true" selection-start-line="23" selection-start-column="25" selection-end-line="23" selection-end-column="25" />
+            <state relative-caret-position="365">
+              <caret line="125" column="30" lean-forward="false" selection-start-line="125" selection-start-column="18" selection-end-line="125" selection-end-column="30" />
               <folding />
             </state>
           </provider>
@@ -104,8 +152,8 @@
       <file leaf-file-name="DocumentOfficeVisitStepDefs.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/iTrust2/src/test/java/edu/ncsu/csc/itrust2/cucumber/DocumentOfficeVisitStepDefs.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="515">
-              <caret line="322" column="95" lean-forward="true" selection-start-line="305" selection-start-column="8" selection-end-line="322" selection-end-column="95" />
+            <state relative-caret-position="516">
+              <caret line="91" column="9" lean-forward="false" selection-start-line="89" selection-start-column="8" selection-end-line="91" selection-end-column="9" />
               <folding />
             </state>
           </provider>
@@ -193,6 +241,7 @@
       <find>navigate</find>
       <find>submit</find>
       <find>the office</find>
+      <find>exist</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -208,6 +257,7 @@
       <list>
         <option value="$PROJECT_DIR$/iTrust2/src/main/java/edu/ncsu/csc/itrust2/forms/personnel/PersonnelForm.java" />
         <option value="$PROJECT_DIR$/iTrust2/src/test/java/edu/ncsu/csc/itrust2/cucumber/ModifyDatabaseStepDefs.java" />
+        <option value="$PROJECT_DIR$/iTrust2/src/test/java/edu/ncsu/csc/itrust2/cucumber/DocumentOfficeVisitStepDefs.java" />
         <option value="$PROJECT_DIR$/iTrust2/src/test/resources/edu/ncsu/csc/itrust/cucumber/DBAdmin.feature" />
         <option value="$PROJECT_DIR$/iTrust2/src/test/java/edu/ncsu/csc/itrust2/cucumber/DBAdminStepDefs.java" />
       </list>
@@ -963,12 +1013,12 @@
       <updated>1508282359023</updated>
       <workItem from="1508282360985" duration="527000" />
       <workItem from="1508443343380" duration="4087000" />
-      <workItem from="1509305962679" duration="3178000" />
+      <workItem from="1509305962679" duration="6635000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="7792000" />
+    <option name="totallyTimeSpent" value="11249000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="0" width="1280" height="800" extended-state="0" />
@@ -1011,7 +1061,9 @@
     <option name="myLimit" value="2678400000" />
   </component>
   <component name="XDebuggerManager">
-    <breakpoint-manager />
+    <breakpoint-manager>
+      <option name="time" value="3" />
+    </breakpoint-manager>
     <watches-manager />
   </component>
   <component name="antWorkspaceConfiguration">
@@ -1550,14 +1602,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/iTrust2/src/test/resources/edu/ncsu/csc/itrust/cucumber/DBAdmin.feature">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="345">
-          <caret line="23" column="25" lean-forward="true" selection-start-line="23" selection-start-column="25" selection-end-line="23" selection-end-column="25" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/iTrust2/src/test/resources/edu/ncsu/csc/itrust/cucumber/DocumentOfficeVisit.feature">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
@@ -1568,17 +1612,73 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/iTrust2/src/test/java/edu/ncsu/csc/itrust2/cucumber/DocumentOfficeVisitStepDefs.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="515">
-          <caret line="322" column="95" lean-forward="true" selection-start-line="305" selection-start-column="8" selection-end-line="322" selection-end-column="95" />
+        <state relative-caret-position="516">
+          <caret line="91" column="9" lean-forward="false" selection-start-line="89" selection-start-column="8" selection-end-line="91" selection-end-column="9" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/iTrust2/src/test/resources/edu/ncsu/csc/itrust/cucumber/DBAdmin.feature">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="365">
+          <caret line="125" column="30" lean-forward="false" selection-start-line="125" selection-start-column="18" selection-end-line="125" selection-end-column="30" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/iTrust2/src/test/java/edu/ncsu/csc/itrust2/cucumber/DBAdminStepDefs.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="314">
-          <caret line="106" column="35" lean-forward="false" selection-start-line="106" selection-start-column="35" selection-end-line="106" selection-end-column="35" />
-          <folding />
+        <state relative-caret-position="166">
+          <caret line="150" column="0" lean-forward="true" selection-start-line="150" selection-start-column="0" selection-end-line="150" selection-end-column="0" />
+          <folding>
+            <element signature="docComment;method#authenticateAdmin#0;class#AddHospitalStepDefs#0" expanded="false" />
+            <element signature="method#authenticateAdmin#0;class#AddHospitalStepDefs#0" expanded="false" />
+            <element signature="docComment;method#updateDatabasePage#0;class#AddHospitalStepDefs#0" expanded="false" />
+            <element signature="method#updateDatabasePage#0;class#AddHospitalStepDefs#0" expanded="false" />
+            <element signature="docComment;method#selectAddNDC#0;class#AddHospitalStepDefs#0" expanded="false" />
+            <element signature="method#selectAddNDC#0;class#AddHospitalStepDefs#0" expanded="false" />
+            <element signature="docComment;method#selectEditNDC#0;class#AddHospitalStepDefs#0" expanded="false" />
+            <element signature="method#selectEditNDC#0;class#AddHospitalStepDefs#0" expanded="false" />
+            <element signature="docComment;method#selectAddIDC#0;class#AddHospitalStepDefs#0" expanded="false" />
+            <element signature="method#selectAddIDC#0;class#AddHospitalStepDefs#0" expanded="false" />
+            <element signature="docComment;method#selectEditIDC#0;class#AddHospitalStepDefs#0" expanded="false" />
+            <element signature="method#selectEditIDC#0;class#AddHospitalStepDefs#0" expanded="false" />
+            <element signature="method#oxycotinExists#0;class#AddHospitalStepDefs#0" expanded="false" />
+            <element signature="docComment;method#selectOxycotin#0;class#AddHospitalStepDefs#0" expanded="false" />
+            <element signature="method#selectOxycotin#0;class#AddHospitalStepDefs#0" expanded="false" />
+            <element signature="method#fillNDCfields#0;class#AddHospitalStepDefs#0" expanded="false" />
+            <element signature="docComment;method#fillIDCfields#0;class#AddHospitalStepDefs#0" expanded="false" />
+            <element signature="method#fillCotinToCodonefields#0;class#AddHospitalStepDefs#0" expanded="false" />
+            <element signature="method#fillCotinToCodonefieldsIncorrect#0;class#AddHospitalStepDefs#0" expanded="false" />
+            <element signature="method#createdSuccessfully#0;class#AddHospitalStepDefs#0" expanded="false" />
+            <element signature="docComment;method#ndcCodeAdded#0;class#AddHospitalStepDefs#0" expanded="false" />
+            <element signature="method#ndcCodeAdded#0;class#AddHospitalStepDefs#0" expanded="false" />
+            <element signature="docComment;method#idcCodeAdded#0;class#AddHospitalStepDefs#0" expanded="false" />
+            <element signature="method#idcCodeAdded#0;class#AddHospitalStepDefs#0" expanded="false" />
+            <element signature="docComment;method#cotinToCodone#0;class#AddHospitalStepDefs#0" expanded="false" />
+            <element signature="method#cotinToCodone#0;class#AddHospitalStepDefs#0" expanded="false" />
+            <element signature="docComment;method#cotinNoChange#0;class#AddHospitalStepDefs#0" expanded="false" />
+            <element signature="docComment;method#ndcCleared#0;class#AddHospitalStepDefs#0" expanded="false" />
+            <element signature="method#ndcCleared#0;class#AddHospitalStepDefs#0" expanded="false" />
+            <marker date="1509313151000" expanded="false" signature="2991:3271" ph="{...}" />
+            <marker date="1509313151000" expanded="false" signature="3507:3540" ph="/**...*/" />
+            <marker date="1509313151000" expanded="false" signature="3608:3708" ph="{...}" />
+            <marker date="1509313151000" expanded="false" signature="3719:3757" ph="/**...*/" />
+            <marker date="1509313151000" expanded="false" signature="4562:4610" ph="/**...*/" />
+            <marker date="1509313151000" expanded="false" signature="5011:5071" ph="/**...*/" />
+            <marker date="1509313151000" expanded="false" signature="5508:5539" ph="/**...*/" />
+            <marker date="1509313151000" expanded="false" signature="5602:5713" ph="{...}" />
+            <marker date="1509313151000" expanded="false" signature="5719:5757" ph="/**...*/" />
+            <marker date="1509313151000" expanded="false" signature="5943:5978" ph="/**...*/" />
+            <marker date="1509313151000" expanded="false" signature="6057:6153" ph="{...}" />
+            <marker date="1509313151000" expanded="false" signature="6343:6387" ph="/**...*/" />
+            <marker date="1509313151000" expanded="false" signature="6515:6524" ph="{...}" />
+            <marker date="1509313151000" expanded="false" signature="6707:6751" ph="/**...*/" />
+            <marker date="1509313151000" expanded="false" signature="6879:6888" ph="{...}" />
+            <marker date="1509313151000" expanded="false" signature="7247:7256" ph="{...}" />
+            <marker date="1509313151000" expanded="false" signature="7407:7453" ph="/**...*/" />
+            <marker date="1509313151000" expanded="false" signature="7528:7537" ph="{...}" />
+          </folding>
         </state>
       </provider>
     </entry>
