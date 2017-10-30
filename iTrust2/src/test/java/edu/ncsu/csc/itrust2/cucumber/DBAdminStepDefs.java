@@ -18,7 +18,7 @@ import cucumber.api.java.en.When;
 /**
  * Step definitions for AddHosptial feature
  */
-public class AddHospitalStepDefs {
+public class DBAdminStepDefs {
 
     private final WebDriver driver       = new HtmlUnitDriver( true );
     private final String    baseUrl      = "http://localhost:8080/iTrust2";
@@ -29,6 +29,10 @@ public class AddHospitalStepDefs {
     /**
      * Admin Login
      */
+
+
+
+
     @Given ( "An admin is authenticated" )
     public void authenticateAdmin () {
         driver.get( baseUrl );
@@ -106,7 +110,7 @@ public class AddHospitalStepDefs {
     @Given ( "NDC code 16590-616-30 exists" )
     public void oxycotinExists () {
         try {
-            final WebElement code = driver.findElement(By.value("16590-616-30"));
+            final WebElement code = driver.findElement( By.value("16590-616-30"));
         }catch ( final Exception e ) {
             /* Assume the code already exists & carry on */
         }
@@ -153,32 +157,41 @@ public class AddHospitalStepDefs {
     /**
      * Fill NDC code forms
      */
-    @When ( "I fill out the fields with code, name <NDC_name>" )
-    public void fillNDCfields () {
-        final WebElement code = driver.findElement( By.id( "code" ) );
-        code.clear();
-        code.sendKeys( "<NDC_code>" );
+    @When ( "I fill out the fields with code (.+), name (.+)" )
+    public void fillNDCfields (final String code, final String name) {
+        final WebElement codeInput = driver.findElement( By.id( "code" ) );
+        codeInput.clear();
+        codeInput.sendKeys( code );
 
-        final WebElement name = driver.findElement( By.id( "name" ) );
-        name.clear();
-        name.sendKeys( "<NDC_name>" );
+        final WebElement nameInput = driver.findElement( By.id( "name" ) );
+        nameInput.clear();
+        nameInput.sendKeys( name);
 
     }
 
     /**
      * Fill IDC code forms
+     *
+     * @param code
+     *          the code of the IDC
+     * @param name
+     *          the name of the IDC
      */
-    @When ( "I fill out the fields with code <IDC_code>, name <IDC_name>" )
-    public void fillIDCfields () {
-        final WebElement code = driver.findElement( By.id( "code" ) );
-        code.clear();
-        code.sendKeys( "<IDC_code>" );
+    @When ( "I fill out the fields with code (.+), name (.+)" )
+    public void fillIDCfields (final String code, final String name) {
+        final WebElement codeInput = driver.findElement( By.id( "code" ) );
+        codeInput.clear();
+        codeInput.sendKeys( code );
 
-        final WebElement name = driver.findElement( By.id( "name" ) );
-        name.clear();
-        name.sendKeys( "<IDC_name>" );
+        final WebElement nameInput = driver.findElement( By.id( "name" ) );
+        nameInput.clear();
+        nameInput.sendKeys( name );
 
     }
+
+
+
+
 
     /**
      * Fill in new form for Oxycotin
@@ -195,14 +208,18 @@ public class AddHospitalStepDefs {
 
     }
 
+
     /**
      * Fill in new form for Oxycotin incorrectly
+     *
+     * @param code
+     *          the code of the drug
      */
-    @When ( "And I fill out the fields with code <NDC_new_code>, name Oxycontin Drugs" )
-    public void fillCotinToCodonefieldsIncorrect () {
-        final WebElement code = driver.findElement( By.id( "code" ) );
-        code.clear();
-        code.sendKeys( "<NDC_new_code>" );
+    @When ( "And I fill out the fields with code (.+), name Oxycontin Drugs" )
+    public void fillCotinToCodonefieldsIncorrect (final String code) {
+        final WebElement codeInput = driver.findElement( By.id( "code" ) );
+        codeInput.clear();
+        codeInput.sendKeys( code );
 
         final WebElement name = driver.findElement( By.id( "name" ) );
         name.clear();
@@ -231,7 +248,7 @@ public class AddHospitalStepDefs {
      * See Success message
      */
     @Then ( "I see a success message" )
-    public void createdSuccessfully () {
+    public void attemptSucessful () {
         assertTrue( driver.getPageSource().contains( "Database modification successful" ) );
     }
 
@@ -239,7 +256,7 @@ public class AddHospitalStepDefs {
      * See fail message
      */
     @Then ( "I see an error message" )
-    public void createdSuccessfully () {
+    public void attemptUnsucessful () {
         assertTrue( driver.getPageSource().contains( "Database modification failed" ) );
     }
 
@@ -250,42 +267,67 @@ public class AddHospitalStepDefs {
 
 
 
-
     /**
      * The NDC code is added
+     *
+     * @param code
+     *          the code for the NDC
+     *
+     * @param name
+     *          the name of the NDC
      */
-    @Then ( "the code: code <NDC_code>, name <NDC_name> is added to the NDC database" )
-    public void ndcCodeAdded () {
+    @Then ( "the code: code (.+), name (.+) is not added to the NDC database" )
+    public void ndcCodeAdded (final String code, final String name) {
 
 
     }
 
     /**
      * The NDC code is NOT added
+     *
+     * @param code
+     *          the code for the NDC
+     *
+     * @param name
+     *          the name of the NDC
      */
-    @Then ( "the code: code <NDC_code>, name <NDC_name> is not added to the NDC database" )
-    public void ndcCodeNotAdded () {
+    @Then ( "the code: code (.+), name (.+) is not added to the NDC database" )
+    public void ndcCodeNotAdded (final String code, final String name) {
 
 
     }
 
     /**
      * The IDC code is added
+     *
+     * @param code
+     *          the code for the IDC
+     *
+     * @param name
+     *          the name of the IDC
      */
-    @Then ( "the code: code <ICD_code>, name <ICD_name> is added to the ICD database " )
-    public void idcCodeAdded () {
+    @Then ( "the code: code (.+), name (.+) is added to the IDC database" )
+    public void idcCodeAdded (final String code, final String name) {
 
 
     }
 
     /**
      * The IDC code is NOT added
+     *
+     * @param code
+     *          the code for the IDC
+     *
+     * @param name
+     *          the name of the IDC
      */
-    @Then ( "the code: code <IDC_code>, name <IDC_name> is not added to the IDC database" )
-    public void idcCodeNotAdded () {
+    @Then ( "the code: code (.+), name (.+) is not added to the IDC database" )
+    public void idcCodeNotAdded (final String code, final String name) {
 
 
     }
+
+
 
     /**
      * Oxycotin becomes oxycodone
@@ -308,7 +350,29 @@ public class AddHospitalStepDefs {
 
 
 
+    /**
+     *Cholera changed successfully
+     *
+     * @param newCode
+     *          the new code for the IDC formerly known as Cholera
+     *
+     * @param newName
+     *          the new name for the IDC formerly known as Cholera
+     */
+    @Then ( " And the code becomes: code (.+), name (.+) instead of: code A00, name Cholera" )
+    public void choleraChange (final String newCode, final String newName) {
 
+
+    }
+
+    /**
+     *Cholera not changed
+     */
+    @Then ( "And the code stays as: code A00, name Cholera" )
+    public void choleraNoChange () {
+
+
+    }
 
 
 

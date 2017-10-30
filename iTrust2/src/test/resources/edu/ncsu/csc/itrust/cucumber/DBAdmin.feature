@@ -11,8 +11,8 @@ Feature: Administer NDC and ICD databases for iTrust2
 Scenario Outline: Create valid NDC code for a prescription
 Given An admin is authenticated
 And   The admin is at the update database page
-When I fill out the fields with code <NDC_code>, name <NDC_name>
-And I select add NDC in the list
+When I select add NDC in the list
+And I fill out the fields with code <NDC_code>, name <NDC_name>
 And I click submit
 Then I see a success message
 And the code: code <NDC_code>, name <NDC_name> is added to the NDC database
@@ -28,8 +28,8 @@ Examples:
 Scenario Outline: Create invalid NDC code for a prescription
 Given An admin is authenticated
 And The admin is at the update database page
-When I fill out the fields with code <NDC_code>, name <NDC_name>
-And I select add NDC in the dropdown
+When I select add NDC in the list
+And I fill out the fields with code <NDC_code>, name <NDC_name>
 And I click submit
 Then I see an error message 
 And the code: code <NDC_code>, name <NDC_name> is not added to the NDC database
@@ -46,8 +46,8 @@ Examples:
 Scenario Outline: Create valid ICD code for a diagnosis
 Given An admin is authenticated
 And The admin is at the update database page
-When I fill out the fields with code <ICD_code>, name <ICD_name>
-And I select add ICD in the dropdown
+When I select add ICD in the list
+Add I fill out the fields with code <ICD_code>, name <ICD_name>
 And I click submit
 Then I see a success message
 And the code: code <ICD_code>, name <ICD_name> is added to the ICD database 
@@ -63,8 +63,8 @@ Examples:
 Scenario Outline: Create invalid ICD code for a diagnosis
 Given An admin is authenticated
 And The admin is at the update database page
-When I fill out the fields with code <ICD_code>, name <ICD_name>
 And I select add ICD in the list
+When I fill out the fields with code <ICD_code>, name <ICD_name>
 And I click submit
 Then I see an error message
 And the code: code <ICD_code>, name <ICD_name> isn't added to the ICD database 
@@ -84,19 +84,21 @@ Scenario: Valid edit of NDC code for a prescription
 Given An admin is authenticated
 And   The admin is at the update database page
 And   NDC code 16590-616-30 exists # Oxycontin
-When I select code 16590-616-30
-And I fill out the fields with code 66666-616-30, name Oxycodone
-And I click submit
-Then I see a success message
-And the code becomes: code 66666-616-30, name Oxycodone instead of: code 16590-616-30, name Oxycontin
-And the NDC database is cleared
+When  I select edit NDC in the list
+And   I select code 16590-616-30
+And   I fill out the fields with code 66666-616-30, name Oxycodone
+And   I click submit
+Then  I see a success message
+And   the code becomes: code 66666-616-30, name Oxycodone instead of: code 16590-616-30, name Oxycontin
+And   the NDC database is cleared
 
 
 Scenario Outlinee: Invalid edit of NDC code for a prescription
 Given An admin is authenticated
 And   The admin is at the update database page
 And   NDC code 16590-616-30 exists # Oxycontin
-When I select code 16590-616-30
+When I select edit NCD in the list
+And I select code 16590-616-30
 And I fill out the fields with code <NDC_new_code>, name Oxycontin Drugs
 And I click submit
 Then I see an error message
@@ -115,7 +117,8 @@ Scenario Outline: Valid edit of ICD code for a diagnosis
 Given An admin is authenticated
 And The admin is at the update database page
 And ICD code A00 exists # Cholera
-When I select code A00
+When I select edit ICD in the list
+And I select code A00
 And I fill out the fields with code <ICD_code>, name <ICD_new_name>
 And I click submit
 Then I see a success message
@@ -132,7 +135,8 @@ Scenario Outline: Invalid edit of ICD code for a diagnosis
 Given An admin is authenticated
 And The admin is at the update database page
 And ICD code A00 exists # Cholera
-When I select code A00
+When I select edit ICD in the list
+And I select code A00
 And I fill out the fields with code <ICD_new_code>, name <ICD_new_name>
 And I click submit
 Then I see an error message
