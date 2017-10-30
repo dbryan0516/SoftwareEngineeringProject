@@ -13,7 +13,7 @@
 						.controller(
 								'modifyDatabaseCtrl',
 								function($scope, $http) {
-									var baseUrl = "iTrust2/api/v1";
+									var baseUrl = "/iTrust2/api/v1";
 									/* Determines if the UI should say add/edit and what the button should do */
 									$scope.formTypes = {
 											addNDCForm: false,
@@ -40,10 +40,10 @@
 									
 									/* Just for testing */
 									$scope.ICDCodes = [
-										{id: 1, name: "Strep-throat", code: "12-122-12345"}
+										{id: 1, description: "Strep-throat", code: "12-122-12345"}
 								    ];
 									$scope.NDCCodes = [
-										{id: 1, name: "Oxycontin", code: "A00.B3"}
+										{id: 1, description: "Oxycontin", code: "A00.B3"}
 									];
 									
 									/* Fetches the NDC codes from DB */
@@ -101,7 +101,7 @@
 										
 										// Deep copy of object
 										$scope.medCodeEdited.id = code.id;
-										$scope.medCodeEdited.name = code.name;
+										$scope.medCodeEdited.description = code.description;
 										$scope.medCodeEdited.code = code.code;
 									};
 									
@@ -180,7 +180,7 @@
 					<li ng-repeat="code in medCodes">
 						<input type="radio" ng-model="medCode" 
 						name="medCode" ng-change="selectCode(code)" value="{{code.code}}" />
-						{{code.name}} ({{code.code}})
+						{{code.description}} ({{code.code}})
 					</li>
 				</ul>
 				<br />
@@ -190,14 +190,14 @@
 						
 			<div class="commonForm" ng-show="formTypes.addNDCForm || formTypes.editNDCForm || formTypes.addICDForm || formTypes.editICDForm">
 				<h3 ng-show="formTypes.addNDCForm || formTypes.addICDForm">Adding new {{medCodeType}} code</h3>
-				<h3 ng-show="formTypes.editNDCForm || formTypes.editICDForm">Editing {{medCode.name}} ({{medCode.code}})</h3>
+				<h3 ng-show="formTypes.editNDCForm || formTypes.editICDForm">Editing {{medCode.description}} ({{medCode.code}})</h3>
 				<table>
 					<tr>
 						<td>Name:</td>
 						<td>
-							<input type="text" name="name" class="name" value="{{medCodeEdited.name}}" ng-model="medCodeEdited.name" placeholder="Name of medication">
+							<input type="text" name="description" class="description" value="{{medCodeEdited.description}}" ng-model="medCodeEdited.description" placeholder="Name of medication">
 						</td>
-						<td class="name-errors"></td>
+						<td class="description-errors"></td>
 					</tr>
 					<tr>
 						<td>Code:</td>
