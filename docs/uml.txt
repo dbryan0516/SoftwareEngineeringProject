@@ -124,9 +124,10 @@ package "forms" #DDDDDD {
 
 package "models" #DDDDDD {
     package "persistent" {
-        class ICD {
+        class ICD<<DomainObject>> {
             .. State ..
-            - id: long
+            - cache: DomainObjectCache<ICD>
+            - id: Long
             - code: String
             - description: String
             __
@@ -136,11 +137,19 @@ package "models" #DDDDDD {
             __
             .. Getters and Setters ..
             ...
+            __
+            .. Methods ..
+            + getById(id: Long): ICD
+            + getByCode(code: String): ICD
+            + getByDescription(description: String): ICD
+            + getICDs(): List<ICD>
+            - getWhere(where: String): List<ICD>
         }
 
-        class NDC {
+        class NDC<<DomainObject>> {
             .. State ..
-            - id: long
+            - cache: DomainObjectCache<NDC>
+            - id: Long
             - code: String
             - description: String
             __
@@ -150,6 +159,13 @@ package "models" #DDDDDD {
             __
             .. Getters and Setters ..
             ...
+            __
+            .. Methods ..
+            + getById(id: Long): NDC
+            + getByCode(code: String): NDC
+            + getByDescription(description: String): NDC
+            + getNDCs(): List<NDC>
+            - getWhere(where: String): List<NDC>
         }
 
         class OfficeVisit {
@@ -166,14 +182,16 @@ package "models" #DDDDDD {
             ...
         }
 
-        class Prescription {
+        class Prescription<<DomainObject>> {
             .. State ..
-            - id: long
+            - cache: DomainObjectCache<Prescription>
+            - id: Long
             - ndc: NDC
             - patient: User
             - startDate: Calendar
             - endDate: Calendar
             - renewals: int
+            - dosage: int
             - officeVisit: OfficeVisit
             __
             .. Constructors ..
@@ -184,10 +202,10 @@ package "models" #DDDDDD {
             ...
             __
             .. Methods ..
-            + getById(id: long): Prescription
+            + getById(id: Long): Prescription
             + getForPatient(patient: String): List<Prescription>
             + getPrescriptions(): List<Prescription>
-            + getWhere(where: String): List<Prescription>
+            - getWhere(where: String): List<Prescription>
         }
     
 
