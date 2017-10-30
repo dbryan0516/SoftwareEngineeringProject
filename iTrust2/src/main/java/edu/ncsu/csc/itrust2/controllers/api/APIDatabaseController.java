@@ -5,7 +5,6 @@ import edu.ncsu.csc.itrust2.forms.admin.NDCForm;
 import edu.ncsu.csc.itrust2.models.enums.TransactionType;
 import edu.ncsu.csc.itrust2.models.persistent.ICD;
 import edu.ncsu.csc.itrust2.models.persistent.NDC;
-import edu.ncsu.csc.itrust2.models.persistent.User;
 import edu.ncsu.csc.itrust2.utils.LoggerUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,13 +15,22 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-
 import java.util.List;
 
+/**
+ * API controller for the admin to interact with NDC and ICD codes in the database
+ * @author dbryan
+ */
 @RestController
 @SuppressWarnings ( { "unchecked", "rawtypes" } )
 public class APIDatabaseController extends APIController{
 
+    /**
+     * Adds an ICD code to the database
+     *
+     * @param icdf the form from the frontend
+     * @return response
+     */
     @PostMapping ( BASE_PATH + "/addICD" )
     public ResponseEntity addICDEntry(@RequestBody final ICDForm icdf){
         try {
@@ -47,6 +55,13 @@ public class APIDatabaseController extends APIController{
         }
     }
 
+    /**
+     * Updates an ICD entry in the database
+     *
+     * @param id the id of the ICD entry to update
+     * @param icdf the form from the frontend
+     * @return response
+     */
     @PutMapping ( BASE_PATH + "/updateICD/{id}" )
     public ResponseEntity updateICDEntry(@PathVariable ("id") final Long id, @RequestBody final ICDForm icdf){
         try {
@@ -71,6 +86,12 @@ public class APIDatabaseController extends APIController{
         }
     }
 
+    /**
+     * Adds an NDC code to the database
+     *
+     * @param ndcf the form from the frontend
+     * @return response
+     */
     @PostMapping (BASE_PATH + "/addNDC")
     public ResponseEntity addNDCEntry(@RequestBody final NDCForm ndcf){
         try {
@@ -95,6 +116,13 @@ public class APIDatabaseController extends APIController{
     }
     }
 
+    /**
+     * Updates an NDC entry in the database
+     *
+     * @param id the ID of the NDC entry to update
+     * @param ndcf the form from the frontend
+     * @return response
+     */
     @PutMapping (BASE_PATH + "/updateNDC/{id}")
     public ResponseEntity updateNDCEntry(@PathVariable ("id") final Long id, @RequestBody final NDCForm ndcf){
         try {
@@ -119,11 +147,21 @@ public class APIDatabaseController extends APIController{
         }
     }
 
+    /**
+     * Retrieves a list of all ICD entries in the database
+     *
+     * @return list of ICD entries
+     */
     @GetMapping (BASE_PATH + "/ICDEntries")
     public List<ICD> getICDEntries(){
         return ICD.getICDs();
     }
 
+    /**
+     * Retrieves a list of all NDC entries in the database
+     *
+     * @return list of NDC entries
+     */
     @GetMapping (BASE_PATH + "/NDCEntries")
     public List<NDC> getNDCEntries(){
         return NDC.getNDCs();
