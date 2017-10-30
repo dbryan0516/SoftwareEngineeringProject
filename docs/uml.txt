@@ -1,0 +1,252 @@
+@startuml
+package "controllers" #DDDDDD {
+    package "api" {
+        class APIDatabaseController {
+            .. Methods ..
+            + addICDEntry(icd: ICDForm): void
+            + updateICDEntry(id: long, icd: ICDForm): void
+            + addNDCEntry(ndc: NDCForm): void
+            + updateNDCEntry(id: long, ndc: NDCForm): void
+            + getICDEntries(): List<ICD>
+            + getNDCEntries(): List<NDC>
+        }
+
+        class APIOfficeVisitController {
+            .. Existing Methods ..
+            ...
+        }
+
+        class APIPatientDemographicsController {
+            .. Methods ..
+            + getPatients(): List<PatientForm>
+            + getPatientDemographics(): ResponseEntity
+            + updatePatientDemographics(patientForm: PatientForm): ReponseEntity
+        }
+
+        class APIPrescriptionController {
+            .. Methods ..
+            + getPrescriptions(): List<Prescription>
+            + getPrescription(id: long): ResponseEntity
+            + createPrescription(prescription: Prescription): ResponseEntity
+        }
+    }
+
+    package "personnel" {
+        class UserController {
+            .. Methods ..
+            + resetPassword(model: Model): void
+            .. Existing Methods ..
+            ...
+        }
+    }
+}
+
+package "forms" #DDDDDD {
+    package "admin" {
+        class ICDForm {
+            .. State ..
+            - id: long
+            - code: String
+            - description: String
+            __
+            .. Constructors ..
+            + ICDForm(code: String, description: String)
+            + ICDForm(icd: ICD)
+            __
+            .. Getters and Setters ..
+            ...
+        }
+
+        class NDCForm {
+            .. State ..
+            - id: long
+            - code: String
+            - description: String
+            __
+            .. Constructors ..
+            + NDCForm(code: String, description: String)
+            + NDCForm(ndc: NDC)
+            __
+            .. Getters and Setters ..
+            ...
+        }
+    }
+
+    package "hcp" {
+        class OfficeVisitForm {
+            .. State ..
+            - icd: String
+            - prescription: String
+            .. Existing State ..
+            ...
+            __
+            .. Existing Constructors ..
+            ...
+            __
+            .. Existing Methods ..
+            ...
+        }
+
+        class PrescriptionForm {
+            .. State ..
+            - id: long
+            - ndc: String
+            - patient: String
+            - startDate: String
+            - endDate: String
+            - renewals: String
+            - officeVisit: String
+            __
+            .. Constructors ..
+            + PrescriptionForm()
+            + PrescriptionForm(prescription: Prescription)
+            __
+            .. Getters and Setters ..
+            ...
+            __
+            .. Methods ..
+            + getById(id: long): Prescription
+            + getForPatient(patient: String): List<Prescription>
+            + getPrescriptions(): List<Prescription>
+            + getWhere(where: String): List<Prescription>
+        }
+    }
+
+    package "personnel" {
+        class PasswordResetForm {
+            .. State ..
+            - oldPassword: String
+            - newPassword1: String
+            - newPassword2: String
+        }
+    }
+}
+
+package "models" #DDDDDD {
+    package "persistent" {
+        class ICD {
+            .. State ..
+            - id: long
+            - code: String
+            - description: String
+            __
+            .. Constructors ..
+            + ICD(code: String, description: String)
+            + ICD(icdForm: ICDForm)
+            __
+            .. Getters and Setters ..
+            ...
+        }
+
+        class NDC {
+            .. State ..
+            - id: long
+            - code: String
+            - description: String
+            __
+            .. Constructors ..
+            + NDC(code: String, description: String)
+            + NDC(ndcForm: NDCForm)
+            __
+            .. Getters and Setters ..
+            ...
+        }
+
+        class OfficeVisit {
+            .. State ..
+            - icd: ICD
+            - prescription: Prescription
+            .. Existing State ..
+            ...
+            __
+            .. Existing Constructors ..
+            ...
+            __
+            .. Existing Methods ..
+            ...
+        }
+
+        class Prescription {
+            .. State ..
+            - id: long
+            - ndc: NDC
+            - patient: User
+            - startDate: Calendar
+            - endDate: Calendar
+            - renewals: int
+            - officeVisit: OfficeVisit
+            __
+            .. Constructors ..
+            + Prescription()
+            + Prescription(prescriptionForm: PrescriptionForm)
+            __
+            .. Getters and Setters ..
+            ...
+            __
+            .. Methods ..
+            + getById(id: long): Prescription
+            + getForPatient(patient: String): List<Prescription>
+            + getPrescriptions(): List<Prescription>
+            + getWhere(where: String): List<Prescription>
+        }
+    
+
+    }
+}
+
+package "resources" {
+    object updateDatabase {
+        HTML, CSS, and JS
+    }
+
+    object documentOfficeVisit {
+        HTML, CSS, and JS
+        ++ Additional Code for Prescription
+        ++ Additional Code for Diagnosis
+    }
+
+    object editOfficeVisit {
+        HTML, CSS, and JS
+        ++ Additional Code for Prescription
+        ++ Additional Code for Diagnosis
+    }
+
+    object documentPrescription {
+        HTML, CSS, and JS
+    }
+
+    object viewOfficeVisits {
+        HTML, CSS, and JS
+        ++ Additional Code for Prescription
+        ++ Additional Code for Diagnosis
+    }
+
+    object viewPrescriptions {
+        HTML, CSS, and JS
+    }
+
+    object editPatientDemographics {
+        HTML, CSS, and JSs
+    }
+}
+NDC *-- Prescription
+
+OfficeVisit --* ICD
+OfficeVisit <--> Prescription
+
+documentOfficeVisit --> OfficeVisitForm
+
+editOfficeVisit --> OfficeVisitForm
+editOfficeVisit --> OfficeVisit
+
+viewOfficeVisit --> OfficeVisit
+
+updateDatabase --> NDC
+updateDatabase --> NDCForm
+updateDatabase --> ICD
+updateDatabase --> ICDForm
+
+documentPrescription --> PrescriptionForm
+
+viewPrescription --> Prescription
+@enduml
