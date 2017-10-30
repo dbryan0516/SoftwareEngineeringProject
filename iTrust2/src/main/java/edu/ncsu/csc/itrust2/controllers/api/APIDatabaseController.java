@@ -23,7 +23,7 @@ import java.util.List;
  */
 @RestController
 @SuppressWarnings ( { "unchecked", "rawtypes" } )
-public class APIDatabaseController extends APIController{
+public class APIDatabaseController extends APIController {
 
     /**
      * Adds an ICD code to the database
