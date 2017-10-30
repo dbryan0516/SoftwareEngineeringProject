@@ -5,9 +5,11 @@ import edu.ncsu.csc.itrust2.forms.admin.NDCForm;
 import edu.ncsu.csc.itrust2.models.enums.TransactionType;
 import edu.ncsu.csc.itrust2.models.persistent.ICD;
 import edu.ncsu.csc.itrust2.models.persistent.NDC;
+import edu.ncsu.csc.itrust2.models.persistent.User;
 import edu.ncsu.csc.itrust2.utils.LoggerUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -29,9 +31,13 @@ public class APIDatabaseController extends APIController{
                 return new ResponseEntity( "ICD with the id " + icd.getId() + " already exists",
                         HttpStatus.CONFLICT );
             }
+            if ( null != ICD.getByCode( icd.getCode() ) ) {
+                return new ResponseEntity( "ICD with the code " + icd.getCode() + " already exists",
+                        HttpStatus.CONFLICT );
+            }
+
             icd.save();
-            //TODO: get admin user
-//            LoggerUtil.log( TransactionType.ICD_CREATE, adminUser );
+            LoggerUtil.log( TransactionType.ICD_CREATE, SecurityContextHolder.getContext().getAuthentication().getName() );
             return new ResponseEntity( icd, HttpStatus.OK );
         }
         catch ( final Exception e ) {
@@ -56,8 +62,7 @@ public class APIDatabaseController extends APIController{
             }
 
             icd.save();
-            //TODO: get admin user
-//            LoggerUtil.log( TransactionType.ICD_UPDATE, adminUser );
+            LoggerUtil.log( TransactionType.ICD_UPDATE, SecurityContextHolder.getContext().getAuthentication().getName() );
             return new ResponseEntity( icd, HttpStatus.OK );
         }
         catch ( final Exception e ) {
@@ -74,9 +79,13 @@ public class APIDatabaseController extends APIController{
             return new ResponseEntity( "NDC with the id " + ndc.getId() + " already exists",
                     HttpStatus.CONFLICT );
         }
+        if ( null != NDC.getByCode( ndc.getCode() ) ) {
+            return new ResponseEntity( "NDC with the code " + ndc.getCode() + " already exists",
+                    HttpStatus.CONFLICT );
+        }
+
         ndc.save();
-        //TODO: ADD LOG
-//            LoggerUtil.log( TransactionType.NDC_CREATE, adminUser );
+        LoggerUtil.log( TransactionType.NDC_CREATE, SecurityContextHolder.getContext().getAuthentication().getName() );
         return new ResponseEntity( ndc, HttpStatus.OK );
     }
     catch ( final Exception e ) {
@@ -101,7 +110,7 @@ public class APIDatabaseController extends APIController{
             }
 
             ndc.save();
-//            LoggerUtil.log( TransactionType.NDC_UPDATE, adminUser );
+            LoggerUtil.log( TransactionType.NDC_UPDATE, SecurityContextHolder.getContext().getAuthentication().getName() );
             return new ResponseEntity( ndc, HttpStatus.OK );
         }
         catch ( final Exception e ) {
