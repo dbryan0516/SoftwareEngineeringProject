@@ -21,7 +21,7 @@ public class ModifyDatabaseController {
      */
     @GetMapping ( "/admin/modifyDatabase" )
     @PreAuthorize ( "hasRole('ROLE_ADMIN')" )
-    public String getModifyDatabasePage () {
+    public String modifyDatabase () {
         return "/admin/modifyDatabase";
     }
 }

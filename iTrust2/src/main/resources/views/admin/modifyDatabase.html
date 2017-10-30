@@ -13,17 +13,88 @@
 						.controller(
 								'modifyDatabaseCtrl',
 								function($scope, $http) {
+									var baseUrl = "/iTrust2/api/v1";
+									
+									/* Determines if the UI should say add/edit and what the button should do */
 									$scope.formTypes = {
 											addNDCForm: false,
-											editNDCForm: false,
+											updateNDCForm: false,
 											addICDForm: false,
-											editICDForm: false
+											updateICDForm: false
 									};
+									
+									/* Either "add" or "update" */
+									$scope.formMode;
+									
+									/* Either "NDC" or "ICD" */
+									$scope.medCodeType;
+									
+									/* The selected medical code, for displaying in UI */
+									$scope.medCode = {};
+									
+									/* The edited version of the code */
+									$scope.medCodeEdited = {};
+									
+									/* The list of med codes currently in the DB */
+									$scope.medCodes = [];
+									
+									
+									/* Just for testing
+									$scope.ICDCodes = [
+										{id: 1, description: "Strep-throat", code: "12-122-12345"}
+								    ];
+									$scope.NDCCodes = [
+										{id: 1, description: "Oxycontin", code: "A00.B3"}
+									];*/
+									
+									$scope.ICDCodes = [];
+									$scope.NDCCodes = [];
+									
+									/* Fetches the NDC codes from DB */
+									$scope.getNDCCodes = function() {
+										$http({
+											method : "GET",
+											url : baseUrl + "/NDCEntries",
+										}).then(function(response) {
+											$scope.NDCCodes = response.data;
+											
+											// Update listing of codes in dropdown
+											$scope.refreshCodeList();
+										}, function(rejection) {
+											console.log(rejection);
+										});
+									};
+									
+									/* Fetches the ICD codes from DB */
+									$scope.getICDCodes = function() {
+										$http({
+											method : "GET",
+											url : baseUrl + "/ICDEntries",
+										}).then(function(response) {
+											$scope.ICDCodes = response.data;
+											
+											// Update listing of codes in dropdown
+											$scope.refreshCodeList();
+										}, function(rejection) {
+											console.log(rejection);
+										});
+									}
+									
+									/* Switch to list of NDC or ICD codes depending on what
+									the form is being used for */
+									$scope.refreshCodeList = function() {
+										if ($scope.medCodeType === "NDC") {
+											$scope.medCodes = $scope.NDCCodes;
+										}
+										else {
+											$scope.medCodes = $scope.ICDCodes;
+										}
+									}
 									
 									/* Changes whether the form is for adding/editing NDC/ICD codes */
 									$scope.changeForm = function(form) {
 										
-										// Choose the right mode 
+										// Choose the right form type 
 										for(var prop in $scope.formTypes) {
 											if (prop === form) {
 												$scope.formTypes [prop] = true;
@@ -33,49 +104,67 @@
 											}
 										}
 										
-										// Reset the form
+										// Change the form for the right medCodeType and formMode
 										$scope.medCodeType = (form.indexOf("NDC") != -1)? "NDC" : "ICD";
-										$scope.formMode = (form.indexOf("add") != -1)? "add" : "edit";
-										$scope.medCode = {};
-										
-										// Switch to list of NDC or ICD codes depending on what the form is being used for
-										$scope.medCodes = ($scope.medCodeType === "NDC")? $scope.NDCCodes : $scope.ICDCodes;
-
+										$scope.formMode = (form.indexOf("add") != -1)? "add" : "update";
+										$scope.resetForm();
+										$scope.refreshCodeList();
 									};
+									
+									/* Resets the form fields and back-end state */
+									$scope.resetForm = function() {
+										$scope.message = "";
+										$scope.medCode = {};
+										$scope.medCodeEdited = {};
+										jQuery("input[type='text']").val("");
+									}
 									
 									/* Set the medical code for editing */
 									$scope.selectCode = function(code) {
 										$scope.medCode = code;
+										
+										// Deep copy of object
+										$scope.medCodeEdited.id = code.id;
+										$scope.medCodeEdited.description = code.description;
+										$scope.medCodeEdited.code = code.code;
 									};
 									
+									/* Send data to backend */
 									$scope.submit = function() {
-										var url = "iTrust2/api/v1/" + $scope.medCodeType;
-										var httpVerb = ($scope.formMode === "add")? "POST" : "PUT";
-										console.log("Submitting to " + url + " via " + httpVerb);
-										console.log($scope.medCode);
-										
-										/*
+										var url = baseUrl + "/" + $scope.formMode + $scope.medCodeType;
+										var requestType;
+										if ($scope.formMode === "add") {
+											requestType = "POST";
+										}
+										else {
+											requestType = "PUT";
+											
+											// The id has to be added as a URL parameter
+											url += "/" + $scope.medCodeEdited.id;
+										}
+										console.log(url);
+										console.log($scope.medCodeEdited);
 										$http({
-											method : httpVerb,
+											method : requestType,
 											url : url,
-											data : $scope.medCode
+											data : $scope.medCodeEdited
 										}).then(function(response) {
-											$scope.message="Office visit created successfully";
+											
+											// Refresh the lists of both types of codes, and reload the form to show 
+											// update code listing
+											$scope.getNDCCodes();
+											$scope.getICDCodes();
+											$scope.changeForm($scope.formMode + $scope.medCodeType + "Form");
+											$scope.message="Database modification successful";
 											console.log(response);
 										}, function(rejection) {
-											$scope.message="Error occurred creating office visit";
+											$scope.message="Database modification failed";
 											console.log(rejection);
-										});*/
+										});
 									};
 									
-									$scope.medCode = {};
-									$scope.ICDCodes = [
-										{name: "Strep-throat", code: "12-122-12345"}
-								    ];
-									$scope.NDCCodes = [
-										{name: "Oxycontin", code: "A00.B3"}
-									];
-									$scope.medCodes = [];
+									$scope.getNDCCodes();
+									$scope.getICDCodes();
 								});
 	</script>
 		<div ng-app="myApp" ng-controller="modifyDatabaseCtrl">
@@ -106,23 +195,23 @@
 				</div>
 			</nav>
 			<h1>Modify Database</h1>
-			<button class="addNDC" ng-click="changeForm('addNDCForm')">Add NDC Code</button>
-			<button class="editNDC" ng-click="changeForm('editNDCForm')">Edit NDC Code</button>
-			<button class="addICD" ng-click="changeForm('addICDForm')">Add ICD Code</button>
-			<button class="editICD" ng-click="changeForm('editICDForm')">Edit ICD Code</button>
+			<button id="addNDC" ng-click="changeForm('addNDCForm')">Add NDC Code</button>
+			<button id="updateNDC" ng-click="changeForm('updateNDCForm')">Edit NDC Code</button>
+			<button id="addICD" ng-click="changeForm('addICDForm')">Add ICD Code</button>
+			<button id="updateICD" ng-click="changeForm('updateICDForm')">Edit ICD Code</button>
 			
 			<br />
 			<br />
 			<br />
 			
-			<div class="existingCodes" ng-show="formTypes.editNDCForm || formTypes.editICDForm">
-				Select the code to edit:
+			<div class="existingCodes" ng-show="formTypes.updateNDCForm || formTypes.updateICDForm">
+				Select the code to update:
 				<br />
 				<ul>
 					<li ng-repeat="code in medCodes">
 						<input type="radio" ng-model="medCode" 
 						name="medCode" ng-change="selectCode(code)" value="{{code.code}}" />
-						{{code.name}}
+						{{code.description}} ({{code.code}})
 					</li>
 				</ul>
 				<br />
@@ -130,25 +219,27 @@
 				<br />
 			</div>
 						
-			<div class="commonForm" ng-show="formTypes.addNDCForm || formTypes.editNDCForm || formTypes.addICDForm || formTypes.editICDForm">
+			<div class="commonForm" ng-show="formTypes.addNDCForm || formTypes.updateNDCForm || formTypes.addICDForm || formTypes.updateICDForm">
 				<h3 ng-show="formTypes.addNDCForm || formTypes.addICDForm">Adding new {{medCodeType}} code</h3>
-				<h3 ng-show="formTypes.editNDCForm || formTypes.editICDForm">Editing {{medCode.name}} ({{medCode.code}})</h3>
+				<h3 ng-show="formTypes.updateNDCForm || formTypes.updateICDForm">Editing {{medCode.description}} ({{medCode.code}})</h3>
 				<table>
 					<tr>
 						<td>Name:</td>
 						<td>
-							<input type="text" class="name" value="{{medCode.name}}" ng-model="medCode.name" placeholder="Name of medication">
+							<input type="text" name="description" class="description" value="{{medCodeEdited.description}}" ng-model="medCodeEdited.description" placeholder="Name">
 						</td>
-						<td class="name-errors"></td>
+						<td class="description-errors"></td>
 					</tr>
 					<tr>
 						<td>Code:</td>
 						<td>
-							 <input type="text" class="code" value="{{medCode.code}}" ng-model="medCode.code" placeholder="Code of medication">
+							 <input type="text" name="code" class="code" value="{{medCodeEdited.code}}" ng-model="medCodeEdited.code" placeholder="Code">
 						 </td>
+						 <td class="code-errors"></td>
 					 </tr>
 				 </table>
 				<button ng-click="submit()">Submit</button>
+				<p id="status">{{message}}</p>
 			</div>
 		</div>
 	</div>
