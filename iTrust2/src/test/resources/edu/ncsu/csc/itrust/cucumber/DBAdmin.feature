@@ -137,14 +137,14 @@ And The admin is at the update database page
 And ICD code A00 exists # Cholera
 When I select edit ICD in the list
 And I select code A00
-And I fill out the fields with code <ICD_new_code>, name <ICD_new_name>
+And I fill out the fields with code <ICD_code>, name <ICD_name>
 And I click submit
 Then I see an error message
 And the code stays as: code A00, name Cholera
 And the ICD database is cleared
 
 Examples:
-	|ICD_new_code|ICD_new_name|
+	|ICD_code|ICD_name|
 	|A010|Cholera|
 	|A0|Serious Cholera|
 
