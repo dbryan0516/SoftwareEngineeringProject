@@ -265,8 +265,6 @@ public class DBAdminStepDefs {
 
 
 
-
-
     /**
      * The NDC code is added
      *
@@ -279,7 +277,17 @@ public class DBAdminStepDefs {
     @Then ( "the code: code (.+), name (.+) is not added to the NDC database" )
     public void ndcCodeAdded (final String code, final String name) {
 
+        driver.get( baseUrl );
+        ((JavascriptExecutor) driver).executeScript(
+                "document.get('http://localhost:8080/iTrust2/modifyDatabase.html');" );
 
+        selectEditNDC();
+
+        try {
+            WebElement radioBtn = driver.findElement(By.value(code));
+        }catch ( final Exception e ) {
+            /*  */
+        }
     }
 
     /**
@@ -293,7 +301,18 @@ public class DBAdminStepDefs {
      */
     @Then ( "the code: code (.+), name (.+) is not added to the NDC database" )
     public void ndcCodeNotAdded (final String code, final String name) {
+        driver.get( baseUrl );
+        ((JavascriptExecutor) driver).executeScript(
+                "document.get('http://localhost:8080/iTrust2/modifyDatabase.html');" );
 
+        selectEditNDC();
+
+        try {
+            WebElement radioBtn = driver.findElement(By.value(code));
+            fail();
+        }catch ( final Exception e ) {
+            //this should fail
+        }
 
     }
 
@@ -308,7 +327,17 @@ public class DBAdminStepDefs {
      */
     @Then ( "the code: code (.+), name (.+) is added to the IDC database" )
     public void idcCodeAdded (final String code, final String name) {
+        driver.get( baseUrl );
+        ((JavascriptExecutor) driver).executeScript(
+                "document.get('http://localhost:8080/iTrust2/modifyDatabase.html');" );
 
+        selectEditIDC();
+
+        try {
+            WebElement radioBtn = driver.findElement(By.value(code));
+        }catch ( final Exception e ) {
+            //TODO
+        }
 
     }
 
@@ -323,7 +352,18 @@ public class DBAdminStepDefs {
      */
     @Then ( "the code: code (.+), name (.+) is not added to the IDC database" )
     public void idcCodeNotAdded (final String code, final String name) {
+        driver.get( baseUrl );
+        ((JavascriptExecutor) driver).executeScript(
+                "document.get('http://localhost:8080/iTrust2/modifyDatabase.html');" );
 
+        selectEditIDC();
+
+        try {
+            WebElement radioBtn = driver.findElement(By.value(code));
+            fail();
+        }catch ( final Exception e ) {
+            //this should fail
+        }
 
     }
 
@@ -334,7 +374,18 @@ public class DBAdminStepDefs {
      */
     @Then ( "the code becomes: code 66666-616-30, name Oxycodone instead of: code 16590-616-30, name Oxycontin" )
     public void cotinToCodone () {
+        driver.get( baseUrl );
+        ((JavascriptExecutor) driver).executeScript(
+                "document.get('http://localhost:8080/iTrust2/modifyDatabase.html');" );
 
+        selectEditNDC();
+
+        try {
+            WebElement radioBtn = driver.findElement(By.value("16590-616-30"));
+            fail();
+        }catch ( final Exception e ) {
+            //this should fail
+        }
 
     }
 
@@ -343,7 +394,17 @@ public class DBAdminStepDefs {
      */
     @Then ( "the code stays as: code 16590-616-30, name Oxycontin" )
     public void cotinNoChange () {
+        driver.get( baseUrl );
+        ((JavascriptExecutor) driver).executeScript(
+                "document.get('http://localhost:8080/iTrust2/modifyDatabase.html');" );
 
+        selectEditNDC();
+
+        try {
+            WebElement radioBtn = driver.findElement(By.value("16590-616-30"));
+        }catch ( final Exception e ) {
+            //this should fail
+        }
 
     }
 
@@ -361,7 +422,17 @@ public class DBAdminStepDefs {
      */
     @Then ( " And the code becomes: code (.+), name (.+) instead of: code A00, name Cholera" )
     public void choleraChange (final String newCode, final String newName) {
+        driver.get( baseUrl );
+        ((JavascriptExecutor) driver).executeScript(
+                "document.get('http://localhost:8080/iTrust2/modifyDatabase.html');" );
 
+        selectEditIDC();
+
+        try {
+            WebElement radioBtn = driver.findElement(By.value(newCode));
+        }catch ( final Exception e ) {
+            //TODO
+        }
 
     }
 
@@ -370,7 +441,17 @@ public class DBAdminStepDefs {
      */
     @Then ( "And the code stays as: code A00, name Cholera" )
     public void choleraNoChange () {
+        driver.get( baseUrl );
+        ((JavascriptExecutor) driver).executeScript(
+                "document.get('http://localhost:8080/iTrust2/modifyDatabase.html');" );
 
+        selectEditIDC();
+
+        try {
+            WebElement radioBtn = driver.findElement(By.value("A00"));
+        }catch ( final Exception e ) {
+            //TODO
+        }
 
     }
 
@@ -383,6 +464,11 @@ public class DBAdminStepDefs {
      */
     @Then ( "the NDC database is cleared" )
     public void ndcCleared () {
+
+//hibernate datagenerator refreshdb
+
+
+
 
 
     }

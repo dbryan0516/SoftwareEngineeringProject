@@ -47,7 +47,7 @@ Scenario Outline: Create valid ICD code for a diagnosis
 Given An admin is authenticated
 And The admin is at the update database page
 When I select add ICD in the list
-Add I fill out the fields with code <ICD_code>, name <ICD_name>
+And I fill out the fields with code <ICD_code>, name <ICD_name>
 And I click submit
 Then I see a success message
 And the code: code <ICD_code>, name <ICD_name> is added to the ICD database 
