@@ -1,11 +1,17 @@
 package edu.ncsu.csc.itrust2.models.persistent;
 
-import edu.ncsu.csc.itrust2.forms.admin.NDCForm;
-import edu.ncsu.csc.itrust2.utils.DomainObjectCache;
+import java.util.List;
+
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
 import org.hibernate.validator.constraints.NotEmpty;
 
-import javax.persistence.*;
-import java.util.List;
+import edu.ncsu.csc.itrust2.forms.admin.NDCForm;
+import edu.ncsu.csc.itrust2.utils.DomainObjectCache;
 
 /**
  * Represents an NDC entry.
@@ -13,16 +19,20 @@ import java.util.List;
  * @author gjabell
  * @author gtstewar
  */
-@Entity @Table ( name = "NDC" ) public class NDC extends DomainObject<NDC> {
+@Entity
+@Table ( name = "NDC" )
+public class NDC extends DomainObject<NDC> {
     /**
-     * In-memory cache for storing instances of the NDCs in the database to avoid database transactions.
+     * In-memory cache for storing instances of the NDCs in the database to
+     * avoid database transactions.
      */
     static private DomainObjectCache<Long, NDC> cache = new DomainObjectCache<>( NDC.class );
 
     /**
      * Get the NDC with the given ID.
      *
-     * @param id The ID of the NDC.
+     * @param id
+     *            The ID of the NDC.
      * @return Returns the NDC with the given id.
      */
     public static NDC getById ( final Long id ) {
@@ -42,31 +52,36 @@ import java.util.List;
     /**
      * Gets the NDC with the given code from the database.
      *
-     * @param code The code of the NDC.
+     * @param code
+     *            The code of the NDC.
      * @return Returns the NDC with the given code, or null if it doesn't exist.
      */
     public static NDC getByCode ( final String code ) {
-        List<NDC> ndcs = getWhere( "code = '" + code + "'" );
+        final List<NDC> ndcs = getWhere( "code = '" + code + "'" );
         return ndcs.size() > 0 ? ndcs.get( 0 ) : null;
     }
 
     /**
      * Gets the NDC with the given description from the database.
      *
-     * @param description The description of the NDC.
-     * @return Returns the NDC with the given description, or null if it doesn't exist.
+     * @param description
+     *            The description of the NDC.
+     * @return Returns the NDC with the given description, or null if it doesn't
+     *         exist.
      */
     public static NDC getByDescription ( final String description ) {
-        List<NDC> ndcs = getWhere( "description = '" + description + "'" );
+        final List<NDC> ndcs = getWhere( "description = '" + description + "'" );
         return ndcs.size() > 0 ? ndcs.get( 0 ) : null;
     }
 
     /**
-     * Retrieve a List of all NDCs in the database. Returns the NDCs sorted by id.
+     * Retrieve a List of all NDCs in the database. Returns the NDCs sorted by
+     * id.
      *
      * @return A List of all NDCs in the database.
      */
-    @SuppressWarnings ( "unchecked" ) public static List<NDC> getNDCs () {
+    @SuppressWarnings ( "unchecked" )
+    public static List<NDC> getNDCs () {
         return (List<NDC>) getAll( NDC.class );
     }
 
@@ -77,22 +92,28 @@ import java.util.List;
     }
 
     /**
-     * Retrieve a List of NDCs that meet the given where query. Query must be valid SQL.
+     * Retrieve a List of NDCs that meet the given where query. Query must be
+     * valid SQL.
      *
-     * @param where The Query by which to find NDCs.
+     * @param where
+     *            The Query by which to find NDCs.
      * @return The List of NDCs.
      */
-    @SuppressWarnings ( "unchecked" ) private static List<NDC> getWhere ( final String where ) {
+    @SuppressWarnings ( "unchecked" )
+    private static List<NDC> getWhere ( final String where ) {
         return (List<NDC>) getWhere( NDC.class, where );
     }
 
     /**
      * Constructs an NDC object from the given NDCForm.
      *
-     * @param form The NDCForm.
+     * @param form
+     *            The NDCForm.
      */
     public NDC ( final NDCForm form ) {
-        setId( Long.valueOf( form.getId() ) );
+        if ( form.getId() != null ) {
+            setId( Long.valueOf( form.getId() ) );
+        }
         setCode( form.getCode() );
         setDescription( form.getDescription() );
     }
@@ -102,14 +123,16 @@ import java.util.List;
      *
      * @return The IDC of the NDC.
      */
-    @Override public Long getId () {
+    @Override
+    public Long getId () {
         return id;
     }
 
     /**
      * Sets the ID of the NDC (used by Hibernate).
      *
-     * @param id The new ID of the NDC.
+     * @param id
+     *            The new ID of the NDC.
      */
     private void setId ( final Long id ) {
         this.id = id;
@@ -127,7 +150,8 @@ import java.util.List;
     /**
      * Sets the NDC code.
      *
-     * @param code The new NDC code.
+     * @param code
+     *            The new NDC code.
      */
     public void setCode ( String code ) {
         this.code = code;
@@ -145,7 +169,8 @@ import java.util.List;
     /**
      * Sets the NDC description.
      *
-     * @param description The new NDC description.
+     * @param description
+     *            The new NDC description.
      */
     public void setDescription ( String description ) {
         this.description = description;
@@ -154,26 +179,33 @@ import java.util.List;
     /**
      * Database id (primary key).
      */
-    @Id @GeneratedValue ( strategy = GenerationType.AUTO ) private Long id;
+    @Id
+    @GeneratedValue ( strategy = GenerationType.AUTO )
+    private Long   id;
 
     /**
      * The NDC code.
      */
-    @NotEmpty private String code;
+    @NotEmpty
+    private String code;
 
     /**
      * The NDC description.
      */
-    @NotEmpty private String description;
+    @NotEmpty
+    private String description;
 
     /**
      * Checks if the given object is equal to this.
      *
-     * @param o The object on which to test.
-     * @return Returns true if the other object has the same id, code, and description, otherwise false.
+     * @param o
+     *            The object on which to test.
+     * @return Returns true if the other object has the same id, code, and
+     *         description, otherwise false.
      */
-    @Override public boolean equals ( Object o ) {
-        return o != null && o instanceof NDC && this.id.equals( ( (NDC) o ).getId() ) && this.code
-                .equals( ( (NDC) o ).getCode() ) && this.description.equals( ( (NDC) o ).getDescription() );
+    @Override
+    public boolean equals ( Object o ) {
+        return o != null && o instanceof NDC && this.id.equals( ( (NDC) o ).getId() )
+                && this.code.equals( ( (NDC) o ).getCode() ) && this.description.equals( ( (NDC) o ).getDescription() );
     }
 }
