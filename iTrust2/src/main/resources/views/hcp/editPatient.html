@@ -1,0 +1,319 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:include="layout :: head(title=~{::title},links=~{})">
+    <title>Document Office Visit</title>
+</head>
+<body th:include="layout :: body" th:with="content=~{::content}">
+<div th:fragment="content">
+
+    <script th:inline="javascript">
+        /* Otherwise Thymeleaf tries to parse Javascript as XML and breaks itself sometimes.  Sigh */
+        /*<![CDATA[*/
+
+        var app = angular.module('myApp', []);
+        app
+            .controller(
+                'editPatientCtrl',
+                function ($scope, $http) {
+                    // run when a patient is chosen
+                    $scope.patientSelect = function (patient) {
+                        $scope.patient = patient;
+                    };
+
+                    $http.get("/iTrust2/api/v1/patients").then(
+                        function (response) {
+                            $scope.patients = response.data;
+                            $scope.patients.forEach(function (patient, index) {
+                                $scope.patients[index].dateOfBirth = parseDate(patient.dateOfBirth);
+                                $scope.patients[index].dateOfDeath = parseDate(patient.dateOfDeath);
+                            });
+                        }
+                    );
+
+                    $http.get("/iTrust2/api/v1/state").then(
+                        function (response) {
+                            $scope.states = response.data;
+                        }
+                    );
+
+                    $http.get("/iTrust2/api/v1/bloodtype").then(
+                        function (response) {
+                            $scope.bloodTypes = response.data;
+                        }
+                    );
+
+                    $http.get("/iTrust2/api/v1/ethnicity").then(
+                        function (response) {
+                            $scope.ethnicities = response.data;
+                        }
+                    );
+
+                    $http.get("/iTrust2/api/v1/gender").then(
+                        function (response) {
+                            $scope.genders = response.data;
+                        }
+                    );
+
+                    console.log($scope);
+
+                    $scope.submit = function () {
+                        $scope.errorMsg = "";
+
+                        if ($scope.patient.firstName === '' || $scope.patient.firstName.length() > 20) {
+                            $scope.errorMsg += 'First name is missing or invalid';
+                        }
+
+                        if ($scope.patient.lastName === '' || $scope.patient.lastName.length() > 20) {
+                            $scope.errorMsg += 'Last name is missing or invalid';
+                        }
+
+                        if ($scope.patient.preferredName.length() > 30) {
+                            $scope.errorMsg += 'Preferred name is invalid';
+                        }
+
+                        if ($scope.patient.mother.length() > 20) {
+                            $scope.errorMsg += 'Mother username is invalid';
+                        }
+
+                        if ($scope.patient.father.length() > 20) {
+                            $scope.errorMsg += 'Father username is invalid';
+                        }
+
+                        if ($scope.patient.email === '' || $scope.patient.email.length() > 30) {
+                            $scope.errorMsg += 'Email is missing or invalid';
+                        }
+
+                        if ($scope.patient.address1 === '' || $scope.patient.address1.length() > 50) {
+                            $scope.errorMsg += 'Address 1 is missing or invalid';
+                        }
+
+                        if ($scope.patient.address2.length() > 50) {
+                            $scope.errorMsg += 'Address 2 is invalid';
+                        }
+
+                        if ($scope.patient.city === '' || $scope.patient.city.length() > 15) {
+                            $scope.errorMsg += 'City is invalid';
+                        }
+                    };
+
+
+
+                    /**
+                     * Parses a JS Date object from the given patient date.
+                     */
+                    function parseDate(date) {
+                        if (date === null || date === undefined)
+                            return null;
+                        return (date.month < 10 ? '0' + date.month : date.month) + '/' +
+                            (date.dayOfMonth < 10 ? '0' + date.dayOfMonth : date.dayOfMonth) + '/' +
+                            (date.year < 10 ? '0' + date.year : date.year);
+                    }
+                });
+
+        /*]]>*/
+    </script>
+
+    <div ng-app="myApp" ng-controller="editPatientCtrl">
+        <nav class="navbar navbar-default">
+            <div class="container-fluid">
+                <ul class="nav navbar-nav">
+                    <li class="dropdown"><a class="dropdown-toggle"
+                                            data-toggle="dropdown" href="#">Patient<span class="caret"></span></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="/iTrust2/hcp/viewAppointmentRequests"
+                                   id="viewrequests">View Appointment Requests</a></li>
+                            <li><a href="/iTrust2/hcp/viewAppointments"
+                                   id="upcomingrequests">View Upcoming Appointments</a></li>
+                            <li><a href="/iTrust2/hcp/editPatient">Edit Patient</a></li>
+                            <li><a href="#">Add Patient -- Not Implemented</a></li>
+                            <li><a href="/iTrust2/hcp/documentOfficeVisit.html"
+                                   id="documentOfficeVisit">Document Office Visit</a></li>
+                        </ul>
+                    </li>
+                    <li class="dropdown"><a class="dropdown-toggle"
+                                            data-toggle="dropdown" href="#">Edit<span class="caret"></span></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="/iTrust2/personnel/editDemographics"
+                                   id="editdemographics">Edit Demographics</a></li>
+                            <li><a href="/iTrust2/hcp/editOfficeVisit"
+                                   id="editOfficeVisit">Edit Office Visit</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+        <div style="float:left;width:30%;height:75%;overflow-y:auto">
+            <h2>Patients:</h2>
+            <!-- info on filtering taken from here: https://www.w3schools.com/angular/angular_filters.asp
+                and https://docs.angularjs.org/api/ng/filter/filter -->
+            <h4>Search: <input type="text" ng-model="searchFilter.self.username"/></h4>
+            <!-- Info on scrolling taken from here: https://www.w3schools.com/cssref/pr_pos_overflow.asp -->
+            <!-- and here: https://stackoverflow.com/questions/9560330/how-to-hide-a-vertical-scroll-bar-when-not-needed -->
+            <ul style="overflow:auto;height=90%;">
+                <!-- Information on how labels wor from here: https://stackoverflow.com/questions/7863251/clicking-the-text-to-select-corresponding-radio-button -->
+                <li ng-repeat="patient in patients | filter:searchFilter"><h4><label>
+                    <input type="radio" ng-model="$parent.patient"
+                           name="name" value="{{patient.self.username}}" required="true"
+                           ng-change='patientSelect(patient)'/>&nbsp;{{patient.self.username}}</label>
+                </h4></li>
+            </ul>
+        </div>
+        <!-- information on vertical rule found here: https://stackoverflow.com/questions/571900/is-there-a-vr-vertical-rule-in-html  -->
+        <div style="float:left;width:70%;border-left:1px solid #bbb;padding: 3%;height:75%;overflow-y:auto">
+            <h2>Patient: {{patient.self.username}}</h2>
+            <h2>Patient Demographics</h2>
+            <table>
+                <tr>
+                    <td>First Name</td>
+                    <td>
+                        <input type="text" ng-model="patient.firstName" required/>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>Last Name</td>
+                    <td>
+                        <input type="text" ng-model="patient.lastName" required/>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>Preferred Name</td>
+                    <td>
+                        <input type="text" ng-model="patient.preferredName"/>
+                    </td>
+                </tr>
+
+
+                <tr>
+                    <td>Mother (username)</td>
+                    <td>
+                        <input type="text" ng-model="patient.mother"/>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>Father (username)</td>
+                    <td>
+                        <input type="text" ng-model="patient.father"/>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>Email</td>
+                    <td>
+                        <input type="text" ng-model="patient.email" required/>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>Address Line 1</td>
+                    <td>
+                        <input type="text" ng-model="patient.address1" required/>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>Address Line 2</td>
+                    <td>
+                        <input type="text" ng-model="patient.address2"/>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>City</td>
+                    <td>
+                        <input type="text" ng-model="patient.city" required/>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>State</td>
+                    <td>
+                        <select ng-model="patient.state" ng-options="state for state in states" required>
+                            <option value>Select a State</option>
+                        </select>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>Zip</td>
+                    <td>
+                        <input type="text" ng-model="patient.zip" required/>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>Phone</td>
+                    <td>
+                        <input type="text" ng-model="patient.phone" required/>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>Date of Birth</td>
+                    <td>
+                        <input type="text" ng-model="patient.dateOfBirth" required/>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>Date of Death</td>
+                    <td>
+                        <input type="text" ng-model="patient.dateOfDeath"/>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>Cause of Death</td>
+                    <td>
+                        <input type="text" ng-model="patient.causeOfDeath"/>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>Blood Type</td>
+                    <td>
+                        <select ng-model="patient.bloodType" ng-options="bloodType for bloodType in bloodTypes" required>
+                            <option value>Select a Blood Type</option>
+                        </select>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>Ethnicity</td>
+                    <td>
+                        <select ng-model="patient.ethnicity" ng-options="ethnicity for ethnicity in ethnicities" required>
+                            <option value>Select an Ethnicity</option>
+                        </select>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>Gender</td>
+                    <td>
+                        <select ng-model="patient.gender" ng-options="gender for gender in genders" required>
+                            <option value>Select a Gender</option>
+                        </select>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>
+                        <button type="submit" class="btn">Submit</button>
+                    </td>
+                </tr>
+
+            </table>
+            <br/>
+            <button ng-click="submit()" name="submit">Submit Patient Demographics</button>
+
+            <div name="errorMsg">
+                <pre>{{errorMsg}}</pre>
+            </div>
+
+            <div name="success">{{message}}</div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
