@@ -213,7 +213,7 @@ package "models" #DDDDDD {
 }
 
 package "resources" {
-    object updateDatabase {
+    object modifyDatabase {
         HTML, CSS, and JS
     }
 
@@ -259,10 +259,10 @@ editOfficeVisit --> OfficeVisit
 
 viewOfficeVisit --> OfficeVisit
 
-updateDatabase --> NDC
-updateDatabase --> NDCForm
-updateDatabase --> ICD
-updateDatabase --> ICDForm
+modifyDatabase --> NDC
+modifyDatabase --> NDCForm
+modifyDatabase --> ICD
+modifyDatabase --> ICDForm
 
 documentPrescription --> PrescriptionForm
 
