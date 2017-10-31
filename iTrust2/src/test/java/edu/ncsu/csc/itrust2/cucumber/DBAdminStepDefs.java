@@ -1,6 +1,7 @@
 package edu.ncsu.csc.itrust2.cucumber;
 
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
 
 import java.util.Random;
 
@@ -188,24 +189,6 @@ public class DBAdminStepDefs {
 
 
 
-
-//
-//    /**
-//     * Fill in new form for Oxycotin
-//     */
-//    @When ( "I fill out the fields with code: 66666-616-30, name: Oxycodone" )
-//    public void fillCotinToCodonefields () {
-//        final WebElement code = driver.findElement( By.name( "code" ) );
-//        code.clear();
-//        code.sendKeys( "66666-616-30" );
-//
-//        final WebElement name = driver.findElement( By.name( "description" ) );
-//        name.clear();
-//        name.sendKeys( "Oxycodone" );
-//
-//    }
-
-
     /**
      * Fill in new form for Oxycotin incorrectly
      *
@@ -246,7 +229,9 @@ public class DBAdminStepDefs {
      */
     @Then ( "I see a success message" )
     public void attemptSucessful () {
-        assertTrue( driver.getPageSource().contains( "Database modification successful" ) );
+
+         WebElement message = driver.findElement(By.id("status"));
+         assertEquals( "Database modification successful", message.getText());
     }
 
     /**
@@ -254,9 +239,10 @@ public class DBAdminStepDefs {
      */
     @Then ( "I see an error message" )
     public void attemptUnsucessful () {
-        assertTrue( driver.getPageSource().contains( "Database modification failed" ) );
-    }
 
+        WebElement message = driver.findElement(By.id("status"));
+        assertEquals( "Database modification failed", message.getText());
+    }
 
 
 
