@@ -9,6 +9,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import edu.ncsu.csc.itrust2.forms.admin.ICDForm;
 import edu.ncsu.csc.itrust2.forms.admin.NDCForm;
+import edu.ncsu.csc.itrust2.models.enums.State;
 import edu.ncsu.csc.itrust2.models.persistent.ICD;
 import edu.ncsu.csc.itrust2.models.persistent.NDC;
 import org.junit.Assert;
@@ -102,6 +103,7 @@ public class APIDatabaseTest {
         try {
             assert icd != null;
             id = icd.getId();
+            icdf.setId(id.toString());
         } catch (NullPointerException e){
             e.printStackTrace();
             fail();
@@ -142,6 +144,7 @@ public class APIDatabaseTest {
         try {
             assert ndc != null;
             id = ndc.getId();
+            ndcf.setId(id.toString());
         } catch (NullPointerException e){
             e.printStackTrace();
             fail();
