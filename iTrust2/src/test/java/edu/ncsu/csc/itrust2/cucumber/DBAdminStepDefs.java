@@ -230,7 +230,12 @@ public class DBAdminStepDefs {
     @Then ( "I see a success message" )
     public void attemptSucessful () {
 
+
          WebElement message = driver.findElement(By.id("status"));
+
+        while(message.getText().equals("")){
+            //do nothing
+        }
          assertEquals( "Database modification successful", message.getText());
     }
 
@@ -240,7 +245,13 @@ public class DBAdminStepDefs {
     @Then ( "I see an error message" )
     public void attemptUnsucessful () {
 
+
         WebElement message = driver.findElement(By.id("status"));
+
+        while(message.getText().equals("")){
+            //do nothing
+        }
+
         assertEquals( "Database modification failed", message.getText());
     }
 
