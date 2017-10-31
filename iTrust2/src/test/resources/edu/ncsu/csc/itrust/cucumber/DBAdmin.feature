@@ -67,7 +67,7 @@ And I select add ICD in the list
 When I fill out the fields with code <ICD_code>, name <ICD_name>
 And I click submit
 Then I see an error message
-And the code: code <ICD_code>, name <ICD_name> isn't added to the ICD database 
+And the code: code <ICD_code>, name <ICD_name> is not added to the ICD database
 And the ICD database is cleared
 
 Examples:
@@ -93,11 +93,11 @@ And   the code becomes: code 66666-616-30, name Oxycodone instead of: code 16590
 And   the NDC database is cleared
 
 
-Scenario Outlinee: Invalid edit of NDC code for a prescription
+Scenario Outline: Invalid edit of NDC code for a prescription
 Given An admin is authenticated
 And   The admin is at the update database page
 And   NDC code 16590-616-30 exists # Oxycontin
-When I select edit NCD in the list
+When I select edit NDC in the list
 And I select code 16590-616-30
 And I fill out the fields with code <NDC_new_code>, name Oxycontin Drugs
 And I click submit
@@ -119,7 +119,7 @@ And The admin is at the update database page
 And ICD code A00 exists # Cholera
 When I select edit ICD in the list
 And I select code A00
-And I fill out the fields with code <ICD_code>, name <ICD_new_name>
+And I fill out the fields with code <ICD_new_code>, name <ICD_new_name>
 And I click submit
 Then I see a success message
 And the code becomes: code <ICD_new_code>, name <ICD_new_name> instead of: code A00, name Cholera
