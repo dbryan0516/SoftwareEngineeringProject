@@ -4,8 +4,6 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.Random;
 
-import edu.ncsu.csc.itrust2.utils.HibernateDataGenerator;
-import org.junit.Assert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
@@ -53,8 +51,8 @@ public class DBAdminStepDefs {
      */
     @Given ( "The admin is at the update database page" )
     public void updateDatabasePage () {
-        ( (JavascriptExecutor) driver ).executeScript( "document.getElementById('modifyDatabase').click();" );
-
+        ( (JavascriptExecutor) driver ).executeScript(
+                "document.get('http://localhost:8080/iTrust2/modifyDatabase.html');" );
     }
 
 
@@ -76,25 +74,25 @@ public class DBAdminStepDefs {
      */
     @When ( "I select edit NDC in the list" )
     public void selectEditNDC () {
-        WebElement radioBtn = driver.findElement(By.id("updateNDC"));
+        WebElement radioBtn = driver.findElement(By.id("editNDC"));
         radioBtn.click();
     }
 
     /**
-     * Pick add ICD in list
+     * Pick add IDC in list
      */
-    @When ( "I select add ICD in the list" )
-    public void selectAddICD () {
-        WebElement radioBtn = driver.findElement(By.id("addICD"));
+    @When ( "I select add IDC in the list" )
+    public void selectAddIDC () {
+        WebElement radioBtn = driver.findElement(By.id("addIDC"));
         radioBtn.click();
     }
 
     /**
-     * Pick edit ICD in list
+     * Pick edit IDC in list
      */
-    @When ( "I select edit ICD in the list" )
-    public void selectEditICD () {
-        WebElement radioBtn = driver.findElement(By.id("updateICD"));
+    @When ( "I select edit IDC in the list" )
+    public void selectEditIDC () {
+        WebElement radioBtn = driver.findElement(By.id("editIDC"));
         radioBtn.click();
     }
 
@@ -112,8 +110,7 @@ public class DBAdminStepDefs {
     @Given ( "NDC code 16590-616-30 exists" )
     public void oxycotinExists () {
         try {
-            final WebElement code = driver.findElement(By.xpath("//input[@value='16590-616-30']"));
-
+            final WebElement code = driver.findElement( By.value("16590-616-30"));
         }catch ( final Exception e ) {
             /* Assume the code already exists & carry on */
         }
@@ -125,8 +122,7 @@ public class DBAdminStepDefs {
     @Given ( "ICD code A00 exists" )
     public void choleraExists () {
         try {
-            final WebElement code = driver.findElement(By.xpath("//input[@value='A00']"));
-
+            final WebElement code = driver.findElement(By.value("A00"));
         }catch ( final Exception e ) {
             /* Assume the code already exists & carry on */ //This was in DocOfficeVisit Step deffs, so I'm not 100% on what to do here.
         }
@@ -139,14 +135,8 @@ public class DBAdminStepDefs {
      */
     @When ( "I select code 16590-616-30" )
     public void selectOxycotin () {
-
-        try {
-            final WebElement radioBtn = driver.findElement(By.xpath("//input[@value='16590-616-30']"));
-            radioBtn.click();
-
-        }catch ( final Exception e ) {
-            /* Assume the code already exists & carry on */
-        }
+        WebElement radioBtn = driver.findElement(By.value("16590-616-30"));
+        radioBtn.click();
     }
 
 
@@ -155,14 +145,8 @@ public class DBAdminStepDefs {
      */
     @When ( "I select code A00" )
     public void selectCholera () {
-        try {
-            final WebElement radioBtn = driver.findElement(By.xpath("//input[@value='A00']"));
-            radioBtn.click();
-
-        }catch ( final Exception e ) {
-            /* Assume the code already exists & carry on */
-        }
-
+        WebElement radioBtn = driver.findElement(By.value("A00"));
+        radioBtn.click();
     }
 
 
@@ -174,14 +158,34 @@ public class DBAdminStepDefs {
      * Fill NDC code forms
      */
     @When ( "I fill out the fields with code (.+), name (.+)" )
-    public void fillFields (final String code, final String name) {
-        final WebElement codeInput = driver.findElement( By.name("code"));
+    public void fillNDCfields (final String code, final String name) {
+        final WebElement codeInput = driver.findElement( By.id( "code" ) );
         codeInput.clear();
         codeInput.sendKeys( code );
 
-        final WebElement nameInput = driver.findElement( By.name( "description" ) );
+        final WebElement nameInput = driver.findElement( By.id( "name" ) );
         nameInput.clear();
         nameInput.sendKeys( name);
+
+    }
+
+    /**
+     * Fill IDC code forms
+     *
+     * @param code
+     *          the code of the IDC
+     * @param name
+     *          the name of the IDC
+     */
+    @When ( "I fill out the fields with code (.+), name (.+)" )
+    public void fillIDCfields (final String code, final String name) {
+        final WebElement codeInput = driver.findElement( By.id( "code" ) );
+        codeInput.clear();
+        codeInput.sendKeys( code );
+
+        final WebElement nameInput = driver.findElement( By.id( "name" ) );
+        nameInput.clear();
+        nameInput.sendKeys( name );
 
     }
 
@@ -189,21 +193,20 @@ public class DBAdminStepDefs {
 
 
 
-//
-//    /**
-//     * Fill in new form for Oxycotin
-//     */
-//    @When ( "I fill out the fields with code: 66666-616-30, name: Oxycodone" )
-//    public void fillCotinToCodonefields () {
-//        final WebElement code = driver.findElement( By.name( "code" ) );
-//        code.clear();
-//        code.sendKeys( "66666-616-30" );
-//
-//        final WebElement name = driver.findElement( By.name( "description" ) );
-//        name.clear();
-//        name.sendKeys( "Oxycodone" );
-//
-//    }
+    /**
+     * Fill in new form for Oxycotin
+     */
+    @When ( "I fill out the fields with code 66666-616-30, name Oxycodone" )
+    public void fillCotinToCodonefields () {
+        final WebElement code = driver.findElement( By.id( "code" ) );
+        code.clear();
+        code.sendKeys( "66666-616-30" );
+
+        final WebElement name = driver.findElement( By.id( "name" ) );
+        name.clear();
+        name.sendKeys( "Oxycodone" );
+
+    }
 
 
     /**
@@ -214,11 +217,11 @@ public class DBAdminStepDefs {
      */
     @When ( "And I fill out the fields with code (.+), name Oxycontin Drugs" )
     public void fillCotinToCodonefieldsIncorrect (final String code) {
-        final WebElement codeInput = driver.findElement( By.name( "code" ) );
+        final WebElement codeInput = driver.findElement( By.id( "code" ) );
         codeInput.clear();
         codeInput.sendKeys( code );
 
-        final WebElement name = driver.findElement( By.name( "description" ) );
+        final WebElement name = driver.findElement( By.id( "name" ) );
         name.clear();
         name.sendKeys( "Oxycontin Drugs" );
 
@@ -236,7 +239,7 @@ public class DBAdminStepDefs {
      */
     @When ( "I click submit" )
     public void clickSubmit () {
-        final WebElement submit = driver.findElement( By.name( "submit" ) );
+        final WebElement submit = driver.findElement( By.className( "btn" ) );
         submit.click();
 
     }
@@ -271,15 +274,17 @@ public class DBAdminStepDefs {
      * @param name
      *          the name of the NDC
      */
-    @Then ( "the code: code (.+), name (.+) is added to the NDC database" )
+    @Then ( "the code: code (.+), name (.+) is not added to the NDC database" )
     public void ndcCodeAdded (final String code, final String name) {
+
+        driver.get( baseUrl );
+        ((JavascriptExecutor) driver).executeScript(
+                "document.get('http://localhost:8080/iTrust2/modifyDatabase.html');" );
 
         selectEditNDC();
 
         try {
-
-            WebElement radioBtn = driver.findElement(By.xpath("//input[@value=" + code + "]"));
-
+            WebElement radioBtn = driver.findElement(By.value(code));
         }catch ( final Exception e ) {
             /*  */
         }
@@ -296,13 +301,15 @@ public class DBAdminStepDefs {
      */
     @Then ( "the code: code (.+), name (.+) is not added to the NDC database" )
     public void ndcCodeNotAdded (final String code, final String name) {
+        driver.get( baseUrl );
+        ((JavascriptExecutor) driver).executeScript(
+                "document.get('http://localhost:8080/iTrust2/modifyDatabase.html');" );
 
         selectEditNDC();
 
         try {
-            WebElement radioBtn = driver.findElement(By.xpath("//input[@value=" + code + "]"));
-
-            Assert.fail();
+            WebElement radioBtn = driver.findElement(By.value(code));
+            fail();
         }catch ( final Exception e ) {
             //this should fail
         }
@@ -310,22 +317,24 @@ public class DBAdminStepDefs {
     }
 
     /**
-     * The ICD code is added
+     * The IDC code is added
      *
      * @param code
-     *          the code for the ICD
+     *          the code for the IDC
      *
      * @param name
-     *          the name of the ICD
+     *          the name of the IDC
      */
-    @Then ( "the code: code (.+), name (.+) is added to the ICD database" )
-    public void icdCodeAdded (final String code, final String name) {
+    @Then ( "the code: code (.+), name (.+) is added to the IDC database" )
+    public void idcCodeAdded (final String code, final String name) {
+        driver.get( baseUrl );
+        ((JavascriptExecutor) driver).executeScript(
+                "document.get('http://localhost:8080/iTrust2/modifyDatabase.html');" );
 
-
-        selectEditICD();
+        selectEditIDC();
 
         try {
-            WebElement radioBtn = driver.findElement(By.xpath("//input[@value=" + code + "]"));
+            WebElement radioBtn = driver.findElement(By.value(code));
         }catch ( final Exception e ) {
             //TODO
         }
@@ -333,23 +342,25 @@ public class DBAdminStepDefs {
     }
 
     /**
-     * The ICD code is NOT added
+     * The IDC code is NOT added
      *
      * @param code
-     *          the code for the ICD
+     *          the code for the IDC
      *
      * @param name
-     *          the name of the ICD
+     *          the name of the IDC
      */
-    @Then ( "the code: code (.+), name (.+) is not added to the ICD database" )
-    public void icdCodeNotAdded (final String code, final String name) {
+    @Then ( "the code: code (.+), name (.+) is not added to the IDC database" )
+    public void idcCodeNotAdded (final String code, final String name) {
+        driver.get( baseUrl );
+        ((JavascriptExecutor) driver).executeScript(
+                "document.get('http://localhost:8080/iTrust2/modifyDatabase.html');" );
 
-        selectEditICD();
+        selectEditIDC();
 
         try {
-            WebElement radioBtn = driver.findElement(By.xpath("//input[@value=" + code + "]"));
-            WebElement radioBtnName = driver.findElement(By.xpath("//input[@medCode=" + name + "]"));
-            Assert.fail();
+            WebElement radioBtn = driver.findElement(By.value(code));
+            fail();
         }catch ( final Exception e ) {
             //this should fail
         }
@@ -363,15 +374,15 @@ public class DBAdminStepDefs {
      */
     @Then ( "the code becomes: code 66666-616-30, name Oxycodone instead of: code 16590-616-30, name Oxycontin" )
     public void cotinToCodone () {
-
+        driver.get( baseUrl );
+        ((JavascriptExecutor) driver).executeScript(
+                "document.get('http://localhost:8080/iTrust2/modifyDatabase.html');" );
 
         selectEditNDC();
 
         try {
-            WebElement radioBtn = driver.findElement(By.xpath("//input[@value='16590-616-30']"));
-            WebElement radioBtnName = driver.findElement(By.xpath("//input[@medCode='Oxycontin']"));
-
-            Assert.fail();
+            WebElement radioBtn = driver.findElement(By.value("16590-616-30"));
+            fail();
         }catch ( final Exception e ) {
             //this should fail
         }
@@ -383,12 +394,14 @@ public class DBAdminStepDefs {
      */
     @Then ( "the code stays as: code 16590-616-30, name Oxycontin" )
     public void cotinNoChange () {
-
+        driver.get( baseUrl );
+        ((JavascriptExecutor) driver).executeScript(
+                "document.get('http://localhost:8080/iTrust2/modifyDatabase.html');" );
 
         selectEditNDC();
 
         try {
-            WebElement radioBtn = driver.findElement(By.xpath("//input[@value='16590-616-30']"));
+            WebElement radioBtn = driver.findElement(By.value("16590-616-30"));
         }catch ( final Exception e ) {
             //this should fail
         }
@@ -402,33 +415,21 @@ public class DBAdminStepDefs {
      *Cholera changed successfully
      *
      * @param newCode
-     *          the new code for the ICD formerly known as Cholera
+     *          the new code for the IDC formerly known as Cholera
      *
      * @param newName
-     *          the new name for the ICD formerly known as Cholera
-     *
+     *          the new name for the IDC formerly known as Cholera
      */
-
-    //the code becomes: code <ICD_new_code>, name <ICD_new_name> instead of: code A00, name Cholera
-    @Then ( "the code becomes: code (.+), name (.+) instead of: code A00, name Cholera" )
+    @Then ( " And the code becomes: code (.+), name (.+) instead of: code A00, name Cholera" )
     public void choleraChange (final String newCode, final String newName) {
+        driver.get( baseUrl );
+        ((JavascriptExecutor) driver).executeScript(
+                "document.get('http://localhost:8080/iTrust2/modifyDatabase.html');" );
 
-
-        selectEditICD();
+        selectEditIDC();
 
         try {
-            WebElement radioBtn = driver.findElement(By.xpath("//input[@value=" + newCode + "]"));
-            WebElement radioBtnName = driver.findElement(By.xpath("//input[@medCode=" + newName + "]"));
-
-
-        }catch ( final Exception e ) {
-            //TODO
-        }
-
-        try{
-            WebElement radioBtn = driver.findElement(By.xpath("//input[@value='A00']"));
-            WebElement radioBtnName = driver.findElement(By.xpath("//input[@medCode='Cholera']"));
-            Assert.fail();
+            WebElement radioBtn = driver.findElement(By.value(newCode));
         }catch ( final Exception e ) {
             //TODO
         }
@@ -438,16 +439,16 @@ public class DBAdminStepDefs {
     /**
      *Cholera not changed
      */
-    @Then ( "the code stays as: code A00, name Cholera" )
+    @Then ( "And the code stays as: code A00, name Cholera" )
     public void choleraNoChange () {
+        driver.get( baseUrl );
+        ((JavascriptExecutor) driver).executeScript(
+                "document.get('http://localhost:8080/iTrust2/modifyDatabase.html');" );
 
-
-        selectEditICD();
+        selectEditIDC();
 
         try {
-            WebElement radioBtn = driver.findElement(By.xpath("//input[@value='A00']"));
-            WebElement radioBtnName = driver.findElement(By.xpath("//input[@medCode='Cholera']"));
-
+            WebElement radioBtn = driver.findElement(By.value("A00"));
         }catch ( final Exception e ) {
             //TODO
         }
@@ -463,7 +464,8 @@ public class DBAdminStepDefs {
      */
     @Then ( "the NDC database is cleared" )
     public void ndcCleared () {
-        HibernateDataGenerator.refreshDB();
+
+//hibernate datagenerator refreshdb
 
 
 
@@ -472,11 +474,10 @@ public class DBAdminStepDefs {
     }
 
     /**
-     * The ICD database is cleared
+     * The IDC database is cleared
      */
-    @Then ( "the ICD database is cleared" )
-    public void icdCleared () {
-        HibernateDataGenerator.refreshDB();
+    @Then ( "the IDC database is cleared" )
+    public void idcCleared () {
 
 
     }
