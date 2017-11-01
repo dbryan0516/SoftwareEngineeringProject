@@ -13,6 +13,8 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.htmlunit.HtmlUnitDriver;
 import org.openqa.selenium.support.ui.Select;
+import org.openqa.selenium.support.ui.WebDriverWait;
+
 
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
@@ -70,6 +72,7 @@ public class DBAdminStepDefs {
     public void selectAddNDC () {
         WebElement radioBtn = driver.findElement(By.id("addNDC"));
         radioBtn.click();
+
     }
 
     /**
@@ -182,7 +185,7 @@ public class DBAdminStepDefs {
 
         final WebElement nameInput = driver.findElement( By.name( "description" ) );
         nameInput.clear();
-        nameInput.sendKeys( name);
+        nameInput.sendKeys( name );
 
     }
 
@@ -276,9 +279,10 @@ public class DBAdminStepDefs {
         try {
 
             WebElement radioBtn = driver.findElement(By.xpath("//input[@value=" + code + "]"));
+            WebElement radioBtnName = driver.findElement(By.xpath("//input[@medCode=" + name + "]"));
 
         }catch ( final Exception e ) {
-            /*  */
+            // A catch will fail the test
         }
     }
 
@@ -298,7 +302,7 @@ public class DBAdminStepDefs {
 
         try {
             WebElement radioBtn = driver.findElement(By.xpath("//input[@value=" + code + "]"));
-
+            WebElement radioBtnName = driver.findElement(By.xpath("//input[@medCode=" + name + "]"));
             Assert.fail();
         }catch ( final Exception e ) {
             //this should fail
@@ -318,11 +322,12 @@ public class DBAdminStepDefs {
     @Then ( "the code: code (.+), name (.+) is added to the ICD database" )
     public void icdCodeAdded (final String code, final String name) {
 
-
         selectEditICD();
 
         try {
             WebElement radioBtn = driver.findElement(By.xpath("//input[@value=" + code + "]"));
+            WebElement radioBtnName = driver.findElement(By.xpath("//input[@medCode=" + name + "]"));
+
         }catch ( final Exception e ) {
             //TODO
         }
@@ -355,6 +360,11 @@ public class DBAdminStepDefs {
 
 
 
+
+
+
+
+
     /**
      * Oxycotin becomes oxycodone
      */
@@ -363,6 +373,14 @@ public class DBAdminStepDefs {
 
 
         selectEditNDC();
+
+        try {
+            WebElement radioBtn = driver.findElement(By.xpath("//input[@value='66666-616-30']"));
+            WebElement radioBtnName = driver.findElement(By.xpath("//input[@medCode='Oxycodone']"));
+
+        }catch ( final Exception e ) {
+            //will fail if reached
+        }
 
         try {
             WebElement radioBtn = driver.findElement(By.xpath("//input[@value='16590-616-30']"));
@@ -386,8 +404,10 @@ public class DBAdminStepDefs {
 
         try {
             WebElement radioBtn = driver.findElement(By.xpath("//input[@value='16590-616-30']"));
+            WebElement radioBtnName = driver.findElement(By.xpath("//input[@medCode='Oxycontin']"));
+
         }catch ( final Exception e ) {
-            //this should fail
+            //will fail if reached
         }
 
     }
@@ -419,7 +439,7 @@ public class DBAdminStepDefs {
 
 
         }catch ( final Exception e ) {
-            //TODO
+            //catch will fail the test
         }
 
         try{
@@ -427,7 +447,7 @@ public class DBAdminStepDefs {
             WebElement radioBtnName = driver.findElement(By.xpath("//input[@medCode='Cholera']"));
             Assert.fail();
         }catch ( final Exception e ) {
-            //TODO
+            //the above should fail.
         }
 
     }
