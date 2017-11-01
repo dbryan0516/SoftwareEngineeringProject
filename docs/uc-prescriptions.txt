@@ -1,0 +1,25 @@
+@startuml
+(Document Office Visit) as (4)
+(Edit Office Visit) as (5)
+(View Office Visit) as (6)
+(Create Prescriptions) as (1)
+(Edit Prescriptions) as (2)
+(View Prescriptions) as (3)
+
+:HCP: as HCP
+:Patient: as Patient
+
+HCP -left-> (1)
+HCP -right-> (2) 
+HCP -down-> (3)
+HCP -left-> (4)
+HCP -right-> (5)
+HCP -down-> (6)
+ 
+(4) .> (1): includes
+(5) .> (2): includes
+(6) .> (3): includes 
+
+Patient -left-> (3)
+Patient -right-> (6)
+@enduml
