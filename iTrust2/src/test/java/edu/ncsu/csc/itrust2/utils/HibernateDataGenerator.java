@@ -3,14 +3,19 @@ package edu.ncsu.csc.itrust2.utils;
 import java.text.ParseException;
 import java.util.Calendar;
 
-import edu.ncsu.csc.itrust2.forms.admin.PrescriptionForm;
-import edu.ncsu.csc.itrust2.models.persistent.*;
 import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.boot.spi.MetadataImplementor;
 import org.hibernate.tool.hbm2ddl.SchemaExport;
 
+import edu.ncsu.csc.itrust2.forms.admin.PrescriptionForm;
 import edu.ncsu.csc.itrust2.models.enums.Role;
+import edu.ncsu.csc.itrust2.models.persistent.Hospital;
+import edu.ncsu.csc.itrust2.models.persistent.ICD;
+import edu.ncsu.csc.itrust2.models.persistent.NDC;
+import edu.ncsu.csc.itrust2.models.persistent.Patient;
+import edu.ncsu.csc.itrust2.models.persistent.Prescription;
+import edu.ncsu.csc.itrust2.models.persistent.User;
 
 /**
  * Newly revamped Test Data Generator. This class is used to generate database
@@ -108,10 +113,20 @@ public class HibernateDataGenerator {
         ndc.setDescription( "Androxy" );
         ndc.save();
 
+        final NDC ndc2 = new NDC();
+        ndc2.setCode( "0832-0087" );
+        ndc2.setDescription( "Androxy2" );
+        ndc2.save();
+
         final ICD icd = new ICD();
-        icd.setCode("A00");
+        icd.setCode( "A00" );
         icd.setDescription( "Cholera" );
         icd.save();
+
+        final ICD icd2 = new ICD();
+        icd2.setCode( "A01" );
+        icd2.setDescription( "Cholera2" );
+        icd2.save();
 
         final PrescriptionForm prescriptionForm = new PrescriptionForm();
         prescriptionForm.setNdc( "Androxy" );
@@ -126,7 +141,7 @@ public class HibernateDataGenerator {
             final Prescription prescription = new Prescription( prescriptionForm );
             prescription.save();
         }
-        catch ( ParseException e ) {
+        catch ( final ParseException e ) {
             e.printStackTrace();
         }
 

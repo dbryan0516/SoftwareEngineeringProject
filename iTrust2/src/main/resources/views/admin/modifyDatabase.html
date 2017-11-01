@@ -210,7 +210,7 @@
 				<ul>
 					<li ng-repeat="code in medCodes">
 						<input type="radio" ng-model="medCode" 
-						name="medCode" ng-change="selectCode(code)" value="{{code.code}}" />
+						name="medCode" ng-change="selectCode(code)" data-medCode="{{code.description}}" value="{{code.code}}" />
 						{{code.description}} ({{code.code}})
 					</li>
 				</ul>
@@ -238,8 +238,8 @@
 						 <td class="code-errors"></td>
 					 </tr>
 				 </table>
-				<button ng-click="submit()">Submit</button>
-				<p id="status">{{message}}</p>
+				<button ng-click="submit()" name="submit">Submit</button>
+				<p id="status" value={{message}}>{{message}}</p>
 			</div>
 		</div>
 	</div>
