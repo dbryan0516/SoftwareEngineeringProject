@@ -8,6 +8,34 @@ Feature: Administer NDC and ICD databases for iTrust2
 		Because that's what the hospital pays me to do
 		
 		
+Scenario: Invalid edit of NDC code for a prescription
+Given An admin is authenticated
+And   The admin is at the update database page
+And NDC code 0832-0086 exists # Androxy
+And NDC code 0832-0087 exists # Androxy2
+When I select edit NDC in the list
+And I select code 0832-0086
+And I fill out the fields with code 0832-0087, name Oxycontin Drugs
+And I click submit
+Then I see an error message
+And the code stays as: code 0832-0086, name Androxy
+And the NDC database is cleared
+
+	
+Scenario: Invalid edit of ICD code for a diagnosis
+Given An admin is authenticated
+And The admin is at the update database page
+And ICD code A00 exists # Cholera
+And ICD code A01 exists # Cholera2
+When I select edit ICD in the list
+And I select code A00
+And I fill out the fields with code A01, name AIDS
+And I click submit
+Then I see an error message
+And the code stays as: code A00, name Cholera
+And the ICD database is cleared
+	
+			
 Scenario Outline: Create valid NDC code for a prescription
 Given An admin is authenticated
 And   The admin is at the update database page
@@ -46,13 +74,13 @@ Examples:
 Scenario: Valid edit of NDC code for a prescription
 Given An admin is authenticated
 And   The admin is at the update database page
-And   NDC code 16590-616-30 exists # Oxycontin
+And   NDC code 0832-0086 exists # Androxy
 When  I select edit NDC in the list
-And   I select code 16590-616-30
+And   I select code 0832-0086 
 And   I fill out the fields with code 66666-616-30, name Oxycodone
 And   I click submit
 Then  I see a success message
-And   the code becomes: code 66666-616-30, name Oxycodone instead of: code 16590-616-30, name Oxycontin
+And   the code becomes: code 66666-616-30, name Oxycodone instead of: code 0832-0086, name Androxy
 And   the NDC database is cleared
 
 	
@@ -71,13 +99,13 @@ And the ICD database is cleared
 
 Examples:
 	|ICD_new_code|ICD_new_name|
-	|A01|Cholera|
+	|A02|Cholera|
 	|A00|Serious Cholera|
 	
 Scenario Outline: Create invalid NDC code for a prescription
 Given An admin is authenticated
 And The admin is at the update database page
-And NDC code 16590-616-30 exists # Oxycontin
+And NDC code 0832-0086 exists # Androxy
 When I select add NDC in the list
 And I fill out the fields with code <NDC_code>, name <NDC_name>
 And I click submit
@@ -87,8 +115,8 @@ And the NDC database is cleared
 
 Examples:
 	|NDC_code|NDC_name|
-	|16590-616-30|Oxycontin|
-	|16590-616-30|Benadryl|
+	|0832-0086|Androxy|
+	|0832-0086|Benadryl|
 
 Scenario Outline: Create invalid ICD code for a diagnosis
 Given An admin is authenticated
@@ -107,45 +135,6 @@ Examples:
 	|A00|HIV|
 	|A00|AIDS|
 
-
-##### TESTS BELOW NEED TO BE FIXED #####
-
-
-Scenario Outline: Invalid edit of NDC code for a prescription
-Given An admin is authenticated
-And   The admin is at the update database page
-And   NDC code 16590-616-30 exists # Oxycontin
-When I select edit NDC in the list
-And I select code 16590-616-30
-And I fill out the fields with code <NDC_new_code>, name Oxycontin Drugs
-And I click submit
-Then I see an error message
-And the code stays as: code 16590-616-30, name Oxycontin
-And the NDC database is cleared
-
-Examples:
-	|NDC_code|
-	|Oxycontin|
-	|0140-00004-01|
-	|0054-091-68|
-	|0054-091068|
-	
-Scenario Outline: Invalid edit of ICD code for a diagnosis
-Given An admin is authenticated
-And The admin is at the update database page
-And ICD code A00 exists # Cholera
-When I select edit ICD in the list
-And I select code A00
-And I fill out the fields with code <ICD_code>, name <ICD_name>
-And I click submit
-Then I see an error message
-And the code stays as: code A00, name Cholera
-And the ICD database is cleared
-
-Examples:
-	|ICD_code|ICD_name|
-	|A010|Cholera|
-	|A0|Serious Cholera|
 
 	
 	
