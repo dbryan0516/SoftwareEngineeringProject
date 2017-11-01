@@ -1,0 +1,5 @@
+@startuml
+:Patient: -- (Edit personal demographics)
+:HCP: -- (Edit personal demographics)
+:HCP: --- (Edit patient demographics) : Enter patient MID
+@enduml
