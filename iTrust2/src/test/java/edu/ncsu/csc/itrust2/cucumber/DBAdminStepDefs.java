@@ -1,6 +1,7 @@
 package edu.ncsu.csc.itrust2.cucumber;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 
 import java.util.Random;
 
@@ -18,6 +19,9 @@ import edu.ncsu.csc.itrust2.utils.HibernateDataGenerator;
 
 /**
  * Step definitions for AddHosptial feature
+ *
+ * @author dwdeans
+ * @author Joshua Kayani (jkayani@ncsu.edu)
  */
 public class DBAdminStepDefs {
 
@@ -55,16 +59,17 @@ public class DBAdminStepDefs {
     /**
      * Pick add NDC in list
      */
-    @When ( "I select add NDC in the list" )
+    @Given ( "I select add NDC in the list" )
     public void selectAddNDC () {
         final WebElement radioBtn = driver.findElement( By.id( "addNDC" ) );
         radioBtn.click();
+
     }
 
     /**
      * Pick edit NDC in list
      */
-    @When ( "I select edit NDC in the list" )
+    @Given ( "I select edit NDC in the list" )
     public void selectEditNDC () {
         final WebElement radioBtn = driver.findElement( By.id( "updateNDC" ) );
         radioBtn.click();
@@ -73,7 +78,7 @@ public class DBAdminStepDefs {
     /**
      * Pick add ICD in list
      */
-    @When ( "I select add ICD in the list" )
+    @Given ( "I select add ICD in the list" )
     public void selectAddICD () {
         final WebElement radioBtn = driver.findElement( By.id( "addICD" ) );
         radioBtn.click();
@@ -82,73 +87,69 @@ public class DBAdminStepDefs {
     /**
      * Pick edit ICD in list
      */
-    @When ( "I select edit ICD in the list" )
+    @Given ( "I select edit ICD in the list" )
     public void selectEditICD () {
         final WebElement radioBtn = driver.findElement( By.id( "updateICD" ) );
         radioBtn.click();
     }
 
     /**
-     * Oxycotin Exists
+     * The first drug exists. Hibernate's refresh DB method, which is run after
+     * each test, should ensure this.
      */
     @Given ( "NDC code 0832-0086 exists" )
-    public void NDCExists () {
+    public void ndcExists () {
         try {
-            final WebElement code = driver.findElement( By.xpath( "//input[@value='0832-0086']" ) );
-
+            Thread.sleep( 1500 );
+            driver.findElement( By.cssSelector( "input[value='0832-0086']" ) );
         }
         catch ( final Exception e ) {
-            /* Assume the code already exists & carry on */
+            Assert.fail();
         }
     }
 
     /**
-     * The second drug exists
+     * The second drug exists. Hibernate's refresh DB method, which is run after
+     * each test, should ensure this.
      */
     @Given ( "NDC code 0832-0087 exists" )
-    public void NDC2Exists () {
+    public void ndc2Exists () {
         try {
-            final WebElement code = driver.findElement( By.xpath( "//input[@value='0832-0087']" ) );
-
+            Thread.sleep( 1500 );
+            driver.findElement( By.cssSelector( "input[value='0832-0087']" ) );
         }
         catch ( final Exception e ) {
-            /* Assume the code already exists & carry on */
+            Assert.fail();
         }
     }
 
     /**
-     * Cholera Exists
+     * The first disease exists. Hibernate's refresh DB method, which is run
+     * after each test, should ensure this.
      */
     @Given ( "ICD code A00 exists" )
-    public void ICDExists () {
+    public void icdExists () {
         try {
-            final WebElement code = driver.findElement( By.xpath( "//input[@value='A00']" ) );
-
+            Thread.sleep( 1500 );
+            driver.findElement( By.cssSelector( "input[value='A00']" ) );
         }
         catch ( final Exception e ) {
-            /* Assume the code already exists & carry on */ // This was in
-                                                            // DocOfficeVisit
-                                                            // Step deffs, so
-                                                            // I'm not 100% on
-                                                            // what to do here.
+            Assert.fail();
         }
     }
 
     /**
-     * Cholera Exists
+     * The second disease exists. Hibernate's refresh DB method, which is run
+     * after each test, should ensure this.
      */
     @Given ( "ICD code A01 exists" )
-    public void ICD2Exists () {
+    public void icd2Exists () {
         try {
-            final WebElement code = driver.findElement( By.xpath( "//input[@value='A01']" ) );
-
+            Thread.sleep( 1500 );
+            driver.findElement( By.cssSelector( "input[value='A01']" ) );
         }
         catch ( final Exception e ) {
-            /* Assume the code already exists & carry on */ // This was in
-                                                            // DocOfficeVisit
-                                                            // Step deffs, so
-                                                            // I'm not 100% on
-                                                            // what to do here.
+            Assert.fail();
         }
     }
 
@@ -185,7 +186,12 @@ public class DBAdminStepDefs {
     }
 
     /**
-     * Fill NDC code forms
+     * Fill NDC form out
+     *
+     * @param code
+     *            The actual NDC code
+     * @param name
+     *            The name of the drug
      */
     @When ( "I fill out the fields with code (.+), name (.+)" )
     public void fillFields ( final String code, final String name ) {
@@ -264,19 +270,18 @@ public class DBAdminStepDefs {
      *
      * @param name
      *            the name of the NDC
+     * @throws InterruptedException
      */
     @Then ( "the code: code (.+), name (.+) is added to the NDC database" )
-    public void ndcCodeAdded ( final String code, final String name ) {
-
+    public void ndcCodeAdded ( final String code, final String name ) throws InterruptedException {
         selectEditNDC();
-
+        Thread.sleep( 1500 );
         try {
-
-            final WebElement radioBtn = driver.findElement( By.xpath( "//input[@value=" + code + "]" ) );
-
+            assertEquals( name, driver.findElement( By.cssSelector( "input[value='" + code + "']" ) )
+                    .getAttribute( "data-medCode" ) );
         }
         catch ( final Exception e ) {
-            /*  */
+            Assert.fail();
         }
     }
 
@@ -288,19 +293,19 @@ public class DBAdminStepDefs {
      *
      * @param name
      *            the name of the NDC
+     * @throws InterruptedException
      */
     @Then ( "the code: code (.+), name (.+) is not added to the NDC database" )
-    public void ndcCodeNotAdded ( final String code, final String name ) {
+    public void ndcCodeNotAdded ( final String code, final String name ) throws InterruptedException {
 
         selectEditNDC();
-
+        Thread.sleep( 1500 );
         try {
-            final WebElement radioBtn = driver.findElement( By.xpath( "//input[@value=" + code + "]" ) );
-
-            Assert.fail();
+            assertNotEquals( name, driver.findElement( By.cssSelector( "input[value='" + code + "']" ) )
+                    .getAttribute( "data-medCode" ) );
         }
         catch ( final Exception e ) {
-            // this should fail
+            // Exception should be thrown, sometimes.
         }
 
     }
@@ -315,15 +320,15 @@ public class DBAdminStepDefs {
      *            the name of the ICD
      */
     @Then ( "the code: code (.+), name (.+) is added to the ICD database" )
-    public void icdCodeAdded ( final String code, final String name ) {
-
+    public void icdCodeAdded ( final String code, final String name ) throws InterruptedException {
         selectEditICD();
-
+        Thread.sleep( 1500 );
         try {
-            final WebElement radioBtn = driver.findElement( By.xpath( "//input[@value=" + code + "]" ) );
+            assertEquals( name, driver.findElement( By.cssSelector( "input[value='" + code + "']" ) )
+                    .getAttribute( "data-medCode" ) );
         }
         catch ( final Exception e ) {
-            // TODO
+            Assert.fail();
         }
 
     }
@@ -336,58 +341,73 @@ public class DBAdminStepDefs {
      *
      * @param name
      *            the name of the ICD
+     * @throws InterruptedException
      */
     @Then ( "the code: code (.+), name (.+) is not added to the ICD database" )
-    public void icdCodeNotAdded ( final String code, final String name ) {
+    public void icdCodeNotAdded ( final String code, final String name ) throws InterruptedException {
 
         selectEditICD();
-
+        Thread.sleep( 1500 );
         try {
-            final WebElement radioBtn = driver.findElement( By.xpath( "//input[@value=" + code + "]" ) );
-            final WebElement radioBtnName = driver.findElement( By.xpath( "//input[@medCode=" + name + "]" ) );
-            Assert.fail();
+            assertNotEquals( code, driver.findElement( By.cssSelector( "input[value='" + code + "']" ) )
+                    .getAttribute( "data-medCode" ) );
         }
         catch ( final Exception e ) {
-            // this should fail
+            // Exception should be thrown, somtimes.
         }
 
     }
 
     /**
      * Oxycotin becomes oxycodone
+     *
+     * @throws InterruptedException
      */
     @Then ( "the code becomes: code 66666-616-30, name Oxycodone instead of: code 0832-0086, name Androxy" )
-    public void cotinToCodone () {
+    public void cotinToCodone () throws InterruptedException {
 
         selectEditNDC();
+        Thread.sleep( 1500 );
 
+        // Androxy shouldn't exist
         try {
-            final WebElement radioBtn = driver.findElement( By.xpath( "//input[@value='0832-0086']" ) );
-            final WebElement radioBtnName = driver.findElement( By.xpath( "//input[@medCode='Androxy']" ) );
-
+            driver.findElement( By.cssSelector( "input[value='0832-0086']" ) );
             Assert.fail();
         }
         catch ( final Exception e ) {
-            // this should fail
+            // Exception should be thrown
+        }
+
+        // Oxycontin should exist
+        try {
+            assertEquals( "Oxycodone", driver.findElement( By.cssSelector( "input[value='66666-616-30']" ) )
+                    .getAttribute( "data-medCode" ) );
+
+        }
+        catch ( final Exception e ) {
+            Assert.fail();
         }
 
     }
 
     /**
      * Oxycotin stays the same
+     *
+     * @throws InterruptedException
      */
     @Then ( "the code stays as: code 0832-0086, name Androxy" )
-    public void cotinNoChange () {
+    public void cotinNoChange () throws InterruptedException {
 
         selectEditNDC();
+        Thread.sleep( 1500 );
 
         try {
-            final WebElement radioBtn = driver.findElement( By.xpath( "//input[@value='0832-0086']" ) );
+            assertEquals( "Androxy",
+                    driver.findElement( By.cssSelector( "input[value='0832-0086']" ) ).getAttribute( "data-medCode" ) );
         }
         catch ( final Exception e ) {
-            // this should fail
+            Assert.fail();
         }
-
     }
 
     /**
@@ -398,51 +418,51 @@ public class DBAdminStepDefs {
      *
      * @param newName
      *            the new name for the ICD formerly known as Cholera
+     * @throws InterruptedException
      *
      */
 
     // the code becomes: code <ICD_new_code>, name <ICD_new_name> instead of:
     // code A00, name Cholera
     @Then ( "the code becomes: code (.+), name (.+) instead of: code A00, name Cholera" )
-    public void choleraChange ( final String newCode, final String newName ) {
+    public void choleraChange ( final String newCode, final String newName ) throws InterruptedException {
 
         selectEditICD();
+        Thread.sleep( 1500 );
 
         try {
-            final WebElement radioBtn = driver.findElement( By.xpath( "//input[@value=" + newCode + "]" ) );
-            final WebElement radioBtnName = driver.findElement( By.xpath( "//input[@medCode=" + newName + "]" ) );
-
+            assertEquals( newName, driver.findElement( By.cssSelector( "input[value='" + newCode + "']" ) )
+                    .getAttribute( "data-medCode" ) );
         }
         catch ( final Exception e ) {
-            // TODO
-        }
-
-        try {
-            final WebElement radioBtn = driver.findElement( By.xpath( "//input[@value='A00']" ) );
-            final WebElement radioBtnName = driver.findElement( By.xpath( "//input[@medCode='Cholera']" ) );
             Assert.fail();
         }
+
+        try {
+            assertNotEquals( "Cholera",
+                    driver.findElement( By.cssSelector( "input[value='A00']" ) ).getAttribute( "data-medCode" ) );
+        }
         catch ( final Exception e ) {
-            // TODO
+            // Exception should be thrown, sometimes.
         }
 
     }
 
     /**
      * Cholera not changed
+     *
+     * @throws InterruptedException
      */
     @Then ( "the code stays as: code A00, name Cholera" )
-    public void choleraNoChange () {
-
+    public void choleraNoChange () throws InterruptedException {
         selectEditICD();
-
+        Thread.sleep( 1500 );
         try {
-            final WebElement radioBtn = driver.findElement( By.xpath( "//input[@value='A00']" ) );
-            final WebElement radioBtnName = driver.findElement( By.xpath( "//input[@medCode='Cholera']" ) );
-
+            assertEquals( "Cholera",
+                    driver.findElement( By.cssSelector( "input[value='A00']" ) ).getAttribute( "data-medCode" ) );
         }
         catch ( final Exception e ) {
-            // TODO
+            Assert.fail();
         }
 
     }

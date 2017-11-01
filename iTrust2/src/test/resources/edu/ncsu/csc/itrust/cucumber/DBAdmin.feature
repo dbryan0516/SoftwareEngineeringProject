@@ -11,10 +11,10 @@ Feature: Administer NDC and ICD databases for iTrust2
 Scenario: Invalid edit of NDC code for a prescription
 Given An admin is authenticated
 And   The admin is at the update database page
+And I select edit NDC in the list
 And NDC code 0832-0086 exists # Androxy
 And NDC code 0832-0087 exists # Androxy2
-When I select edit NDC in the list
-And I select code 0832-0086
+When I select code 0832-0086
 And I fill out the fields with code 0832-0087, name Oxycontin Drugs
 And I click submit
 Then I see an error message
@@ -25,10 +25,10 @@ And the NDC database is cleared
 Scenario: Invalid edit of ICD code for a diagnosis
 Given An admin is authenticated
 And The admin is at the update database page
+And I select edit ICD in the list
 And ICD code A00 exists # Cholera
 And ICD code A01 exists # Cholera2
-When I select edit ICD in the list
-And I select code A00
+When I select code A00
 And I fill out the fields with code A01, name AIDS
 And I click submit
 Then I see an error message
@@ -39,8 +39,8 @@ And the ICD database is cleared
 Scenario Outline: Create valid NDC code for a prescription
 Given An admin is authenticated
 And   The admin is at the update database page
-When I select add NDC in the list
-And I fill out the fields with code <NDC_code>, name <NDC_name>
+And I select add NDC in the list
+When I fill out the fields with code <NDC_code>, name <NDC_name>
 And I click submit
 Then I see a success message
 And the code: code <NDC_code>, name <NDC_name> is added to the NDC database
@@ -57,8 +57,8 @@ Examples:
 Scenario Outline: Create valid ICD code for a diagnosis
 Given An admin is authenticated
 And The admin is at the update database page
-When I select add ICD in the list
-And I fill out the fields with code <ICD_code>, name <ICD_name>
+And I select add ICD in the list
+When I fill out the fields with code <ICD_code>, name <ICD_name>
 And I click submit
 Then I see a success message
 And the code: code <ICD_code>, name <ICD_name> is added to the ICD database 
@@ -74,9 +74,9 @@ Examples:
 Scenario: Valid edit of NDC code for a prescription
 Given An admin is authenticated
 And   The admin is at the update database page
+And   I select edit NDC in the list
 And   NDC code 0832-0086 exists # Androxy
-When  I select edit NDC in the list
-And   I select code 0832-0086 
+When  I select code 0832-0086 
 And   I fill out the fields with code 66666-616-30, name Oxycodone
 And   I click submit
 Then  I see a success message
@@ -88,9 +88,9 @@ And   the NDC database is cleared
 Scenario Outline: Valid edit of ICD code for a diagnosis
 Given An admin is authenticated
 And The admin is at the update database page
+And I select edit ICD in the list
 And ICD code A00 exists # Cholera
-When I select edit ICD in the list
-And I select code A00
+When I select code A00
 And I fill out the fields with code <ICD_new_code>, name <ICD_new_name>
 And I click submit
 Then I see a success message
@@ -105,9 +105,9 @@ Examples:
 Scenario Outline: Create invalid NDC code for a prescription
 Given An admin is authenticated
 And The admin is at the update database page
+And I select add NDC in the list
 And NDC code 0832-0086 exists # Androxy
-When I select add NDC in the list
-And I fill out the fields with code <NDC_code>, name <NDC_name>
+When I fill out the fields with code <NDC_code>, name <NDC_name>
 And I click submit
 Then I see an error message 
 And the code: code <NDC_code>, name <NDC_name> is not added to the NDC database
@@ -115,14 +115,13 @@ And the NDC database is cleared
 
 Examples:
 	|NDC_code|NDC_name|
-	|0832-0086|Androxy|
 	|0832-0086|Benadryl|
 
 Scenario Outline: Create invalid ICD code for a diagnosis
 Given An admin is authenticated
 And The admin is at the update database page
-And ICD code A00 exists # Cholera
 And I select add ICD in the list
+And ICD code A00 exists # Cholera
 When I fill out the fields with code <ICD_code>, name <ICD_name>
 And I click submit
 Then I see an error message
@@ -131,7 +130,6 @@ And the ICD database is cleared
 
 Examples:
 	|ICD_code|ICD_name|
-	|A00|Cholera|
 	|A00|HIV|
 	|A00|AIDS|
 
