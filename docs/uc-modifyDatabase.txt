@@ -1,0 +1,14 @@
+@startuml
+:Patient: -left- (View ICD-10 Entry from Office Visit)
+:Patient: -up- (View assigned NDC Entries)
+
+:HCP: -right- (View ICD-10 Entries)
+:HCP: -up- (View NDC Entries)
+:HCP: -left- (Append ICD-10 Entry to Office Visit)
+:HCP: --- (Assign ICD-10 Entry to Patient)
+
+:Administrator: -up- (Add ICD-10 Entry)
+:Administrator: -up- (Add NDC Entry)
+:Administrator: -left- (Update ICD-10 Entry)
+:Administrator: -left- (Update NDC Entry)
+@enduml
