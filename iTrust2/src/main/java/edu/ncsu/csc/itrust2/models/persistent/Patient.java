@@ -51,8 +51,7 @@ public class Patient extends DomainObject<Patient> implements Serializable {
     /**
      * The cache representation of the patients in the database
      */
-    static private DomainObjectCache<String, Patient> cache            = new DomainObjectCache<String, Patient>(
-            Patient.class );
+    static private DomainObjectCache<String, Patient> cache            = new DomainObjectCache<>( Patient.class );
 
     /**
      * Get all patients in the database
@@ -87,6 +86,11 @@ public class Patient extends DomainObject<Patient> implements Serializable {
             }
         }
         return patient;
+//        try {
+//            return getWhere( "self_id = '" + username + "'" ).get( 0 );
+//        } catch (Exception e) {
+//            return null;
+//        }
     }
 
     /**
@@ -103,8 +107,24 @@ public class Patient extends DomainObject<Patient> implements Serializable {
     }
 
     /**
+     * Saves the DomainObject into the database. If the object instance does not
+     * exist a new record will be created in the database. If the object already
+     * exists in the DB, then the existing record will be updated.
+     */
+    @SuppressWarnings ( "unchecked" )
+    @Override public void save () {
+        final Session session = HibernateUtil.getSessionFactory().openSession();
+        session.beginTransaction();
+        session.saveOrUpdate( this );
+        session.getTransaction().commit();
+        session.close();
+
+        getCache( this.getClass() ).put( this.getSelf().getUsername(), this );
+    }
+
+    /**
      * Deletes the selected DomainObject from the database. This is operation
-     * cannot be reversed.
+     () )     * cannot be reversed.
      */
     @SuppressWarnings ( "unchecked" )
     @Override
@@ -708,5 +728,4 @@ public class Patient extends DomainObject<Patient> implements Serializable {
     public void setGender ( final Gender gender ) {
         this.gender = gender;
     }
-
 }

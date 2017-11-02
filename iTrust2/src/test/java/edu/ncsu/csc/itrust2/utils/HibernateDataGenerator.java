@@ -50,6 +50,8 @@ public class HibernateDataGenerator {
         export.drop( true, true );
         export.create( true, true );
 
+        DomainObjectCache.clearCaches();
+
         // TODO we might need to add a delay here
 
         final User hcp = new User( "hcp", "$2a$10$EblZqNptyYvcLm/VwDCVAuBjzZOI7khzdyGPBr08PpIi0na624b8.", Role.ROLE_HCP,

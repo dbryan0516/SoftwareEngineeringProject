@@ -87,7 +87,7 @@ public enum BloodType {
      */
     public static BloodType parse ( final String typeStr ) {
         for ( final BloodType type : values() ) {
-            if ( type.getName().equals( typeStr ) ) {
+            if ( type.getName().equals( typeStr ) || type.name().equals( typeStr ) ) {
                 return type;
             }
         }
