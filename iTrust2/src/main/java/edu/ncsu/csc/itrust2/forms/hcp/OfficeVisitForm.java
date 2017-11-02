@@ -138,6 +138,16 @@ public class OfficeVisitForm implements Serializable {
     private PatientSmokingStatus   patientSmokingStatus;
 
     /**
+     * The ICD of the patient (may be null).
+     */
+    private String icd;
+
+    /**
+     * The prescription of the patient (may be null).
+     */
+    private String prescription;
+
+    /**
      * Creates an OfficeVisitForm from the OfficeVisit provided
      *
      * @param ov
@@ -153,7 +163,8 @@ public class OfficeVisitForm implements Serializable {
         setNotes( ov.getNotes() );
         setId( ov.getId().toString() );
         setPreScheduled( ( (Boolean) ( ov.getAppointment() != null ) ).toString() );
-
+        setIcd( ov.getIcd() == null ? null : ov.getIcd().getDescription() );
+        setPrescription( ov.getPrescription() == null ? null : ov.getPrescription().getId().toString() );
     }
 
     /**
@@ -515,5 +526,37 @@ public class OfficeVisitForm implements Serializable {
      */
     public void setPatientSmokingStatus ( final PatientSmokingStatus patientSmokingStatus ) {
         this.patientSmokingStatus = patientSmokingStatus;
+    }
+
+    /**
+     * Get the ICD.
+     * @return The ICD.
+     */
+    public String getIcd () {
+        return icd;
+    }
+
+    /**
+     * Set the ICD.
+     * @param icd The new ICD.
+     */
+    public void setIcd ( String icd ) {
+        this.icd = icd;
+    }
+
+    /**
+     * Get the prescription.
+     * @return The prescription.
+     */
+    public String getPrescription () {
+        return prescription;
+    }
+
+    /**
+     * Set the prescription.
+     * @param prescription The new prescription.
+     */
+    public void setPrescription ( String prescription ) {
+        this.prescription = prescription;
     }
 }

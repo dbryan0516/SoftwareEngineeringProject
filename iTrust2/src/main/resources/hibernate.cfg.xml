@@ -28,6 +28,9 @@
 		<mapping class="edu.ncsu.csc.itrust2.models.persistent.Patient" />
 		<mapping class="edu.ncsu.csc.itrust2.models.persistent.Personnel" />
 		<mapping class="edu.ncsu.csc.itrust2.models.persistent.BasicHealthMetrics" />
+		<mapping class="edu.ncsu.csc.itrust2.models.persistent.NDC" />
+		<mapping class="edu.ncsu.csc.itrust2.models.persistent.ICD" />
+		<mapping class="edu.ncsu.csc.itrust2.models.persistent.Prescription" />
 
 
 	</session-factory>
