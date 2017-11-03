@@ -23,7 +23,11 @@
 									
 									$scope.NDCCodes = [];
 									$scope.patients = [];
+									$scope.currentPatient;
+									$scope.currentPrescription = {};
 									$scope.officeVisitsForPatient = [];
+									$scope.allOfficeVisits = {};
+
 
 									/* Fetches the NDC codes from DB */
 									$scope.getNDCCodes = function() {
@@ -44,56 +48,148 @@
 											url : baseUrl + "/patients",
 										}).then(function(response) {
 											$scope.patients = response.data;
+
+											// Now that we have the Patients, let's get a list of office visits
+											$scope.getAllOfficeVisits();
 										}, function(rejection) {
 											console.log(rejection);
 										});
 									};
 
-									/* Fetches the NDC codes from DB */
-									$scope.getOfficeVisitsForPatient = function(patient) {
+									$scope.getAllOfficeVisits = function() {
 										$http({
-											method : "GET",
-											url : baseUrl + "/",
-										}).then(function(response) {
-											$scope.officeVisitsForPatient = response;
-										}, function(rejection) {
-											console.log(rejection);
-										});
-									};
-									
+												method : "GET",
+												url : baseUrl + "/officevisits",
+											}).then(function(response) {
+
+												// Populate a map of OfficeVisits, where key is username and value is a list of visits
+												// for that user
+												response.data.forEach(function(elm) {
+													if ($scope.allOfficeVisits[elm.patient.username] === undefined) {
+														$scope.allOfficeVisits[elm.patient.username] = [];
+													}
+													$scope.allOfficeVisits[elm.patient.username].push(elm);
+												});
+
+												console.log($scope.allOfficeVisits);
+											}, function(rejection) {
+												console.log(rejection);
+											});	
+									};							
 								
 									/* Resets the form fields and back-end state */
 									$scope.resetForm = function() {
 										$scope.message = "";
 										jQuery("input[type='text']").val("");
-									}
-									
-									/* Set the medical code for editing */
-									$scope.selectCode = function(code) {
-										$scope.medCode = code;
-										
-										// Deep copy of object
-										$scope.medCodeEdited.id = code.id;
-										$scope.medCodeEdited.description = code.description;
-										$scope.medCodeEdited.code = code.code;
 									};
+									
+									/* Set the Patient associated with this Prescription and update the list of OfficeVisits*/
+									$scope.selectPatient = function(patient) {
+										$scope.currentPatient = patient;
+										console.log("Changed patient to:");
+										console.log($scope.currentPatient);
+										$scope.officeVisitsForPatient = $scope.allOfficeVisits[patient.self.username];
+										console.log("Changed array to:");
+										console.log($scope.officeVisitsForPatient);
+									};
+
+									/* Set the NDC associated with this Prescription */
+									$scope.selectNDC = function(ndcCode) {
+										$scope.currentPrescription.ndcDescription = ndcCode.description;
+										$scope.currentPrescription.ndcCode = ndcCode.code;
+									};
+
+									/* Date formatting garbage, since the API returns a silly representation of a date */
+									function twoDigit(num) {
+										if (num < 10) {
+											return "0" + num;
+										}
+										return num;
+									};	
+
+									function getTime(date) {									
+										var hour = date.hourOfDay;
+										var suffix;
+										if ( hour > 12 ) {
+											hour = hour - 12;
+											suffix = "PM";
+										} else {
+											suffix = "AM";
+										}
+										return twoDigit(hour) + ":" + twoDigit(date.minute) + " " + suffix;
+									};
+
+									function getDate(date) {
+										/* The months start at 0... only the months.  So we have to add 1 to get the correct input.*/
+										month = date.month + 1;
+										return twoDigit(month) + "/" + twoDigit(date.dayOfMonth) + "/" + date.year;
+									};
+
+									$scope.prettyDate = function(apiDate) {
+										return getDate(apiDate) + " at " + getTime(apiDate);
+									};
+
+
+									$scope.validateData = function() {
+										var dateRegex = /^\d{2}\/\d{2}\/\d{4}$/;
+										var intRegex = /^\d{1,}$/;
+										var validData = true;
+										$scope.errorMsg = "";
+
+										// No patient selected
+										if ($scope.currentPatient === undefined) {
+											$scope.errorMsg += "A Patient must be associated with this Prescription \n";
+											validData = false;
+										}
+
+										// No NDC selected
+										if ($scope.currentPrescription.ndcDescription === undefined || $scope.currentPrescription.ndcCode === undefined) {
+											$scope.errorMsg += "An NDC code must be associated with this Prescription \n";
+											validData = false;
+										}
+
+										// Invalid start date
+										if (!dateRegex.test($scope.currentPrescription.startDate)) {
+											$scope.errorMsg += "Start date must be in the format: mm/dd/yyyy \n";
+											validData = false;
+										}
+
+										// Invalid end date
+										if (!dateRegex.test($scope.currentPrescription.endDate)) {
+											$scope.errorMsg += "End date must be in the format: mm/dd/yyyy \n";
+											validData = false;
+										}
+
+										// Invalid dosage (non-integers and 0 value)
+										var dosage = $scope.currentPrescription.dosage;
+										if (!intRegex.test(dosage) || parseInt(dosage) == 0) {
+											$scope.errorMsg += "Dosage must be an integer >= 0 \n";
+											validData = false;
+
+										}
+
+										// Invalid renewal count
+										if (!intRegex.test($scope.currentPrescription.numRenewals)) {
+											$scope.errorMsg += "Renewal count must be an integer \n";
+											validData = false;
+										}
+
+										return validData;
+									}
 									
 									/* Send data to backend */
 									$scope.submit = function() {
-										var url = baseUrl + "/" + $scope.formMode + $scope.medCodeType;
-										var requestType;
-										if ($scope.formMode === "add") {
-											requestType = "POST";
-										}
-										else {
-											requestType = "PUT";
-											
-											// The id has to be added as a URL parameter
-											url += "/" + $scope.medCodeEdited.id;
-										}
-										console.log(url);
+										var url = baseUrl + "/" + $scope.formMode + $scope.medCodeType;	
+
+										// Add Patient to this Prescription
+										$scope.currentPrescription.patient = $scope.currentPatient;
+
+										console.log($scope.currentPrescription);	
+										if ($scope.validateData()) {
+											$scope.message = "Valid data given!";
+										}							
 										$http({
-											method : requestType,
+											method : "POST",
 											url : url,
 											data : $scope.medCodeEdited
 										}).then(function(response) {
@@ -149,7 +245,7 @@
 				<li ng-repeat="patient in patients | filter:searchFilter"><h4><label>
 						<input type="radio" ng-model="$parent.visit.patient"
 						name="name" value="{{patient.self.username}}" required="true"
-						ng-change="" />&nbsp;{{patient.self.username}}</label>
+						ng-change="selectPatient(patient)" />&nbsp;{{patient.self.username}}</label>
 				</h4></li>
 			</ul>
 		</div>
@@ -158,32 +254,47 @@
 			<h2>Patient: {{visit.actualPatient.self.username}}</h2>
 			<h2>Document a new Prescription</h2>
 			<div class="prescriptionForm">
+				Select an NDC code (mandatory):
 				<div class="ndcCodes">
-					<input type="text" id="ndcCodeSearch" name="ndcCodeSearch" ng-model="ndcSearchFilter" placeholder="Search by Prescription name" />
+					<input style="width:50%;" type="text" id="ndcCodeSearch" name="ndcCodeSearch" ng-model="ndcSearchFilter" placeholder="Search by Prescription name" />
 					<ul>
 						<li ng-repeat="code in NDCCodes | filter:ndcSearchFilter">
-							<input id="{{code.code}}" type="radio" ng-model="currentPrescription" name="ndcCode" data-medCode="{{code.description}}" value="{{code.code}}" />
+							<input id="{{code.code}}" type="radio" ng-model="currentPrescription.ndcCode" ng-change="selectNDC(code)" name="ndcCode" data-medCode="{{code.description}}" value="{{code.code}}" />
 							<label for="{{code.code}}">{{code.description}} ({{code.code}})</label>
 						</li>
 					</ul>
 				</div>
 				<br />
+				Select an office visit to associate with this prescription (optional):
+				<div class="officeVisits">
+					<ul>
+						<li ng-repeat="visit in officeVisitsForPatient">
+							<input id="visit-{{visit.id}}" type="radio" ng-model="currentPrescription.officeVisit" ng-change="selectOfficeVisit(visit.id)" name="officeVisit" value="{{visit.id}}" />
+							<label for="visit-{{visit.id}}">
+								{{visit.type}} on 
+								{{prettyDate(visit.date)}}
+							</label>
+						</li>
+					</ul>
+				</div>
+				<br />
+				Mandatory information:
 				<table>
 					<tr>
 						<td>Start Date</td>
-						<td><input type="text" id="startDate" placeholder="Format: mm/dd/yyyy" /></td>
+						<td><input type="text" id="startDate" ng-model="currentPrescription.startDate" placeholder="Format: mm/dd/yyyy" /></td>
 					</tr>
 					<tr>
 						<td>End Date</td>
-						<td><input type="text" id="endDate" placeholder="Format: mm/dd/yyyy" /></td>
+						<td><input type="text" id="endDate" ng-model="currentPrescription.endDate" placeholder="Format: mm/dd/yyyy" /></td>
 					</tr>
 					<tr>
 						<td>Dosage (mg)</td>
-						<td><input type="text" id="dosage" placeholder="Dosage in mg" /></td>
+						<td><input type="text" id="dosage" ng-model="currentPrescription.dosage" placeholder="Dosage in mg" /></td>
 					</tr>
 					<tr>
 						<td>Renewals</td>
-						<td><input type="text" id="renewals" placeholder="Renewal count"></td>
+						<td><input type="text" id="numRenewals" ng-model="currentPrescription.numRenewals" placeholder="Renewal count"></td>
 					</tr>
 				</table>
 				<br />
