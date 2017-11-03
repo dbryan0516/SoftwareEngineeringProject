@@ -129,7 +129,8 @@ public class HibernateDataGenerator {
         icd2.save();
 
         final PrescriptionForm prescriptionForm = new PrescriptionForm();
-        prescriptionForm.setNdc( "Androxy" );
+        prescriptionForm.setNdcDescription( "Androxy" );
+        prescriptionForm.setNdcCode( "0832-0086" );
         prescriptionForm.setPatient( "patient" );
         prescriptionForm.setOfficeVisit( null );
         prescriptionForm.setStartDate( "01/01/2017" );

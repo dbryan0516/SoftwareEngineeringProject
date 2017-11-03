@@ -80,7 +80,9 @@ public class APIPresciptionTest {
         pform.setDosage( 100 );
         pform.setStartDate( "01/11/2018" );
         pform.setEndDate( "02/02/2018" );
-        pform.setNdc( "Androxy" );
+        pform.setNdcDescription( "Androxy" );
+        pform.setNdcCode( "0832-0086" );
+
         pform.setPatient( "patient" );
         pform.setNumRenewals( 2 );
 
@@ -91,15 +93,15 @@ public class APIPresciptionTest {
 
         final PrescriptionForm pform2 = new PrescriptionForm( plist.get( plist.size() - 1 ) );
         pform2.setDosage( 200 );
-        System.out.println( "\n\n\n\n\n\n" );
-        System.out.println( pform2.getId() );
-        System.out.println( pform2.getStartDate() );
-        System.out.println( pform2.getEndDate() );
-        System.out.println( pform2.getPatient() );
-        System.out.println( pform2.getNdc() );
-        System.out.println( pform2.getDosage() );
-        System.out.println( pform2.getNumRenewals() );
-        System.out.println( "\n\n\n\n\n\n" );
+        // System.out.println( "\n\n\n\n\n\n" );
+        // System.out.println( pform2.getId() );
+        // System.out.println( pform2.getStartDate() );
+        // System.out.println( pform2.getEndDate() );
+        // System.out.println( pform2.getPatient() );
+        // System.out.println( pform2.getNdc() );
+        // System.out.println( pform2.getDosage() );
+        // System.out.println( pform2.getNumRenewals() );
+        // System.out.println( "\n\n\n\n\n\n" );
 
         mvc.perform( put( "/api/v1/prescriptions/" + pform2.getId() ).contentType( MediaType.APPLICATION_JSON )
                 .content( TestUtils.asJsonString( pform2 ) ) ).andExpect( status().isOk() );
@@ -108,7 +110,8 @@ public class APIPresciptionTest {
         pformInvalid.setDosage( 100 );
         pformInvalid.setStartDate( "aaaaaaaaaaa" );
         pformInvalid.setEndDate( "02/02/2018" );
-        pformInvalid.setNdc( "Androxy" );
+        pformInvalid.setNdcDescription( "Androxy" );
+        pformInvalid.setNdcCode( "0832-0086" );
         pformInvalid.setPatient( "patient" );
         pformInvalid.setNumRenewals( 2 );
 
@@ -121,7 +124,8 @@ public class APIPresciptionTest {
         mvc.perform( post( "/api/v1/prescriptions" ).contentType( MediaType.APPLICATION_JSON )
                 .content( TestUtils.asJsonString( pformInvalid ) ) ).andExpect( status().isBadRequest() );
 
-        pformInvalid.setNdc( "Not a drug" );
+        pformInvalid.setNdcDescription( "Not a drug" );
+        pformInvalid.setNdcCode( "not a drug" );
         pformInvalid.setDosage( 223 );
 
         mvc.perform( post( "/api/v1/prescriptions" ).contentType( MediaType.APPLICATION_JSON )
@@ -134,7 +138,9 @@ public class APIPresciptionTest {
         pformInvalid.setDosage( 100 );
         pformInvalid.setStartDate( "aaaaaaaaaaa" );
         pformInvalid.setEndDate( "02/02/2018" );
-        pformInvalid.setNdc( "Androxy" );
+        pformInvalid.setNdcDescription( "Androxy" );
+        pformInvalid.setNdcCode( "0832-0086" );
+        ;
         pformInvalid.setPatient( "patient" );
         pformInvalid.setNumRenewals( 2 );
 
@@ -147,7 +153,8 @@ public class APIPresciptionTest {
         mvc.perform( put( "/api/v1/prescriptions/" + pform2.getId() ).contentType( MediaType.APPLICATION_JSON )
                 .content( TestUtils.asJsonString( pformInvalid ) ) ).andExpect( status().isBadRequest() );
 
-        pformInvalid.setNdc( "Not a drug" );
+        pformInvalid.setNdcDescription( "Not a drug" );
+        pformInvalid.setNdcCode( "Not a drug" );
         pformInvalid.setDosage( 223 );
 
         mvc.perform( put( "/api/v1/prescriptions/" + pform2.getId() ).contentType( MediaType.APPLICATION_JSON )
