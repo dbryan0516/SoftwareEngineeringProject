@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.google.gson.Gson;
+
 import edu.ncsu.csc.itrust2.forms.admin.PrescriptionForm;
 import edu.ncsu.csc.itrust2.models.enums.TransactionType;
 import edu.ncsu.csc.itrust2.models.persistent.Prescription;
@@ -64,15 +66,19 @@ public class APIPrescriptionController extends APIController {
     @PutMapping ( BASE_PATH + "/prescriptions/{id}" )
     @PreAuthorize ( "hasRole('ROLE_HCP')" )
     public ResponseEntity updateOfficeVisit ( @PathVariable final Long id, @RequestBody final PrescriptionForm form ) {
+        final Gson builder = new Gson();
         try {
             final Prescription prescription = new Prescription( form );
             if ( null != prescription.getId() && !id.equals( prescription.getId() ) ) {
-                return new ResponseEntity( "The ID provided does not match the ID of the Presciption provided",
+                return new ResponseEntity(
+                        builder.toJson( "The ID provided does not match the ID of the Presciption provided" ),
                         HttpStatus.CONFLICT );
             }
             final Prescription dbPrescription = Prescription.getById( id );
             if ( null == dbPrescription ) {
-                return new ResponseEntity( "No prescription found for id " + id, HttpStatus.NOT_FOUND );
+                return new ResponseEntity(
+                        builder.toJson( "The prescription to be updated does not exist in the database" ),
+                        HttpStatus.NOT_FOUND );
             }
             // get current date -
             // https://beginnersbook.com/2013/05/current-date-time-in-java/
@@ -82,32 +88,30 @@ public class APIPrescriptionController extends APIController {
             // validate data that is not checked in persistent object
             if ( prescription.getStartDate().before( current ) || prescription.getEndDate().before( current )
                     || prescription.getStartDate().after( prescription.getEndDate() ) ) {
-                System.out.println( "\n\n\n\n date \n\n\n\n" );
-                return new ResponseEntity( "Dates must be after current date and end date must be after start date",
+                return new ResponseEntity(
+                        builder.toJson(
+                                "start date must be after curent date and end date can't be before start date" ),
                         HttpStatus.BAD_REQUEST );
             }
             else if ( prescription.getDosage() < 0 ) {
-                System.out.println( "\n\n\n\n dose \n\n\n\n" );
-                return new ResponseEntity( "Dosage must be positive", HttpStatus.BAD_REQUEST );
+                return new ResponseEntity( builder.toJson( "Dosage must be positive" ), HttpStatus.BAD_REQUEST );
             }
             else if ( prescription.getNumRenewals() < 0 ) {
-                System.out.println( "\n\n\n\n Renewals \n\n\n\n" );
-                return new ResponseEntity( "Renewals must be greater than or equal to 0", HttpStatus.BAD_REQUEST );
+                return new ResponseEntity( builder.toJson( "Renewals must be greater than or equal to zero" ),
+                        HttpStatus.BAD_REQUEST );
             }
             prescription.save(); /* Will overwrite existing request */
-
-            System.out.println( "\n\n\n\n saved correctly \n\n\n\n" );
             // log appropriately
             final String hcp = SecurityContextHolder.getContext().getAuthentication().getName();
             final String patient = prescription.getPatient().getUsername();
             LoggerUtil.log( TransactionType.PRESCRIPTION_EDIT, hcp, patient,
                     hcp + " edited a prescription for " + patient );
-            return new ResponseEntity( prescription, HttpStatus.OK );
+            return new ResponseEntity( builder.toJson( "Prescription was added successfully" ), HttpStatus.OK );
 
         }
         catch ( final Exception e ) {
-            System.out.println( "\n\n\n\n Soemthing else \n\n\n\n" );
-            return new ResponseEntity( "Could not update " + form.toString() + " because of " + e.getMessage(),
+            return new ResponseEntity(
+                    builder.toJson( "Could not update " + form.toString() + " because of " + e.getMessage() ),
                     HttpStatus.BAD_REQUEST );
         }
     }
@@ -122,10 +126,12 @@ public class APIPrescriptionController extends APIController {
     @PostMapping ( BASE_PATH + "/prescriptions" )
     @PreAuthorize ( "hasRole('ROLE_HCP')" )
     public ResponseEntity createOfficeVisit ( @RequestBody final PrescriptionForm form ) {
+        final Gson builder = new Gson();
         try {
             final Prescription prescription = new Prescription( form );
             if ( null != Prescription.getById( prescription.getId() ) ) {
-                return new ResponseEntity( "Office visit with the id " + prescription.getId() + " already exists",
+                return new ResponseEntity(
+                        builder.toJson( "Office visit with the id " + prescription.getId() + " already exists" ),
                         HttpStatus.CONFLICT );
             }
             // get current date -
@@ -136,14 +142,16 @@ public class APIPrescriptionController extends APIController {
             // validate data that is not checked in persistent object
             if ( prescription.getStartDate().before( current ) || prescription.getEndDate().before( current )
                     || prescription.getStartDate().after( prescription.getEndDate() ) ) {
-                return new ResponseEntity( "Dates must be after current date and end date must be after start date",
+                return new ResponseEntity(
+                        builder.toJson( "Dates must be after current date and end date must be after start date" ),
                         HttpStatus.BAD_REQUEST );
             }
             else if ( prescription.getDosage() < 0 ) {
-                return new ResponseEntity( "Dosage must be positive", HttpStatus.BAD_REQUEST );
+                return new ResponseEntity( builder.toJson( "Dosage must be positive" ), HttpStatus.BAD_REQUEST );
             }
             else if ( prescription.getNumRenewals() < 0 ) {
-                return new ResponseEntity( "Renewals must be greater than or equal to 0", HttpStatus.BAD_REQUEST );
+                return new ResponseEntity( builder.toJson( "Renewals must be greater than or equal to 0" ),
+                        HttpStatus.BAD_REQUEST );
             }
             // save to db
             prescription.save();
@@ -152,10 +160,11 @@ public class APIPrescriptionController extends APIController {
             final String patient = prescription.getPatient().getUsername();
             LoggerUtil.log( TransactionType.PRESCRIPTION_CREATE, hcp, patient,
                     hcp + " created a prescription for " + patient );
-            return new ResponseEntity( prescription, HttpStatus.OK );
+            return new ResponseEntity( builder.toJson( "Presciption added successfully" ), HttpStatus.OK );
         }
         catch ( final Exception e ) {
-            return new ResponseEntity( "Could not validate or save the prescription provided due to " + e.getMessage(),
+            return new ResponseEntity(
+                    builder.toJson( "Could not validate or save the prescription provided due to " + e.getMessage() ),
                     HttpStatus.BAD_REQUEST );
         }
     }
