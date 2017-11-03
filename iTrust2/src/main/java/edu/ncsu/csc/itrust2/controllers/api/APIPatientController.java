@@ -2,6 +2,8 @@ package edu.ncsu.csc.itrust2.controllers.api;
 
 import java.util.List;
 
+import edu.ncsu.csc.itrust2.models.enums.TransactionType;
+import edu.ncsu.csc.itrust2.utils.LoggerUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -120,6 +122,8 @@ public class APIPatientController extends APIController {
                 return new ResponseEntity( "No Patient found for id " + id, HttpStatus.NOT_FOUND );
             }
             patient.save();
+            LoggerUtil.log( TransactionType.HCP_EDIT_PATIENT_DEMOGRAPHICS,
+                    SecurityContextHolder.getContext().getAuthentication().getName(), patient.getSelf().getUsername() );
             return new ResponseEntity( patient, HttpStatus.OK );
         }
         catch ( final Exception e ) {

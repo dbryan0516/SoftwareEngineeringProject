@@ -58,6 +58,11 @@ public enum TransactionType {
     ENTER_EDIT_DEMOGRAPHICS ( 410, "Demographics edited by user", true ),
 
     /**
+     * HCP updated Patient demographics
+     */
+    HCP_EDIT_PATIENT_DEMOGRAPHICS ( 420, "Demographics edited for user", true ),
+
+    /**
      * Hospital created
      */
     CREATE_HOSPITAL ( 500, "New hospital created", false ),
