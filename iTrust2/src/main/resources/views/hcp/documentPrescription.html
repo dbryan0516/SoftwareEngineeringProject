@@ -1,0 +1,198 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:include="layout :: head(title=~{::title},links=~{})">
+	<title>Document Prescriptions</title>
+</head>
+<body th:include="layout :: body" th:with="content=~{::content}">
+	<style>
+		div.prescriptionForm input[type='text'] {
+			width: 50%;
+		}
+	</style>
+	<div th:fragment="content">
+
+		<script th:inline="javascript">
+					/* Otherwise Thymeleaf tries to parse Javascript as XML and breaks itself sometimes.  Sigh */
+				/*<![CDATA[*/
+	
+				var app = angular.module('myApp', []);
+				app
+						.controller(
+								'documentPrescriptionCtrl',
+								function($scope, $http) {
+									var baseUrl = "/iTrust2/api/v1";
+									
+									$scope.NDCCodes = [];
+									$scope.patients = [];
+									$scope.officeVisitsForPatient = [];
+
+									/* Fetches the NDC codes from DB */
+									$scope.getNDCCodes = function() {
+										$http({
+											method : "GET",
+											url : baseUrl + "/NDCEntries",
+										}).then(function(response) {
+											$scope.NDCCodes = response.data;
+										}, function(rejection) {
+											console.log(rejection);
+										});
+									};
+
+									/* Fetches the list of Patients from DB */
+									$scope.getPatients = function() {
+										$http({
+											method : "GET",
+											url : baseUrl + "/patients",
+										}).then(function(response) {
+											$scope.patients = response.data;
+										}, function(rejection) {
+											console.log(rejection);
+										});
+									};
+
+									/* Fetches the NDC codes from DB */
+									$scope.getOfficeVisitsForPatient = function(patient) {
+										$http({
+											method : "GET",
+											url : baseUrl + "/",
+										}).then(function(response) {
+											$scope.officeVisitsForPatient = response;
+										}, function(rejection) {
+											console.log(rejection);
+										});
+									};
+									
+								
+									/* Resets the form fields and back-end state */
+									$scope.resetForm = function() {
+										$scope.message = "";
+										jQuery("input[type='text']").val("");
+									}
+									
+									/* Set the medical code for editing */
+									$scope.selectCode = function(code) {
+										$scope.medCode = code;
+										
+										// Deep copy of object
+										$scope.medCodeEdited.id = code.id;
+										$scope.medCodeEdited.description = code.description;
+										$scope.medCodeEdited.code = code.code;
+									};
+									
+									/* Send data to backend */
+									$scope.submit = function() {
+										var url = baseUrl + "/" + $scope.formMode + $scope.medCodeType;
+										var requestType;
+										if ($scope.formMode === "add") {
+											requestType = "POST";
+										}
+										else {
+											requestType = "PUT";
+											
+											// The id has to be added as a URL parameter
+											url += "/" + $scope.medCodeEdited.id;
+										}
+										console.log(url);
+										$http({
+											method : requestType,
+											url : url,
+											data : $scope.medCodeEdited
+										}).then(function(response) {
+											console.log(response);
+										}, function(rejection) {
+											console.log(rejection);
+										});
+									};
+									
+									$scope.getNDCCodes();
+									$scope.getPatients();
+								});
+		</script>
+
+	<div ng-app="myApp" ng-controller="documentPrescriptionCtrl">
+		<nav class="navbar navbar-default">
+				<div class="container-fluid">
+					<ul class="nav navbar-nav">
+						<li class="dropdown"><a class="dropdown-toggle"
+							data-toggle="dropdown" href="#">Patient<span class="caret"></span></a>
+							<ul class="dropdown-menu">
+								<li><a href="/iTrust2/hcp/viewAppointmentRequests"
+									id="viewrequests">View Appointment Requests</a></li>
+								<li><a href="/iTrust2/hcp/viewAppointments"
+									id="upcomingrequests">View Upcoming Appointments</a></li>
+								<li><a href="#">Edit Patient -- Not Implemented</a></li>
+								<li><a href="#">Add Patient -- Not Implemented</a></li>
+								<li><a href="/iTrust2/hcp/documentOfficeVisit"
+									id="documentOfficeVisit">Document Office Visit</a></li>
+								<li><a href="/iTrust2/hcp/documentPrescription"
+									id="documentOfficeVisit">Document Prescription</a></li>
+							</ul></li>
+						<li class="dropdown"><a class="dropdown-toggle"
+							data-toggle="dropdown" href="#">Edit<span class="caret"></span></a>
+							<ul class="dropdown-menu">
+								<li><a href="/iTrust2/personnel/editDemographics"
+									id="editdemographics">Edit Demographics</a></li>
+								<li> <a href="/iTrust2/hcp/editOfficeVisit"
+								      id="editOfficeVisit">Edit Office Visit</a></li>
+							</ul></li>
+					</ul>
+				</div>
+		</nav>
+		<div style="float:left;width:30%;height:75%;overflow-y:auto">
+			<h2>Patients:</h2>
+			<!-- info on filtering taken from here: https://www.w3schools.com/angular/angular_filters.asp
+				and https://docs.angularjs.org/api/ng/filter/filter -->
+			<h4>Search: <input type="text" ng-model="searchFilter.self.username"/></h4>
+			<!-- Info on scrolling taken from here: https://www.w3schools.com/cssref/pr_pos_overflow.asp -->
+			<!-- and here: https://stackoverflow.com/questions/9560330/how-to-hide-a-vertical-scroll-bar-when-not-needed -->
+			<ul style="overflow:auto;height=90%;">
+			<!-- Information on how labels wor from here: https://stackoverflow.com/questions/7863251/clicking-the-text-to-select-corresponding-radio-button -->
+				<li ng-repeat="patient in patients | filter:searchFilter"><h4><label>
+						<input type="radio" ng-model="$parent.visit.patient"
+						name="name" value="{{patient.self.username}}" required="true"
+						ng-change="" />&nbsp;{{patient.self.username}}</label>
+				</h4></li>
+			</ul>
+		</div>
+		<!-- information on vertical rule found here: https://stackoverflow.com/questions/571900/is-there-a-vr-vertical-rule-in-html  -->
+		<div style="float:left;width:70%;border-left:1px solid #bbb;padding: 3%;height:75%;overflow-y:auto">
+			<h2>Patient: {{visit.actualPatient.self.username}}</h2>
+			<h2>Document a new Prescription</h2>
+			<div class="prescriptionForm">
+				<div class="ndcCodes">
+					<input type="text" id="ndcCodeSearch" name="ndcCodeSearch" ng-model="ndcSearchFilter" placeholder="Search by Prescription name" />
+					<ul>
+						<li ng-repeat="code in NDCCodes | filter:ndcSearchFilter">
+							<input id="{{code.code}}" type="radio" ng-model="currentPrescription" name="ndcCode" data-medCode="{{code.description}}" value="{{code.code}}" />
+							<label for="{{code.code}}">{{code.description}} ({{code.code}})</label>
+						</li>
+					</ul>
+				</div>
+				<br />
+				<table>
+					<tr>
+						<td>Start Date</td>
+						<td><input type="text" id="startDate" placeholder="Format: mm/dd/yyyy" /></td>
+					</tr>
+					<tr>
+						<td>End Date</td>
+						<td><input type="text" id="endDate" placeholder="Format: mm/dd/yyyy" /></td>
+					</tr>
+					<tr>
+						<td>Dosage (mg)</td>
+						<td><input type="text" id="dosage" placeholder="Dosage in mg" /></td>
+					</tr>
+					<tr>
+						<td>Renewals</td>
+						<td><input type="text" id="renewals" placeholder="Renewal count"></td>
+					</tr>
+				</table>
+				<br />
+				<button ng-click="submit()" name="submit">Submit Prescription</button>
+				<div name="errorMsg"><pre>{{errorMsg}}</pre></div>
+				<div name="success">{{message}}</div>
+			</div>
+		</div>
+	</div>
+	</div>
+</body>
+</html>
