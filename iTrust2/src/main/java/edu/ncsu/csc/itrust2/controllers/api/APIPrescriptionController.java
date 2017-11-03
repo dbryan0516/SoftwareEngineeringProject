@@ -9,7 +9,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -62,7 +61,7 @@ public class APIPrescriptionController extends APIController {
      *            The updated prescription to save
      * @return response
      */
-    @PutMapping ( BASE_PATH + "/presciptions/{id}" )
+    @PutMapping ( BASE_PATH + "/prescriptions/{id}" )
     @PreAuthorize ( "hasRole('ROLE_HCP')" )
     public ResponseEntity updateOfficeVisit ( @PathVariable final Long id, @RequestBody final PrescriptionForm form ) {
         try {
@@ -83,16 +82,21 @@ public class APIPrescriptionController extends APIController {
             // validate data that is not checked in persistent object
             if ( prescription.getStartDate().before( current ) || prescription.getEndDate().before( current )
                     || prescription.getStartDate().after( prescription.getEndDate() ) ) {
+                System.out.println( "\n\n\n\n date \n\n\n\n" );
                 return new ResponseEntity( "Dates must be after current date and end date must be after start date",
                         HttpStatus.BAD_REQUEST );
             }
             else if ( prescription.getDosage() < 0 ) {
+                System.out.println( "\n\n\n\n dose \n\n\n\n" );
                 return new ResponseEntity( "Dosage must be positive", HttpStatus.BAD_REQUEST );
             }
             else if ( prescription.getNumRenewals() < 0 ) {
+                System.out.println( "\n\n\n\n Renewals \n\n\n\n" );
                 return new ResponseEntity( "Renewals must be greater than or equal to 0", HttpStatus.BAD_REQUEST );
             }
             prescription.save(); /* Will overwrite existing request */
+
+            System.out.println( "\n\n\n\n saved correctly \n\n\n\n" );
             // log appropriately
             final String hcp = SecurityContextHolder.getContext().getAuthentication().getName();
             final String patient = prescription.getPatient().getUsername();
@@ -102,6 +106,7 @@ public class APIPrescriptionController extends APIController {
 
         }
         catch ( final Exception e ) {
+            System.out.println( "\n\n\n\n Soemthing else \n\n\n\n" );
             return new ResponseEntity( "Could not update " + form.toString() + " because of " + e.getMessage(),
                     HttpStatus.BAD_REQUEST );
         }
@@ -155,43 +160,46 @@ public class APIPrescriptionController extends APIController {
         }
     }
 
-    // delete method just in case
-    /**
-     * Deletes the Prescription with the id provided. This will remove all
-     * traces from the system and cannot be reversed.
-     *
-     * @param id
-     *            The id of the Prescription to delete
-     * @return response
-     */
-    @DeleteMapping ( BASE_PATH + "/prescriptions/{id}" )
-    public ResponseEntity deleteOfficeVisitByID ( @PathVariable final Long id ) {
-        final Prescription prescription = Prescription.getById( id );
-        if ( null == prescription ) {
-            return new ResponseEntity( "No prescription found for " + id, HttpStatus.NOT_FOUND );
-        }
-        try {
-            prescription.delete();
-            return new ResponseEntity( id, HttpStatus.OK );
-        }
-        catch ( final Exception e ) {
-            return new ResponseEntity( "Could not delete " + id + " because of " + e.getMessage(),
-                    HttpStatus.BAD_REQUEST );
-        }
-
-    }
-
-    /**
-     * Deletes all the Prescriptions from the db. This will remove all traces
-     * from the system and cannot be reversed.
-     *
-     * @param id
-     *            The id of the Prescription to delete
-     * @return response
-     */
-    @DeleteMapping ( BASE_PATH + "/prescriptions" )
-    public void deleteAllOfficeVisits () {
-        Prescription.deleteAll( Prescription.class );
-    }
+    // // delete method just in case
+    // /**
+    // * Deletes the Prescription with the id provided. This will remove all
+    // * traces from the system and cannot be reversed.
+    // *
+    // * @param id
+    // * The id of the Prescription to delete
+    // * @return response
+    // */
+    // @DeleteMapping ( BASE_PATH + "/prescriptions/{id}" )
+    // public ResponseEntity deleteOfficeVisitByID ( @PathVariable final Long id
+    // ) {
+    // final Prescription prescription = Prescription.getById( id );
+    // if ( null == prescription ) {
+    // return new ResponseEntity( "No prescription found for " + id,
+    // HttpStatus.NOT_FOUND );
+    // }
+    // try {
+    // prescription.delete();
+    // return new ResponseEntity( id, HttpStatus.OK );
+    // }
+    // catch ( final Exception e ) {
+    // return new ResponseEntity( "Could not delete " + id + " because of " +
+    // e.getMessage(),
+    // HttpStatus.BAD_REQUEST );
+    // }
+    //
+    // }
+    //
+    // /**
+    // * Deletes all the Prescriptions from the db. This will remove all traces
+    // * from the system and cannot be reversed.
+    // *
+    // * @param id
+    // * The id of the Prescription to delete
+    // * @return response
+    // */
+    // @DeleteMapping ( BASE_PATH + "/prescriptions" )
+    // public void deleteAllOfficeVisits () {
+    // Prescription.deleteAll( Prescription.class );
+    // }
 
 }
