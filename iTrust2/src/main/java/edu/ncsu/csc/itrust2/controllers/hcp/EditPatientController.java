@@ -11,6 +11,11 @@ import org.springframework.web.bind.annotation.GetMapping;
  */
 @Controller
 public class EditPatientController {
+    /**
+     * Returns the endpoint for editing a patient's demographics.
+     *
+     * @return The editPatient endpoint.
+     */
     @GetMapping("/hcp/editPatient")
     @PreAuthorize("hasRole('ROLE_HCP')")
     public String editPatient() {
