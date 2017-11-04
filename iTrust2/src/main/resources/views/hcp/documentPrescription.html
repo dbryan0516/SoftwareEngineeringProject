@@ -23,7 +23,6 @@
 									
 									$scope.NDCCodes = [];
 									$scope.patients = [];
-									$scope.currentPatient;
 									$scope.currentPrescription = {};
 									$scope.officeVisitsForPatient = [];
 									$scope.allOfficeVisits = {};
@@ -77,26 +76,20 @@
 											});	
 									};							
 								
-									/* Resets the form fields and back-end state */
-									$scope.resetForm = function() {
-										$scope.message = "";
-										jQuery("input[type='text']").val("");
-									};
 									
 									/* Set the Patient associated with this Prescription and update the list of OfficeVisits*/
 									$scope.selectPatient = function(patient) {
-										$scope.currentPatient = patient;
-										console.log("Changed patient to:");
-										console.log($scope.currentPatient);
+										$scope.resetForm();
+										$scope.message = "";
+										$scope.currentPrescription.patient = patient.self.username;
 										$scope.officeVisitsForPatient = $scope.allOfficeVisits[patient.self.username];
-										console.log("Changed array to:");
-										console.log($scope.officeVisitsForPatient);
 									};
 
 									/* Set the NDC associated with this Prescription */
 									$scope.selectNDC = function(ndcCode) {
 										$scope.currentPrescription.ndcDescription = ndcCode.description;
 										$scope.currentPrescription.ndcCode = ndcCode.code;
+										$scope.message = "";
 									};
 
 									/* Date formatting garbage, since the API returns a silly representation of a date */
@@ -130,73 +123,81 @@
 									};
 
 
+									/* Validates the data in the form */
+									function isInvalid(str) {
+										return str === "" || str === null || str === undefined;
+									};
+
 									$scope.validateData = function() {
 										var dateRegex = /^\d{2}\/\d{2}\/\d{4}$/;
 										var intRegex = /^\d{1,}$/;
-										var validData = true;
+										var p = $scope.currentPrescription;
 										$scope.errorMsg = "";
 
 										// No patient selected
-										if ($scope.currentPatient === undefined) {
+										if (isInvalid(p.patient)) {
 											$scope.errorMsg += "A Patient must be associated with this Prescription \n";
-											validData = false;
 										}
 
 										// No NDC selected
-										if ($scope.currentPrescription.ndcDescription === undefined || $scope.currentPrescription.ndcCode === undefined) {
+										if (isInvalid(p.ndcDescription) || isInvalid(p.ndcCode)) {
 											$scope.errorMsg += "An NDC code must be associated with this Prescription \n";
-											validData = false;
 										}
 
 										// Invalid start date
-										if (!dateRegex.test($scope.currentPrescription.startDate)) {
+										if (!dateRegex.test(p.startDate)) {
 											$scope.errorMsg += "Start date must be in the format: mm/dd/yyyy \n";
-											validData = false;
 										}
 
 										// Invalid end date
-										if (!dateRegex.test($scope.currentPrescription.endDate)) {
+										if (!dateRegex.test(p.endDate)) {
 											$scope.errorMsg += "End date must be in the format: mm/dd/yyyy \n";
-											validData = false;
 										}
 
 										// Invalid dosage (non-integers and 0 value)
-										var dosage = $scope.currentPrescription.dosage;
-										if (!intRegex.test(dosage) || parseInt(dosage) == 0) {
+										if (!intRegex.test(p.dosage) || parseInt(p.dosage) == 0) {
 											$scope.errorMsg += "Dosage must be an integer >= 0 \n";
-											validData = false;
 
 										}
 
 										// Invalid renewal count
-										if (!intRegex.test($scope.currentPrescription.numRenewals)) {
+										if (!intRegex.test(p.numRenewals)) {
 											$scope.errorMsg += "Renewal count must be an integer \n";
-											validData = false;
 										}
 
-										return validData;
+										// No errors mean valid data
+										return $scope.errorMsg === "";
+									}
+
+									$scope.resetForm = function() {
+										$scope.currentPrescription = {};
+										$scope.officeVisitsForPatient = [];
+										$scope.errorMsg = "";
 									}
 									
 									/* Send data to backend */
 									$scope.submit = function() {
-										var url = baseUrl + "/" + $scope.formMode + $scope.medCodeType;	
-
-										// Add Patient to this Prescription
-										$scope.currentPrescription.patient = $scope.currentPatient;
-
+										var url = baseUrl + "/prescription";	
+										$scope.message = "";
 										console.log($scope.currentPrescription);	
 										if ($scope.validateData()) {
 											$scope.message = "Valid data given!";
+											$http({
+												method : "POST",
+												url : url,
+												data : $scope.currentPrescription
+											}).then(function(response) {
+												console.log(response);
+											}, function(rejection) {
+												console.log(rejection);
+											});	
+
+											// Reset the form
+											$scope.resetForm();						
+										}
+										else {
+											$scope.message = "An error occurred"
 										}							
-										$http({
-											method : "POST",
-											url : url,
-											data : $scope.medCodeEdited
-										}).then(function(response) {
-											console.log(response);
-										}, function(rejection) {
-											console.log(rejection);
-										});
 									};
 									
 									$scope.getNDCCodes();
@@ -237,13 +238,13 @@
 			<h2>Patients:</h2>
 			<!-- info on filtering taken from here: https://www.w3schools.com/angular/angular_filters.asp
 				and https://docs.angularjs.org/api/ng/filter/filter -->
-			<h4>Search: <input type="text" ng-model="searchFilter.self.username"/></h4>
+			<h4>Search: <input type="text" ng-model="userSearchFilter"/></h4>
 			<!-- Info on scrolling taken from here: https://www.w3schools.com/cssref/pr_pos_overflow.asp -->
 			<!-- and here: https://stackoverflow.com/questions/9560330/how-to-hide-a-vertical-scroll-bar-when-not-needed -->
 			<ul style="overflow:auto;height=90%;">
 			<!-- Information on how labels wor from here: https://stackoverflow.com/questions/7863251/clicking-the-text-to-select-corresponding-radio-button -->
-				<li ng-repeat="patient in patients | filter:searchFilter"><h4><label>
-						<input type="radio" ng-model="$parent.visit.patient"
+				<li ng-repeat="patient in patients | filter:userSearchFilter"><h4><label>
+						<input type="radio" ng-model="currentPrescription.patient"
 						name="name" value="{{patient.self.username}}" required="true"
 						ng-change="selectPatient(patient)" />&nbsp;{{patient.self.username}}</label>
 				</h4></li>
