@@ -86,11 +86,6 @@ public class Patient extends DomainObject<Patient> implements Serializable {
             }
         }
         return patient;
-//        try {
-//            return getWhere( "self_id = '" + username + "'" ).get( 0 );
-//        } catch (Exception e) {
-//            return null;
-//        }
     }
 
     /**

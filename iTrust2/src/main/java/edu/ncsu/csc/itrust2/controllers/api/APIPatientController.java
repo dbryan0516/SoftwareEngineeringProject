@@ -122,8 +122,10 @@ public class APIPatientController extends APIController {
                 return new ResponseEntity( "No Patient found for id " + id, HttpStatus.NOT_FOUND );
             }
             patient.save();
-            LoggerUtil.log( TransactionType.HCP_EDIT_PATIENT_DEMOGRAPHICS,
-                    SecurityContextHolder.getContext().getAuthentication().getName(), patient.getSelf().getUsername() );
+            if ( SecurityContextHolder.getContext().getAuthentication() != null ) {
+                LoggerUtil.log(TransactionType.HCP_EDIT_PATIENT_DEMOGRAPHICS,
+                        SecurityContextHolder.getContext().getAuthentication().getName(), patient.getSelf().getUsername());
+            }
             return new ResponseEntity( patient, HttpStatus.OK );
         }
         catch ( final Exception e ) {
