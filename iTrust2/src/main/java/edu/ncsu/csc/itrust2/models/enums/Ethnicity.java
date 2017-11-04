@@ -74,7 +74,7 @@ public enum Ethnicity {
      */
     public static Ethnicity parse ( final String ethnicityStr ) {
         for ( final Ethnicity ethnicity : values() ) {
-            if ( ethnicity.getName().equals( ethnicityStr ) ) {
+            if ( ethnicity.getName().equals( ethnicityStr ) || ethnicity.name().equals( ethnicityStr ) ) {
                 return ethnicity;
             }
         }
