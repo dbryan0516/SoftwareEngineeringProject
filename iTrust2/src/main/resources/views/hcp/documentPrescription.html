@@ -24,8 +24,8 @@
 									$scope.NDCCodes = [];
 									$scope.patients = [];
 									$scope.currentPrescription = {};
-									$scope.officeVisitsForPatient = [];
-									$scope.allOfficeVisits = {};
+									// $scope.officeVisitsForPatient = [];
+									// $scope.allOfficeVisits = {};
 
 
 									/* Fetches the NDC codes from DB */
@@ -49,32 +49,32 @@
 											$scope.patients = response.data;
 
 											// Now that we have the Patients, let's get a list of office visits
-											$scope.getAllOfficeVisits();
+											//$scope.getAllOfficeVisits();
 										}, function(rejection) {
 											console.log(rejection);
 										});
 									};
 
-									$scope.getAllOfficeVisits = function() {
-										$http({
-												method : "GET",
-												url : baseUrl + "/officevisits",
-											}).then(function(response) {
+									// $scope.getAllOfficeVisits = function() {
+									// 	$http({
+									// 			method : "GET",
+									// 			url : baseUrl + "/officevisits",
+									// 		}).then(function(response) {
 
-												// Populate a map of OfficeVisits, where key is username and value is a list of visits
-												// for that user
-												response.data.forEach(function(elm) {
-													if ($scope.allOfficeVisits[elm.patient.username] === undefined) {
-														$scope.allOfficeVisits[elm.patient.username] = [];
-													}
-													$scope.allOfficeVisits[elm.patient.username].push(elm);
-												});
+									// 			// Populate a map of OfficeVisits, where key is username and value is a list of visits
+									// 			// for that user
+									// 			response.data.forEach(function(elm) {
+									// 				if ($scope.allOfficeVisits[elm.patient.username] === undefined) {
+									// 					$scope.allOfficeVisits[elm.patient.username] = [];
+									// 				}
+									// 				$scope.allOfficeVisits[elm.patient.username].push(elm);
+									// 			});
 
-												console.log($scope.allOfficeVisits);
-											}, function(rejection) {
-												console.log(rejection);
-											});	
-									};							
+									// 			console.log($scope.allOfficeVisits);
+									// 		}, function(rejection) {
+									// 			console.log(rejection);
+									// 		});	
+									// };							
 								
 									
 									/* Set the Patient associated with this Prescription and update the list of OfficeVisits*/
@@ -82,7 +82,7 @@
 										$scope.resetForm();
 										$scope.message = "";
 										$scope.currentPrescription.patient = patient.self.username;
-										$scope.officeVisitsForPatient = $scope.allOfficeVisits[patient.self.username];
+										// $scope.officeVisitsForPatient = $scope.allOfficeVisits[patient.self.username];
 									};
 
 									/* Set the NDC associated with this Prescription */
@@ -171,7 +171,7 @@
 
 									$scope.resetForm = function() {
 										$scope.currentPrescription = {};
-										$scope.officeVisitsForPatient = [];
+										// $scope.officeVisitsForPatient = [];
 										$scope.errorMsg = "";
 									}
 									
@@ -221,7 +221,7 @@
 								<li><a href="/iTrust2/hcp/documentOfficeVisit"
 									id="documentOfficeVisit">Document Office Visit</a></li>
 								<li><a href="/iTrust2/hcp/documentPrescription"
-									id="documentOfficeVisit">Document Prescription</a></li>
+									id="documentPrescription">Document Prescription</a></li>
 							</ul></li>
 						<li class="dropdown"><a class="dropdown-toggle"
 							data-toggle="dropdown" href="#">Edit<span class="caret"></span></a>
@@ -266,7 +266,7 @@
 					</ul>
 				</div>
 				<br />
-				Select an office visit to associate with this prescription (optional):
+<!-- 				Select an office visit to associate with this prescription (optional):
 				<div class="officeVisits">
 					<ul>
 						<li ng-repeat="visit in officeVisitsForPatient">
@@ -278,7 +278,7 @@
 						</li>
 					</ul>
 				</div>
-				<br />
+				<br /> -->
 				Mandatory information:
 				<table>
 					<tr>
