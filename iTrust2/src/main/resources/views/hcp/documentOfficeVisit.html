@@ -145,19 +145,8 @@
                         $scope.visit.status = "PENDING";
 
                         if ($scope.validateData()) {
-                            $scope.message = "Valid data given!";
-                            $http({
-                                method : "POST",
-                                url : baseUrl + "/ICDEntries",
-                                data : $scope.currentDiagnosis
-                            }).then(function(response) {
-                                console.log(response);
-                            }, function(rejection) {
-                                console.log(rejection);
-                            });
 
-                            // Reset the form
-                            $scope.resetForm();
+                            $scope.visit.icd = $scope.currentDiagnosis.code;
                         }
 
 
