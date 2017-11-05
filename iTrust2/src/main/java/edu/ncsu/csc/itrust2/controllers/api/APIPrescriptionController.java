@@ -1,8 +1,5 @@
 package edu.ncsu.csc.itrust2.controllers.api;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
@@ -80,20 +77,14 @@ public class APIPrescriptionController extends APIController {
                         builder.toJson( "The prescription to be updated does not exist in the database" ),
                         HttpStatus.NOT_FOUND );
             }
-            // get current date -
-            // https://beginnersbook.com/2013/05/current-date-time-in-java/
-            final DateFormat df = new SimpleDateFormat( "dd/MM/yy" );
-            final Date current = new Date();
-            df.format( current );
             // validate data that is not checked in persistent object
-            if ( prescription.getStartDate().before( current ) || prescription.getEndDate().before( current )
-                    || prescription.getStartDate().after( prescription.getEndDate() ) ) {
+            if ( prescription.getStartDate().after( prescription.getEndDate() ) ) {
                 return new ResponseEntity(
                         builder.toJson(
                                 "start date must be after curent date and end date can't be before start date" ),
                         HttpStatus.BAD_REQUEST );
             }
-            else if ( prescription.getDosage() < 0 ) {
+            else if ( prescription.getDosage() <= 0 ) {
                 return new ResponseEntity( builder.toJson( "Dosage must be positive" ), HttpStatus.BAD_REQUEST );
             }
             else if ( prescription.getNumRenewals() < 0 ) {
@@ -134,19 +125,13 @@ public class APIPrescriptionController extends APIController {
                         builder.toJson( "Office visit with the id " + prescription.getId() + " already exists" ),
                         HttpStatus.CONFLICT );
             }
-            // get current date -
-            // https://beginnersbook.com/2013/05/current-date-time-in-java/
-            final DateFormat df = new SimpleDateFormat( "dd/MM/yy" );
-            final Date current = new Date();
-            df.format( current );
             // validate data that is not checked in persistent object
-            if ( prescription.getStartDate().before( current ) || prescription.getEndDate().before( current )
-                    || prescription.getStartDate().after( prescription.getEndDate() ) ) {
+            if ( prescription.getStartDate().after( prescription.getEndDate() ) ) {
                 return new ResponseEntity(
                         builder.toJson( "Dates must be after current date and end date must be after start date" ),
                         HttpStatus.BAD_REQUEST );
             }
-            else if ( prescription.getDosage() < 0 ) {
+            else if ( prescription.getDosage() <= 0 ) {
                 return new ResponseEntity( builder.toJson( "Dosage must be positive" ), HttpStatus.BAD_REQUEST );
             }
             else if ( prescription.getNumRenewals() < 0 ) {
