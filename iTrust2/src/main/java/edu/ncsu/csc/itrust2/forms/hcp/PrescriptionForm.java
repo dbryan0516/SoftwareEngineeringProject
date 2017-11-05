@@ -1,4 +1,4 @@
-package edu.ncsu.csc.itrust2.forms.admin;
+package edu.ncsu.csc.itrust2.forms.hcp;
 
 import java.io.Serializable;
 import java.text.SimpleDateFormat;

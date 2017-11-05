@@ -1,8 +1,5 @@
 package edu.ncsu.csc.itrust2.controllers.api;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
@@ -17,13 +14,9 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.google.gson.Gson;
-
-import edu.ncsu.csc.itrust2.forms.admin.PrescriptionForm;
 import edu.ncsu.csc.itrust2.forms.hcp.OfficeVisitForm;
 import edu.ncsu.csc.itrust2.models.enums.TransactionType;
 import edu.ncsu.csc.itrust2.models.persistent.OfficeVisit;
-import edu.ncsu.csc.itrust2.models.persistent.Prescription;
 import edu.ncsu.csc.itrust2.models.persistent.User;
 import edu.ncsu.csc.itrust2.utils.LoggerUtil;
 
@@ -96,67 +89,17 @@ public class APIOfficeVisitController extends APIController {
      */
     @PostMapping ( BASE_PATH + "/officevisits" )
     public ResponseEntity createOfficeVisit ( @RequestBody final OfficeVisitForm visitF ) {
-        boolean addedPrescription = false;
-        // placeholder just in case office visit is invalid and presciption
-        // needs to be deleted after the fact
-        Long prescriptionID = Long.valueOf( -1 );
         try {
             final OfficeVisit visit = new OfficeVisit( visitF );
             if ( null != OfficeVisit.getById( visit.getId() ) ) {
                 return new ResponseEntity( "Office visit with the id " + visit.getId() + " already exists",
                         HttpStatus.CONFLICT );
             }
-            // check if there is a prescription to be added
-            if ( visitF.getPrescription() != null ) {
-                final Gson builder = new Gson();
-                final PrescriptionForm prescriptionForm = builder.fromJson( visitF.getPrescription(),
-                        PrescriptionForm.class );
-                final Prescription prescription = new Prescription( prescriptionForm );
-                if ( null != Prescription.getById( prescription.getId() ) ) {
-                    return new ResponseEntity(
-                            builder.toJson( "Office visit with the id " + prescription.getId() + " already exists" ),
-                            HttpStatus.CONFLICT );
-                }
-                // get current date -
-                // https://beginnersbook.com/2013/05/current-date-time-in-java/
-                final DateFormat df = new SimpleDateFormat( "dd/MM/yy" );
-                final Date current = new Date();
-                df.format( current );
-                // validate data that is not checked in persistent object
-                if ( prescription.getStartDate().before( current ) || prescription.getEndDate().before( current )
-                        || prescription.getStartDate().after( prescription.getEndDate() ) ) {
-                    return new ResponseEntity(
-                            builder.toJson( "Dates must be after current date and end date must be after start date" ),
-                            HttpStatus.BAD_REQUEST );
-                }
-                else if ( prescription.getDosage() < 0 ) {
-                    return new ResponseEntity( builder.toJson( "Dosage must be positive" ), HttpStatus.BAD_REQUEST );
-                }
-                else if ( prescription.getNumRenewals() < 0 ) {
-                    return new ResponseEntity( builder.toJson( "Renewals must be greater than or equal to 0" ),
-                            HttpStatus.BAD_REQUEST );
-                }
-                // save to db
-                prescription.save();
-                // log
-                final String hcp = SecurityContextHolder.getContext().getAuthentication().getName();
-                final String patient = prescription.getPatient().getUsername();
-                LoggerUtil.log( TransactionType.PRESCRIPTION_CREATE, hcp, patient,
-                        hcp + " created a prescription for " + patient );
-                prescriptionID = prescription.getId();
-                addedPrescription = true;
-            }
             visit.save();
             return new ResponseEntity( visit, HttpStatus.OK );
 
         }
         catch ( final Exception e ) {
-            try {
-                Prescription.getById( prescriptionID ).delete();
-            }
-            catch ( final Exception i ) {
-                // empty catch block
-            }
             return new ResponseEntity( "Could not validate or save the OfficeVisit provided due to " + e.getMessage(),
                     HttpStatus.BAD_REQUEST );
         }
@@ -200,10 +143,6 @@ public class APIOfficeVisitController extends APIController {
      */
     @PutMapping ( BASE_PATH + "/officevisits/{id}" )
     public ResponseEntity updateOfficeVisit ( @PathVariable final Long id, @RequestBody final OfficeVisitForm form ) {
-        boolean addedPrescription = false;
-        // placeholder just in case office visit is invalid and presciption
-        // needs to be deleted after the fact
-        Long prescriptionID = Long.valueOf( -1 );
         try {
             final OfficeVisit visit = new OfficeVisit( form );
             if ( null != visit.getId() && !id.equals( visit.getId() ) ) {
@@ -221,58 +160,10 @@ public class APIOfficeVisitController extends APIController {
                 LoggerUtil.log( TransactionType.OFFICE_VISIT_EDIT, form.getHcp(), form.getPatient(), form.getHcp()
                         + " updated basic health metrics for " + form.getPatient() + " from " + form.getDate() );
             }
-            // check if there is a prescription to be added
-            if ( form.getPrescription() != null ) {
-                final Gson builder = new Gson();
-                final PrescriptionForm prescriptionForm = builder.fromJson( form.getPrescription(),
-                        PrescriptionForm.class );
-                final Prescription prescription = new Prescription( prescriptionForm );
-                if ( null != Prescription.getById( prescription.getId() ) ) {
-                    return new ResponseEntity(
-                            builder.toJson( "Office visit with the id " + prescription.getId() + " already exists" ),
-                            HttpStatus.CONFLICT );
-                }
-                // get current date -
-                // https://beginnersbook.com/2013/05/current-date-time-in-java/
-                final DateFormat df = new SimpleDateFormat( "dd/MM/yy" );
-                final Date current = new Date();
-                df.format( current );
-                // validate data that is not checked in persistent object
-                if ( prescription.getStartDate().before( current ) || prescription.getEndDate().before( current )
-                        || prescription.getStartDate().after( prescription.getEndDate() ) ) {
-                    return new ResponseEntity(
-                            builder.toJson( "Dates must be after current date and end date must be after start date" ),
-                            HttpStatus.BAD_REQUEST );
-                }
-                else if ( prescription.getDosage() < 0 ) {
-                    return new ResponseEntity( builder.toJson( "Dosage must be positive" ), HttpStatus.BAD_REQUEST );
-                }
-                else if ( prescription.getNumRenewals() < 0 ) {
-                    return new ResponseEntity( builder.toJson( "Renewals must be greater than or equal to 0" ),
-                            HttpStatus.BAD_REQUEST );
-                }
-                // save to db
-                prescription.save();
-                // log
-                final String hcp = SecurityContextHolder.getContext().getAuthentication().getName();
-                final String patient = prescription.getPatient().getUsername();
-                LoggerUtil.log( TransactionType.PRESCRIPTION_CREATE, hcp, patient,
-                        hcp + " created a prescription for " + patient );
-                prescriptionID = prescription.getId();
-                addedPrescription = true;
-            }
             visit.save(); /* Will overwrite existing request */
             return new ResponseEntity( visit, HttpStatus.OK );
         }
         catch ( final Exception e ) {
-            if ( addedPrescription ) {
-                try {
-                    Prescription.getById( prescriptionID ).delete();
-                }
-                catch ( final Exception i ) {
-                    // empty catch block
-                }
-            }
             return new ResponseEntity( "Could not update " + form.toString() + " because of " + e.getMessage(),
                     HttpStatus.BAD_REQUEST );
         }

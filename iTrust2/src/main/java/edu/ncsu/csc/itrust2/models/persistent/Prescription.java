@@ -17,7 +17,7 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
-import edu.ncsu.csc.itrust2.forms.admin.PrescriptionForm;
+import edu.ncsu.csc.itrust2.forms.hcp.PrescriptionForm;
 import edu.ncsu.csc.itrust2.models.enums.Role;
 import edu.ncsu.csc.itrust2.utils.DomainObjectCache;
 
@@ -120,7 +120,17 @@ public class Prescription extends DomainObject<Prescription> {
         final SimpleDateFormat sdf = new SimpleDateFormat( "MM/dd/yyyy", Locale.ENGLISH );
         setStartDate( sdf.parse( form.getStartDate() ) );
         setEndDate( sdf.parse( form.getEndDate() ) );
+        // validate data that is not checked in persistent object
+        if ( getStartDate().after( getEndDate() ) ) {
+            throw new IllegalArgumentException( "start date can't be after the end date" );
+        }
+        if ( form.getNumRenewals() < 0 ) {
+            throw new IllegalArgumentException( "Renewals must be greater than or equal to zero" );
+        }
         setNumRenewals( form.getNumRenewals() );
+        if ( form.getDosage() <= 0 ) {
+            throw new IllegalArgumentException( "Dosage must be a non zero positive number" );
+        }
         setDosage( form.getDosage() );
     }
 

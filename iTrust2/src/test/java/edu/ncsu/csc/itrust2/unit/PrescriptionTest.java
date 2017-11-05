@@ -10,7 +10,7 @@ import java.util.Locale;
 
 import org.junit.Test;
 
-import edu.ncsu.csc.itrust2.forms.admin.PrescriptionForm;
+import edu.ncsu.csc.itrust2.forms.hcp.PrescriptionForm;
 import edu.ncsu.csc.itrust2.models.persistent.NDC;
 import edu.ncsu.csc.itrust2.models.persistent.Prescription;
 import edu.ncsu.csc.itrust2.models.persistent.User;
@@ -25,7 +25,7 @@ public class PrescriptionTest {
         prescriptionForm.setNdcCode( "0832-0086" );
         prescriptionForm.setPatient( "patient" );
         prescriptionForm.setOfficeVisit( null );
-        prescriptionForm.setStartDate( "01/01/2017" );
+        prescriptionForm.setStartDate( "01/01/2018" );
         prescriptionForm.setEndDate( "01/01/2035" );
         prescriptionForm.setNumRenewals( 1000 );
         prescriptionForm.setDosage( 50000 );
@@ -36,7 +36,7 @@ public class PrescriptionTest {
         assertEquals( User.getByName( "patient" ), prescription.getPatient() );
         assertNull( prescription.getVisit() );
         final SimpleDateFormat format = new SimpleDateFormat( "MM/dd/yyyy", Locale.ENGLISH );
-        assertEquals( "01/01/2017", format.format( prescription.getStartDate() ) );
+        assertEquals( "01/01/2018", format.format( prescription.getStartDate() ) );
         assertEquals( "01/01/2035", format.format( prescription.getEndDate() ) );
         assertEquals( 1000, (int) prescription.getNumRenewals() );
         assertEquals( 50000, (int) prescription.getDosage() );

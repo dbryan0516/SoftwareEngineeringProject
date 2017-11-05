@@ -24,8 +24,8 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import edu.ncsu.csc.itrust2.config.RootConfiguration;
-import edu.ncsu.csc.itrust2.forms.admin.PrescriptionForm;
 import edu.ncsu.csc.itrust2.forms.admin.UserForm;
+import edu.ncsu.csc.itrust2.forms.hcp.PrescriptionForm;
 import edu.ncsu.csc.itrust2.models.enums.Role;
 import edu.ncsu.csc.itrust2.models.persistent.Prescription;
 import edu.ncsu.csc.itrust2.mvc.config.WebMvcConfiguration;
