@@ -125,21 +125,37 @@ public enum TransactionType {
      */
     OFFICE_VISIT_PATIENT_VIEW ( 810, "Patient views basic health metrics for an office visit", true ),
     /**
+     * Prescription entered for patient
+     */
+    PRESCRIPTION_CREATE ( 900, "HCP creates a prescription", true ),
+    /**
+     * Prescription entered for patient
+     */
+    PRESCRIPTION_EDIT ( 901, "HCP edits a prescription", true ),
+    /**
+     * Prescription entered for patient
+     */
+    PRESCRIPTION_VIEW_PAT ( 902, "Patient views a prescription", true ),
+    /**
+     * Prescription entered for patient
+     */
+    PRESCRIPTION_VIEW_HCP ( 903, "HCP views a prescription", true ),
+    /**
      * Admin creates an ICD-10 code
      */
-    ICD_CREATE (1101, "Admin created ICD-10 code", false),
+    ICD_CREATE ( 1101, "Admin created ICD-10 code", false ),
     /**
      * Admin updates an ICD-10 code
      */
-    ICD_UPDATE (1102, "Admin updated ICD-10 code", false),
+    ICD_UPDATE ( 1102, "Admin updated ICD-10 code", false ),
     /**
      * Admin creates NDC code
      */
-    NDC_CREATE (1104, "Admin created NDC code", false),
+    NDC_CREATE ( 1104, "Admin created NDC code", false ),
     /**
      * Admin updates NDC code
      */
-    NDC_UPDATE (1105, "Admin updated NDC code", false)
+    NDC_UPDATE ( 1105, "Admin updated NDC code", false )
 
     ;
 
