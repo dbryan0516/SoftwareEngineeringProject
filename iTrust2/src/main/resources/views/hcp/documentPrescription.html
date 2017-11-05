@@ -177,23 +177,23 @@
 									
 									/* Send data to backend */
 									$scope.submit = function() {
-										var url = baseUrl + "/prescription";	
+										var url = baseUrl + "/prescriptions";	
 										$scope.message = "";
 										console.log($scope.currentPrescription);	
 										if ($scope.validateData()) {
-											$scope.message = "Valid data given!";
 											$http({
 												method : "POST",
 												url : url,
 												data : $scope.currentPrescription
 											}).then(function(response) {
+												$scope.message = "Prescription successfully submitted";
+												$scope.resetForm();
 												console.log(response);
 											}, function(rejection) {
+												$scope.message = "An error occurred";
+												$scope.errorMsg += rejection.data;
 												console.log(rejection);
-											});	
-
-											// Reset the form
-											$scope.resetForm();						
+											});				
 										}
 										else {
 											$scope.message = "An error occurred"
