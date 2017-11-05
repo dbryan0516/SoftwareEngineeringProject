@@ -65,7 +65,7 @@ public class APIPrescriptionController extends APIController {
      */
     @PutMapping ( BASE_PATH + "/prescriptions/{id}" )
     @PreAuthorize ( "hasRole('ROLE_HCP')" )
-    public ResponseEntity updateOfficeVisit ( @PathVariable final Long id, @RequestBody final PrescriptionForm form ) {
+    public ResponseEntity updatePrescription ( @PathVariable final Long id, @RequestBody final PrescriptionForm form ) {
         final Gson builder = new Gson();
         try {
             final Prescription prescription = new Prescription( form );
@@ -125,7 +125,7 @@ public class APIPrescriptionController extends APIController {
      */
     @PostMapping ( BASE_PATH + "/prescriptions" )
     @PreAuthorize ( "hasRole('ROLE_HCP')" )
-    public ResponseEntity createOfficeVisit ( @RequestBody final PrescriptionForm form ) {
+    public ResponseEntity createPrescription ( @RequestBody final PrescriptionForm form ) {
         final Gson builder = new Gson();
         try {
             final Prescription prescription = new Prescription( form );
