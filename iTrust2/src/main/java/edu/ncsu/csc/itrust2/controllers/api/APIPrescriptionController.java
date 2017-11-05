@@ -28,7 +28,9 @@ public class APIPrescriptionController extends APIController {
     /**
      * Retrieves list of prescriptions for a given patient - must be hcp logged
      * in
-     *
+     * 
+     * @param id
+     *            - id of patient to get prescription of
      * @return list of prescriptions
      */
     @GetMapping ( BASE_PATH + "/prescriptions/hcp/{id}" )

@@ -84,6 +84,8 @@ public class PrescriptionForm implements Serializable {
     }
 
     /**
+     * returns the ndc code
+     * 
      * @return the ndcCode
      */
     public String getNdcCode () {
@@ -91,6 +93,8 @@ public class PrescriptionForm implements Serializable {
     }
 
     /**
+     * set the ndc code
+     * 
      * @param ndcCode
      *            the ndcCode to set
      */
