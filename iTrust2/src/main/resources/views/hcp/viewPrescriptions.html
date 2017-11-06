@@ -1,0 +1,103 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:include="layout :: head(title=~{::title},links=~{})">
+    <title>View Prescriptions</title>
+</head>
+<body th:include="layout :: body" th:with="content=~{::content}">
+<div th:fragment="content">
+
+    <script th:inline="javascript">
+        /* Otherwise Thymeleaf tries to parse Javascript as XML and breaks itself sometimes.  Sigh */
+        /*<![CDATA[*/
+
+        var app = angular.module('myApp', []);
+        app.controller('viewPrescriptionCtrl', function ($scope, $http) {
+            var BASE_URL = '/iTrust2/api/v1';
+
+            $scope.prescriptions = [];
+
+            $http.get(BASE_URL + '/patients').then(
+                function (response) {
+                    $scope.patients = response.data;
+                }
+            );
+
+            $scope.selectPatient = function (patient) {
+                $scope.patient = patient;
+                $http.get(BASE_URL + '/prescriptions/hcp/' + patient.self.username).then(
+                    function (response) {
+                        var prescriptions = response.data;
+                        prescriptions.forEach(function (p, index) {
+                            if (prescriptions[index].officeVisit != null) prescriptions[index].officeVisit.date = parseDate(p.officeVisit.date);
+                            prescriptions[index].startDate = parseDate(p.startDate);
+                            prescriptions[index].endDate = parseDate(p.endDate);
+                        });
+                        $scope.prescriptions = response.data;
+                    }, function (error) {
+                        $scope.error = error.data;
+                    }
+                );
+            };
+
+            /**
+             * Parses a JS Date object from the given patient date.
+             */
+            function parseDate(date) {
+                if (date == null)
+                    return null;
+                return new Date(date);
+            }
+        });
+
+        /*]]>*/
+    </script>
+
+
+    <div ng-app="myApp" ng-controller="viewPrescriptionCtrl">
+        <div style="float:left;width:30%;height:75%;overflow-y:auto">
+            <h2>Patients:</h2>
+            <!-- info on filtering taken from here: https://www.w3schools.com/angular/angular_filters.asp
+                and https://docs.angularjs.org/api/ng/filter/filter -->
+            <h4>Search: <input type="text" ng-model="searchFilter.self.username"/></h4>
+            <!-- Info on scrolling taken from here: https://www.w3schools.com/cssref/pr_pos_overflow.asp -->
+            <!-- and here: https://stackoverflow.com/questions/9560330/how-to-hide-a-vertical-scroll-bar-when-not-needed -->
+            <ul style="overflow:auto;height=90%;">
+                <!-- Information on how labels wor from here: https://stackoverflow.com/questions/7863251/clicking-the-text-to-select-corresponding-radio-button -->
+                <li ng-repeat="patient in patients | filter:searchFilter"><h4><label>
+                    <input type="radio" ng-model="$parent.visit.patient"
+                           name="name" value="{{patient.self.username}}" required="true"
+                           ng-change='selectPatient(patient)'/>&nbsp;{{patient.self.username}}</label>
+                </h4></li>
+            </ul>
+        </div>
+        <div style="float:left;width:65%;border-left:1px solid #bbb;padding: 3%;height:75%;overflow-y:auto">
+            <h2>Patient: {{patient.self.username}}</h2>
+            <div ng-if="prescriptions.length === 0">
+                Patient has no prescriptions.
+            </div>
+            <table ng-if="prescriptions.length !== 0" class="table table-hover">
+                <thead>
+                <tr>
+                    <th>Prescription</th>
+                    <th>Visit Date</th>
+                    <th>Prescribed Date</th>
+                    <th>End Date</th>
+                    <th>Total Renewals</th>
+                    <th>Dosage (mg)</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="p in prescriptions">
+                    <td>{{ p.ndc.description }}</td>
+                    <td>{{ p.officeVisit == null ? 'None' : p.officeVisit.date.toLocaleDateString() }}</td>
+                    <td>{{ p.startDate.toLocaleDateString() }}</td>
+                    <td>{{ p.endDate.toLocaleDateString() }}</td>
+                    <td>{{ p.numRenewals }}</td>
+                    <td>{{ p.dosage }}</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</body>
+</html>

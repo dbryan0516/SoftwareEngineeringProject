@@ -41,6 +41,17 @@ public class PatientController {
     }
 
     /**
+     * Returns the form page for a patient to view their prescriptions.
+     * @param model The data for the front end.
+     * @return Page to display to the user.
+     */
+    @GetMapping ( "/patient/viewPrescriptions" )
+    @PreAuthorize( "hasRole('ROLE_PATIENT')" )
+    public String viewPrescriptions ( final Model model ) {
+        return "/patient/viewPrescriptions";
+    }
+
+    /**
      * Landing screen for a Patient when they log in
      *
      * @param model

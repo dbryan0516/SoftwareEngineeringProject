@@ -28,4 +28,14 @@ public class HCPController {
         return edu.ncsu.csc.itrust2.models.enums.Role.ROLE_HCP.getLanding();
     }
 
+    /**
+     * Returns the page for an HCP to view Patient's prescriptions.
+     * @param model Data from the front end.
+     * @return The page to display.
+     */
+    @RequestMapping ( value = "hcp/viewPrescriptions" )
+    @PreAuthorize( "hasRole('ROLE_HCP')" )
+    public String viewPrescriptions ( final Model model ) {
+        return "/hcp/viewPrescriptions";
+    }
 }
