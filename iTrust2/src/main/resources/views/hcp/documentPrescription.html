@@ -24,8 +24,6 @@
 									$scope.NDCCodes = [];
 									$scope.patients = [];
 									$scope.currentPrescription = {};
-									// $scope.officeVisitsForPatient = [];
-									// $scope.allOfficeVisits = {};
 
 
 									/* Fetches the NDC codes from DB */
@@ -47,41 +45,16 @@
 											url : baseUrl + "/patients",
 										}).then(function(response) {
 											$scope.patients = response.data;
-
-											// Now that we have the Patients, let's get a list of office visits
-											//$scope.getAllOfficeVisits();
 										}, function(rejection) {
 											console.log(rejection);
 										});
-									};
-
-									// $scope.getAllOfficeVisits = function() {
-									// 	$http({
-									// 			method : "GET",
-									// 			url : baseUrl + "/officevisits",
-									// 		}).then(function(response) {
-
-									// 			// Populate a map of OfficeVisits, where key is username and value is a list of visits
-									// 			// for that user
-									// 			response.data.forEach(function(elm) {
-									// 				if ($scope.allOfficeVisits[elm.patient.username] === undefined) {
-									// 					$scope.allOfficeVisits[elm.patient.username] = [];
-									// 				}
-									// 				$scope.allOfficeVisits[elm.patient.username].push(elm);
-									// 			});
-
-									// 			console.log($scope.allOfficeVisits);
-									// 		}, function(rejection) {
-									// 			console.log(rejection);
-									// 		});	
-									// };							
+									};						
 									
 									/* Set the Patient associated with this Prescription and update the list of OfficeVisits*/
 									$scope.selectPatient = function(patient) {
 										$scope.resetForm();
 										$scope.message = "";
 										$scope.currentPrescription.patient = patient.self.username;
-										// $scope.officeVisitsForPatient = $scope.allOfficeVisits[patient.self.username];
 									};
 
 									/* Set the NDC associated with this Prescription */
@@ -170,102 +143,7 @@
 
 									$scope.resetForm = function() {
 										$scope.currentPrescription = {};
-										// $scope.officeVisitsForPatient = [];
 										$scope.errorMsg = "";
-									}
-									
-									/* Set the Patient associated with this Prescription and update the list of OfficeVisits*/
-									$scope.selectPatient = function(patient) {
-										$scope.currentPatient = patient;
-										console.log("Changed patient to:");
-										console.log($scope.currentPatient);
-										$scope.officeVisitsForPatient = $scope.allOfficeVisits[patient.self.username];
-										console.log("Changed array to:");
-										console.log($scope.officeVisitsForPatient);
-									};
-
-									/* Set the NDC associated with this Prescription */
-									$scope.selectNDC = function(ndcCode) {
-										$scope.currentPrescription.ndcDescription = ndcCode.description;
-										$scope.currentPrescription.ndcCode = ndcCode.code;
-									};
-
-									/* Date formatting garbage, since the API returns a silly representation of a date */
-									function twoDigit(num) {
-										if (num < 10) {
-											return "0" + num;
-										}
-										return num;
-									};	
-
-									function getTime(date) {									
-										var hour = date.hourOfDay;
-										var suffix;
-										if ( hour > 12 ) {
-											hour = hour - 12;
-											suffix = "PM";
-										} else {
-											suffix = "AM";
-										}
-										return twoDigit(hour) + ":" + twoDigit(date.minute) + " " + suffix;
-									};
-
-									function getDate(date) {
-										/* The months start at 0... only the months.  So we have to add 1 to get the correct input.*/
-										month = date.month + 1;
-										return twoDigit(month) + "/" + twoDigit(date.dayOfMonth) + "/" + date.year;
-									};
-
-									$scope.prettyDate = function(apiDate) {
-										return getDate(apiDate) + " at " + getTime(apiDate);
-									};
-
-
-									$scope.validateData = function() {
-										var dateRegex = /^\d{2}\/\d{2}\/\d{4}$/;
-										var intRegex = /^\d{1,}$/;
-										var validData = true;
-										$scope.errorMsg = "";
-
-										// No patient selected
-										if ($scope.currentPatient === undefined) {
-											$scope.errorMsg += "A Patient must be associated with this Prescription \n";
-											validData = false;
-										}
-
-										// No NDC selected
-										if ($scope.currentPrescription.ndcDescription === undefined || $scope.currentPrescription.ndcCode === undefined) {
-											$scope.errorMsg += "An NDC code must be associated with this Prescription \n";
-											validData = false;
-										}
-
-										// Invalid start date
-										if (!dateRegex.test($scope.currentPrescription.startDate)) {
-											$scope.errorMsg += "Start date must be in the format: mm/dd/yyyy \n";
-											validData = false;
-										}
-
-										// Invalid end date
-										if (!dateRegex.test($scope.currentPrescription.endDate)) {
-											$scope.errorMsg += "End date must be in the format: mm/dd/yyyy \n";
-											validData = false;
-										}
-
-										// Invalid dosage (non-integers and 0 value)
-										var dosage = $scope.currentPrescription.dosage;
-										if (!intRegex.test(dosage) || parseInt(dosage) == 0) {
-											$scope.errorMsg += "Dosage must be an integer >= 0 \n";
-											validData = false;
-
-										}
-
-										// Invalid renewal count
-										if (!intRegex.test($scope.currentPrescription.numRenewals)) {
-											$scope.errorMsg += "Renewal count must be an integer \n";
-											validData = false;
-										}
-
-										return validData;
 									}
 									
 									/* Send data to backend */
