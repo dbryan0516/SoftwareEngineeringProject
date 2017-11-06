@@ -52,7 +52,7 @@
                 </thead>
                 <tbody>
                 <tr ng-repeat="p in prescriptions">
-                    <td>{{ p.ndc.description }}</td>
+                    <td name="{{ p.ndc.description }}">{{ p.ndc.description }}</td>
                     <td>{{ p.officeVisit == null ? 'None' : p.officeVisit.date.toLocaleDateString() }}</td>
                     <td>{{ p.startDate.toLocaleDateString() }}</td>
                     <td>{{ p.endDate.toLocaleDateString() }}</td>
