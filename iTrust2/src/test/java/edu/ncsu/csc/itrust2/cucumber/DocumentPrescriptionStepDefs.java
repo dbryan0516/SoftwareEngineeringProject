@@ -97,7 +97,7 @@ public class DocumentPrescriptionStepDefs {
         Thread.sleep( timeout );
         try {
             Assert.assertEquals( "", driver.findElement( By.name( "errorMsg" ) ).getText() );
-            Assert.assertEquals( "Prescription successfully submitted",
+            Assert.assertEquals( "Prescription added successfully",
                     driver.findElement( By.name( "success" ) ).getText() );
         }
         catch ( final Exception e ) {

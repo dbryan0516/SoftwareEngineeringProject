@@ -104,6 +104,7 @@
 										var dateRegex = /^\d{2}\/\d{2}\/\d{4}$/;
 										var intRegex = /^\d{1,}$/;
 										var p = $scope.currentPrescription;
+										var validDate = true;
 										$scope.errorMsg = "";
 
 										// No patient selected
@@ -119,11 +120,23 @@
 										// Invalid start date
 										if (!dateRegex.test(p.startDate)) {
 											$scope.errorMsg += "Start date must be in the format: mm/dd/yyyy \n";
+											validDate = false;
 										}
 
 										// Invalid end date
 										if (!dateRegex.test(p.endDate)) {
 											$scope.errorMsg += "End date must be in the format: mm/dd/yyyy \n";
+											validDate = false;
+										}
+										
+										// Valid date, but start date isn't before end date
+										if (validDate) {
+											var sDate = new Date(p.startDate);
+											var eDate = new Date(p.endDate);
+											if (sDate > eDate) {
+												$scope.errorMsg += "Start date must be before end date \n";
+												validDate = false;
+											}
 										}
 
 										// Invalid dosage (non-integers and 0 value)
@@ -157,7 +170,7 @@
 												url : url,
 												data : $scope.currentPrescription
 											}).then(function(response) {
-												$scope.message = "Prescription successfully submitted";
+												$scope.message = response.data;
 												$scope.resetForm();
 												console.log(response);
 											}, function(rejection) {
@@ -237,19 +250,6 @@
 					</ul>
 				</div>
 				<br />
-<!-- 				Select an office visit to associate with this prescription (optional):
-				<div class="officeVisits">
-					<ul>
-						<li ng-repeat="visit in officeVisitsForPatient">
-							<input id="visit-{{visit.id}}" type="radio" ng-model="currentPrescription.officeVisit" ng-change="selectOfficeVisit(visit.id)" name="officeVisit" value="{{visit.id}}" />
-							<label for="visit-{{visit.id}}">
-								{{visit.type}} on 
-								{{prettyDate(visit.date)}}
-							</label>
-						</li>
-					</ul>
-				</div>
-				<br /> -->
 				Mandatory information:
 				<table>
 					<tr>
