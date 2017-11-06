@@ -7,9 +7,8 @@ Feature: Document a prescription that may/may not be associated with an office v
 		 
 		 
 Scenario Outline: Successfully document a prescription 
-Given An HCP is authenticated
-And   The HCP is at the document prescription page
-When  I select a patient <patient> by username
+Given The HCP is authenticated and at the document prescription page
+When  I select by username patient <patient>
 And I select a drug <drug> by NDC code
 And I input start date <sdate>, end date <edate>, dosage <dosage>, and renewals <renewals>
 And I submit the prescription
@@ -23,9 +22,8 @@ Examples:
 
 
 Scenario Outline: Unsuccessfully document a prescription 
-Given An HCP is authenticated
-And   The HCP is at the document prescription page
-When  I select a patient <patient> by username
+Given The HCP is authenticated and at the document prescription page
+When  I select by username patient <patient>
 And I select a drug <drug> by NDC code
 And I input start date "<sdate>", end date "<edate>", dosage "<dosage>", and renewals "<renewals>"
 And I submit the prescription
@@ -40,19 +38,18 @@ Examples:
 	|TimTheOneYearOld|0832-0086|09/13/2016|09/14/2016|0|3|
 	|TimTheOneYearOld|0832-0086|09/13/2016|09/14/2016|3|string|
 	|TimTheOneYearOld|0832-0086|09/13/2016|09/14/2016|string|string|
+	|TimTheOneYearOld|0832-0086|09/13/2016|09/12/2016|3|3|
 	|AliceThirteen|0832-0086| | | | |
 	
 
 Scenario: Don't select a patient
-Given An HCP is authenticated
-And   The HCP is at the document prescription page
+Given The HCP is authenticated and at the document prescription page
 When I submit the prescription
 Then The prescription was NOT submitted successfully
 
 Scenario: Don't select a medication
-Given An HCP is authenticated
-And   The HCP is at the document prescription page
-When  I select a patient AliceThirteen by username
+Given The HCP is authenticated and at the document prescription page
+When  I select by username patient AliceThirteen
 And I submit the prescription
 Then The prescription was NOT submitted successfully
 

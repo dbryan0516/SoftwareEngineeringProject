@@ -22,13 +22,8 @@ public class DocumentPrescriptionStepDefs {
     private final String    baseUrl = "http://localhost:8080/iTrust2";
     private final long      timeout = 1500;
 
-    /**
-     * Log in as HCP
-     *
-     * @throws InterruptedException
-     */
-    @Given ( "An HCP is authenticated" )
-    public void authenticateHCP () throws InterruptedException {
+    @Given ( "The HCP is authenticated and at the document prescription page" )
+    public void loadDocumentPrescriptionPage () throws InterruptedException {
         driver.get( baseUrl );
         final WebElement username = driver.findElement( By.name( "username" ) );
         username.clear();
@@ -38,17 +33,13 @@ public class DocumentPrescriptionStepDefs {
         password.sendKeys( "123456" );
         final WebElement submit = driver.findElement( By.className( "btn" ) );
         submit.click();
-    }
-
-    @Given ( "The HCP is at the document prescription page" )
-    public void loadDocumentPrescriptionPage () throws InterruptedException {
-        driver.get( baseUrl + "/hcp/documentPrescription.html" );
+        driver.get( baseUrl + "/hcp/documentPrescription" );
         Thread.sleep( timeout );
         System.out.println( "\n\n\n" + driver.getTitle() + "\n\n\n" );
         Assert.assertTrue( driver.getPageSource().contains( "Document a new Prescription" ) );
     }
 
-    @When ( "I select a patient (.+) by username" )
+    @When ( "^I select by username patient (.+)$" )
     public void selectPatient ( String patient ) throws InterruptedException {
         Thread.sleep( timeout );
         try {
@@ -102,10 +93,12 @@ public class DocumentPrescriptionStepDefs {
     }
 
     @Then ( "The prescription was submitted successfully" )
-    public void seeSuccess () {
+    public void seeSuccess () throws InterruptedException {
+        Thread.sleep( timeout );
         try {
-            Assert.assertEquals( "Valid data given!", driver.findElement( By.name( "success" ) ).getText() );
             Assert.assertEquals( "", driver.findElement( By.name( "errorMsg" ) ).getText() );
+            Assert.assertEquals( "Prescription successfully submitted",
+                    driver.findElement( By.name( "success" ) ).getText() );
         }
         catch ( final Exception e ) {
             Assert.fail( e.getMessage() );
@@ -113,7 +106,8 @@ public class DocumentPrescriptionStepDefs {
     }
 
     @Then ( "The prescription was NOT submitted successfully" )
-    public void seeFailure () {
+    public void seeFailure () throws InterruptedException {
+        Thread.sleep( timeout );
         try {
             Assert.assertEquals( "An error occurred", driver.findElement( By.name( "success" ) ).getText() );
             Assert.assertNotEquals( "", driver.findElement( By.name( "errorMsg" ) ).getText() );
