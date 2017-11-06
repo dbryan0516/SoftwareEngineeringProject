@@ -29,6 +29,8 @@ public class APIPrescriptionController extends APIController {
      * Retrieves list of prescriptions for a given patient - must be hcp logged
      * in
      *
+     * @param id
+     *            - id of patient to get prescription of
      * @return list of prescriptions
      */
     @GetMapping ( BASE_PATH + "/prescriptions/hcp/{id}" )
@@ -145,12 +147,10 @@ public class APIPrescriptionController extends APIController {
             final String patient = prescription.getPatient().getUsername();
             LoggerUtil.log( TransactionType.PRESCRIPTION_CREATE, hcp, patient,
                     hcp + " created a prescription for " + patient );
-            return new ResponseEntity( builder.toJson( "Presciption added successfully" ), HttpStatus.OK );
+            return new ResponseEntity( builder.toJson( "Prescription added successfully" ), HttpStatus.OK );
         }
         catch ( final Exception e ) {
-            return new ResponseEntity(
-                    builder.toJson( "Could not validate or save the prescription provided due to " + e.getMessage() ),
-                    HttpStatus.BAD_REQUEST );
+            return new ResponseEntity( builder.toJson( e.getMessage() ), HttpStatus.BAD_REQUEST );
         }
     }
 

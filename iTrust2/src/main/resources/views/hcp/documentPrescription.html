@@ -1,0 +1,281 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:include="layout :: head(title=~{::title},links=~{})">
+	<title>Document Prescriptions</title>
+</head>
+<body th:include="layout :: body" th:with="content=~{::content}">
+	<style>
+		div.prescriptionForm input[type='text'] {
+			width: 50%;
+		}
+	</style>
+	<div th:fragment="content">
+
+		<script th:inline="javascript">
+					/* Otherwise Thymeleaf tries to parse Javascript as XML and breaks itself sometimes.  Sigh */
+				/*<![CDATA[*/
+	
+				var app = angular.module('myApp', []);
+				app
+						.controller(
+								'documentPrescriptionCtrl',
+								function($scope, $http) {
+									var baseUrl = "/iTrust2/api/v1";
+									
+									$scope.NDCCodes = [];
+									$scope.patients = [];
+									$scope.currentPrescription = {};
+
+
+									/* Fetches the NDC codes from DB */
+									$scope.getNDCCodes = function() {
+										$http({
+											method : "GET",
+											url : baseUrl + "/NDCEntries",
+										}).then(function(response) {
+											$scope.NDCCodes = response.data;
+										}, function(rejection) {
+											console.log(rejection);
+										});
+									};
+
+									/* Fetches the list of Patients from DB */
+									$scope.getPatients = function() {
+										$http({
+											method : "GET",
+											url : baseUrl + "/patients",
+										}).then(function(response) {
+											$scope.patients = response.data;
+										}, function(rejection) {
+											console.log(rejection);
+										});
+									};						
+									
+									/* Set the Patient associated with this Prescription and update the list of OfficeVisits*/
+									$scope.selectPatient = function(patient) {
+										$scope.resetForm();
+										$scope.message = "";
+										$scope.currentPrescription.patient = patient.self.username;
+									};
+
+									/* Set the NDC associated with this Prescription */
+									$scope.selectNDC = function(ndcCode) {
+										$scope.currentPrescription.ndcDescription = ndcCode.description;
+										$scope.currentPrescription.ndcCode = ndcCode.code;
+										$scope.message = "";
+									};
+
+									/* Date formatting garbage, since the API returns a silly representation of a date */
+									function twoDigit(num) {
+										if (num < 10) {
+											return "0" + num;
+										}
+										return num;
+									};	
+
+									function getTime(date) {									
+										var hour = date.hourOfDay;
+										var suffix;
+										if ( hour > 12 ) {
+											hour = hour - 12;
+											suffix = "PM";
+										} else {
+											suffix = "AM";
+										}
+										return twoDigit(hour) + ":" + twoDigit(date.minute) + " " + suffix;
+									};
+
+									function getDate(date) {
+										/* The months start at 0... only the months.  So we have to add 1 to get the correct input.*/
+										month = date.month + 1;
+										return twoDigit(month) + "/" + twoDigit(date.dayOfMonth) + "/" + date.year;
+									};
+
+									$scope.prettyDate = function(apiDate) {
+										return getDate(apiDate) + " at " + getTime(apiDate);
+									};
+
+
+									/* Validates the data in the form */
+									function isInvalid(str) {
+										return str === "" || str === null || str === undefined;
+									};
+
+									$scope.validateData = function() {
+										var dateRegex = /^\d{2}\/\d{2}\/\d{4}$/;
+										var intRegex = /^\d{1,}$/;
+										var p = $scope.currentPrescription;
+										var validDate = true;
+										$scope.errorMsg = "";
+
+										// No patient selected
+										if (isInvalid(p.patient)) {
+											$scope.errorMsg += "A Patient must be associated with this Prescription \n";
+										}
+
+										// No NDC selected
+										if (isInvalid(p.ndcDescription) || isInvalid(p.ndcCode)) {
+											$scope.errorMsg += "An NDC code must be associated with this Prescription \n";
+										}
+
+										// Invalid start date
+										if (!dateRegex.test(p.startDate)) {
+											$scope.errorMsg += "Start date must be in the format: mm/dd/yyyy \n";
+											validDate = false;
+										}
+
+										// Invalid end date
+										if (!dateRegex.test(p.endDate)) {
+											$scope.errorMsg += "End date must be in the format: mm/dd/yyyy \n";
+											validDate = false;
+										}
+										
+										// Valid date, but start date isn't before end date
+										if (validDate) {
+											var sDate = new Date(p.startDate);
+											var eDate = new Date(p.endDate);
+											if (sDate > eDate) {
+												$scope.errorMsg += "Start date must be before end date \n";
+												validDate = false;
+											}
+										}
+
+										// Invalid dosage (non-integers and 0 value)
+										if (!intRegex.test(p.dosage) || parseInt(p.dosage) == 0) {
+											$scope.errorMsg += "Dosage must be an integer >= 0 \n";
+
+										}
+
+										// Invalid renewal count
+										if (!intRegex.test(p.numRenewals)) {
+											$scope.errorMsg += "Renewal count must be an integer \n";
+										}
+
+										// No errors mean valid data
+										return $scope.errorMsg === "";
+									}
+
+									$scope.resetForm = function() {
+										$scope.currentPrescription = {};
+										$scope.errorMsg = "";
+									}
+									
+									/* Send data to backend */
+									$scope.submit = function() {
+										var url = baseUrl + "/prescriptions";	
+										$scope.message = "";
+										console.log($scope.currentPrescription);	
+										if ($scope.validateData()) {
+											$http({
+												method : "POST",
+												url : url,
+												data : $scope.currentPrescription
+											}).then(function(response) {
+												$scope.message = response.data;
+												$scope.resetForm();
+												console.log(response);
+											}, function(rejection) {
+												$scope.message = "An error occurred";
+												$scope.errorMsg += rejection.data;
+												console.log(rejection);
+											});				
+										}
+										else {
+											$scope.message = "An error occurred"
+										}							
+									};
+									
+									$scope.getNDCCodes();
+									$scope.getPatients();
+								});
+		</script>
+
+	<div ng-app="myApp" ng-controller="documentPrescriptionCtrl">
+		<nav class="navbar navbar-default">
+				<div class="container-fluid">
+					<ul class="nav navbar-nav">
+						<li class="dropdown"><a class="dropdown-toggle"
+							data-toggle="dropdown" href="#">Patient<span class="caret"></span></a>
+							<ul class="dropdown-menu">
+								<li><a href="/iTrust2/hcp/viewAppointmentRequests"
+									id="viewrequests">View Appointment Requests</a></li>
+								<li><a href="/iTrust2/hcp/viewAppointments"
+									id="upcomingrequests">View Upcoming Appointments</a></li>
+								<li><a href="#">Edit Patient -- Not Implemented</a></li>
+								<li><a href="#">Add Patient -- Not Implemented</a></li>
+								<li><a href="/iTrust2/hcp/documentOfficeVisit"
+									id="documentOfficeVisit">Document Office Visit</a></li>
+								<li><a href="/iTrust2/hcp/documentPrescription"
+									id="documentPrescription">Document Prescription</a></li>
+							</ul></li>
+						<li class="dropdown"><a class="dropdown-toggle"
+							data-toggle="dropdown" href="#">Edit<span class="caret"></span></a>
+							<ul class="dropdown-menu">
+								<li><a href="/iTrust2/personnel/editDemographics"
+									id="editdemographics">Edit Demographics</a></li>
+								<li> <a href="/iTrust2/hcp/editOfficeVisit"
+								      id="editOfficeVisit">Edit Office Visit</a></li>
+							</ul></li>
+					</ul>
+				</div>
+		</nav>
+		<div style="float:left;width:30%;height:75%;overflow-y:auto">
+			<h2>Patients:</h2>
+			<!-- info on filtering taken from here: https://www.w3schools.com/angular/angular_filters.asp
+				and https://docs.angularjs.org/api/ng/filter/filter -->
+			<h4>Search: <input type="text" ng-model="userSearchFilter"/></h4>
+			<!-- Info on scrolling taken from here: https://www.w3schools.com/cssref/pr_pos_overflow.asp -->
+			<!-- and here: https://stackoverflow.com/questions/9560330/how-to-hide-a-vertical-scroll-bar-when-not-needed -->
+			<ul style="overflow:auto;height=90%;">
+			<!-- Information on how labels wor from here: https://stackoverflow.com/questions/7863251/clicking-the-text-to-select-corresponding-radio-button -->
+				<li ng-repeat="patient in patients | filter:userSearchFilter"><h4><label>
+						<input type="radio" ng-model="currentPrescription.patient"
+						name="name" value="{{patient.self.username}}" required="true"
+						ng-change="selectPatient(patient)" />&nbsp;{{patient.self.username}}</label>
+				</h4></li>
+			</ul>
+		</div>
+		<!-- information on vertical rule found here: https://stackoverflow.com/questions/571900/is-there-a-vr-vertical-rule-in-html  -->
+		<div style="float:left;width:70%;border-left:1px solid #bbb;padding: 3%;height:75%;overflow-y:auto">
+			<h2>Patient: {{visit.actualPatient.self.username}}</h2>
+			<h2>Document a new Prescription</h2>
+			<div class="prescriptionForm">
+				Select an NDC code (mandatory):
+				<div class="ndcCodes">
+					<input style="width:50%;" type="text" id="ndcCodeSearch" name="ndcCodeSearch" ng-model="ndcSearchFilter" placeholder="Search by Prescription name" />
+					<ul>
+						<li ng-repeat="code in NDCCodes | filter:ndcSearchFilter">
+							<input id="{{code.code}}" type="radio" ng-model="currentPrescription.ndcCode" ng-change="selectNDC(code)" name="ndcCode" data-medCode="{{code.description}}" value="{{code.code}}" />
+							<label for="{{code.code}}">{{code.description}} ({{code.code}})</label>
+						</li>
+					</ul>
+				</div>
+				<br />
+				Mandatory information:
+				<table>
+					<tr>
+						<td>Start Date</td>
+						<td><input type="text" id="startDate" ng-model="currentPrescription.startDate" placeholder="Format: mm/dd/yyyy" /></td>
+					</tr>
+					<tr>
+						<td>End Date</td>
+						<td><input type="text" id="endDate" ng-model="currentPrescription.endDate" placeholder="Format: mm/dd/yyyy" /></td>
+					</tr>
+					<tr>
+						<td>Dosage (mg)</td>
+						<td><input type="text" id="dosage" ng-model="currentPrescription.dosage" placeholder="Dosage in mg" /></td>
+					</tr>
+					<tr>
+						<td>Renewals</td>
+						<td><input type="text" id="numRenewals" ng-model="currentPrescription.numRenewals" placeholder="Renewal count"></td>
+					</tr>
+				</table>
+				<br />
+				<button ng-click="submit()" name="submit">Submit Prescription</button>
+				<div name="errorMsg"><pre>{{errorMsg}}</pre></div>
+				<div name="success">{{message}}</div>
+			</div>
+		</div>
+	</div>
+	</div>
+</body>
+</html>
