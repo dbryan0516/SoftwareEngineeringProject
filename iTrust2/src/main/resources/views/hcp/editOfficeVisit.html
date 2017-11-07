@@ -94,7 +94,6 @@
 									return num;
 								}
 
-
 								
 								$scope.populateVisit = function () {
 									var visitsLength = $scope.visits.length;
@@ -124,7 +123,9 @@
 											$scope.selectedVisit.tri = $scope.visits[i].basicHealthMetrics.tri;
 											$scope.selectedVisit.houseSmokingStatus = $scope.visits[i].basicHealthMetrics.houseSmokingStatus;
 											$scope.selectedVisit.patientSmokingStatus = $scope.visits[i].basicHealthMetrics.patientSmokingStatus;
-                                            $scope.selectedVisit.currentDiagnosis = $scope.visits[i].basicHealthMetrics.currentDiagnosis;
+                                            $scope.selectedVisit.currentDiagnosis = $scope.visits[i].icd;
+
+
 
                                             $scope.three = false;
 										     $scope.threeAndUp = false;
@@ -427,17 +428,20 @@
 						</ul>
 					</td>
 				</tr>
-			</table>
-
-				<div class="icdCodes">
+				<tr >
+					<td style="text-align:right;padding:5px"><b>Patient Diagnosis:</b></td>
 					<input style="width:50%;" type="text" id="icdCodeSearch" name="icdCodeSearch" ng-model="icdSearchFilter" placeholder="Search by Disease name" />
-					<ul>
-						<li ng-repeat="code in ICDCodes | filter:icdSearchFilter">
-							<input id="{{code.code}}" type="radio" ng-model="currentDiagnosis.icdCode" ng-change="selectICD(code)" name="icdCode" data-medCode="{{code.description}}" value="{{code.code}}" />
-							<label for="{{code.code}}">{{code.description}} ({{code.code}})</label>
-						</li>
-					</ul>
-				</div>
+					<td >
+						<ul>
+							<li ng-repeat="code in ICDCodes"><label>
+								<input type="radio" ng-model="selectedVisit.currentDiagnosis"
+									   name="currentDiagnosis" value="{{code.code}}" required="true" />
+								{{code.description}} ({{code.code}})
+							</label></li>
+						</ul>
+					</td>
+				</tr>
+			</table>
 
 						<button ng-click="submit()" name="submit">Edit Office
 				Visit</button>
