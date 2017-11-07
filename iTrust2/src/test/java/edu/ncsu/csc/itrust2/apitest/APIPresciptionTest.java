@@ -82,7 +82,7 @@ public class APIPresciptionTest {
         pform.setStartDate( "01/11/2018" );
         pform.setEndDate( "02/02/2018" );
         pform.setNdcDescription( "Androxy" );
-        pform.setNdcCode( "0832-0086" );
+        pform.setNdcCode( "0832-0086-00" );
 
         pform.setPatient( "patient" );
         pform.setNumRenewals( 2 );
@@ -104,7 +104,7 @@ public class APIPresciptionTest {
         pformInvalid.setStartDate( "aaaaaaaaaaa" );
         pformInvalid.setEndDate( "02/02/2018" );
         pformInvalid.setNdcDescription( "Androxy" );
-        pformInvalid.setNdcCode( "0832-0086" );
+        pformInvalid.setNdcCode( "0832-0086-00" );
         pformInvalid.setPatient( "patient" );
         pformInvalid.setNumRenewals( 2 );
 
@@ -132,7 +132,7 @@ public class APIPresciptionTest {
         pformInvalid.setStartDate( "aaaaaaaaaaa" );
         pformInvalid.setEndDate( "02/02/2018" );
         pformInvalid.setNdcDescription( "Androxy" );
-        pformInvalid.setNdcCode( "0832-0086" );
+        pformInvalid.setNdcCode( "0832-0086-00" );
         pformInvalid.setPatient( "patient" );
         pformInvalid.setNumRenewals( 2 );
 
