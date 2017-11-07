@@ -111,12 +111,12 @@ public class HibernateDataGenerator {
         admin.save();
 
         final NDC ndc = new NDC();
-        ndc.setCode( "0832-0086" );
+        ndc.setCode( "0832-0086-00" );
         ndc.setDescription( "Androxy" );
         ndc.save();
 
         final NDC ndc2 = new NDC();
-        ndc2.setCode( "0832-0087" );
+        ndc2.setCode( "0832-0087-00" );
         ndc2.setDescription( "Androxy2" );
         ndc2.save();
 
@@ -132,7 +132,7 @@ public class HibernateDataGenerator {
 
         final PrescriptionForm prescriptionForm = new PrescriptionForm();
         prescriptionForm.setNdcDescription( "Androxy" );
-        prescriptionForm.setNdcCode( "0832-0086" );
+        prescriptionForm.setNdcCode( "0832-0086-00" );
         prescriptionForm.setPatient( "patient" );
         prescriptionForm.setOfficeVisit( null );
         prescriptionForm.setStartDate( "01/01/2018" );
