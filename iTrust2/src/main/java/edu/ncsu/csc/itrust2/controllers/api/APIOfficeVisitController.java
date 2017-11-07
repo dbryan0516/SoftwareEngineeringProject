@@ -15,8 +15,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import edu.ncsu.csc.itrust2.forms.hcp.OfficeVisitForm;
+import edu.ncsu.csc.itrust2.forms.hcp.PrescriptionForm;
 import edu.ncsu.csc.itrust2.models.enums.TransactionType;
 import edu.ncsu.csc.itrust2.models.persistent.OfficeVisit;
+import edu.ncsu.csc.itrust2.models.persistent.Prescription;
 import edu.ncsu.csc.itrust2.models.persistent.User;
 import edu.ncsu.csc.itrust2.utils.LoggerUtil;
 
@@ -89,6 +91,10 @@ public class APIOfficeVisitController extends APIController {
      */
     @PostMapping ( BASE_PATH + "/officevisits" )
     public ResponseEntity createOfficeVisit ( @RequestBody final OfficeVisitForm visitF ) {
+        // keep track of the status of office visit just in case prescription
+        // doesn't save correctly
+        boolean savedVisit = false;
+        long officeVisitID = -1;
         try {
             final OfficeVisit visit = new OfficeVisit( visitF );
             if ( null != OfficeVisit.getById( visit.getId() ) ) {
@@ -96,10 +102,31 @@ public class APIOfficeVisitController extends APIController {
                         HttpStatus.CONFLICT );
             }
             visit.save();
+            officeVisitID = visit.getId();
+            savedVisit = true;
+            // check if prescription exists
+            if ( visitF.getNdcCode() != null && visitF.getStartDate() != null && visitF.getEndDate() != null
+                    && visitF.getDosage() != null && visitF.getNumRenewals() != null ) {
+                System.out.println( "\n\n\n\n HERE \n\n\n\n\n" );
+                // make prescription object and save
+                final PrescriptionForm pform = new PrescriptionForm();
+                pform.setNdcCode( visitF.getNdcCode() );
+                pform.setNdcDescription( visitF.getNdcDescription() );
+                pform.setStartDate( visitF.getStartDate() );
+                pform.setEndDate( visitF.getEndDate() );
+                pform.setDosage( visitF.getDosage() );
+                pform.setNumRenewals( visitF.getNumRenewals() );
+                pform.setPatient( visitF.getPatient() );
+                pform.setOfficeVisit( visit.getId().toString() );
+                final Prescription prescription = new Prescription( pform );
+                prescription.save();
+            }
             return new ResponseEntity( visit, HttpStatus.OK );
-
         }
         catch ( final Exception e ) {
+            if ( savedVisit ) {
+                OfficeVisit.getById( officeVisitID ).delete();
+            }
             return new ResponseEntity( "Could not validate or save the OfficeVisit provided due to " + e.getMessage(),
                     HttpStatus.BAD_REQUEST );
         }
@@ -120,6 +147,15 @@ public class APIOfficeVisitController extends APIController {
             return new ResponseEntity( "No office visit found for " + id, HttpStatus.NOT_FOUND );
         }
         try {
+            // find prescription that office visit references if it exists
+            final Prescription prescription = (Prescription) Prescription
+                    .getWhere( Prescription.class, " office_visit_id = " + visit.getId() ).get( 0 );
+            System.out.println( "\n\n\n\n\n" + prescription.getNdc().getDescription() + "\n\n\n\n" );
+            if ( prescription != null ) {
+                // delete reference to office visit
+                prescription.setVisit( null );
+                prescription.save();
+            }
             visit.delete();
             return new ResponseEntity( id, HttpStatus.OK );
         }
