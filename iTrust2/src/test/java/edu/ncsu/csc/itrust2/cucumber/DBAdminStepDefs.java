@@ -3,7 +3,7 @@ package edu.ncsu.csc.itrust2.cucumber;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 
-import java.util.Random;
+import java.util.List;
 
 import org.junit.Assert;
 import org.openqa.selenium.By;
@@ -25,10 +25,9 @@ import edu.ncsu.csc.itrust2.utils.HibernateDataGenerator;
  */
 public class DBAdminStepDefs {
 
-    private final WebDriver driver       = new HtmlUnitDriver( true );
-    private final String    baseUrl      = "http://localhost:8080/iTrust2";
-
-    private final String    hospitalName = "TimHortons" + ( new Random() ).nextInt();
+    private final WebDriver  driver  = new HtmlUnitDriver( true );
+    private final String     baseUrl = "http://localhost:8080/iTrust2";
+    private static final int TIMEOUT = 1500;
 
     /**
      * Admin Login
@@ -97,11 +96,11 @@ public class DBAdminStepDefs {
      * The first drug exists. Hibernate's refresh DB method, which is run after
      * each test, should ensure this.
      */
-    @Given ( "NDC code 0832-0086 exists" )
+    @Given ( "NDC code 0832-0086-00 exists" )
     public void ndcExists () {
         try {
-            Thread.sleep( 1500 );
-            driver.findElement( By.cssSelector( "input[value='0832-0086']" ) );
+            Thread.sleep( TIMEOUT );
+            driver.findElement( By.cssSelector( "input[value='0832-0086-00']" ) );
         }
         catch ( final Exception e ) {
             Assert.fail();
@@ -112,11 +111,11 @@ public class DBAdminStepDefs {
      * The second drug exists. Hibernate's refresh DB method, which is run after
      * each test, should ensure this.
      */
-    @Given ( "NDC code 0832-0087 exists" )
+    @Given ( "NDC code 0832-0087-00 exists" )
     public void ndc2Exists () {
         try {
-            Thread.sleep( 1500 );
-            driver.findElement( By.cssSelector( "input[value='0832-0087']" ) );
+            Thread.sleep( TIMEOUT );
+            driver.findElement( By.cssSelector( "input[value='0832-0087-00']" ) );
         }
         catch ( final Exception e ) {
             Assert.fail();
@@ -130,7 +129,7 @@ public class DBAdminStepDefs {
     @Given ( "ICD code A00 exists" )
     public void icdExists () {
         try {
-            Thread.sleep( 1500 );
+            Thread.sleep( TIMEOUT );
             driver.findElement( By.cssSelector( "input[value='A00']" ) );
         }
         catch ( final Exception e ) {
@@ -145,7 +144,7 @@ public class DBAdminStepDefs {
     @Given ( "ICD code A01 exists" )
     public void icd2Exists () {
         try {
-            Thread.sleep( 1500 );
+            Thread.sleep( TIMEOUT );
             driver.findElement( By.cssSelector( "input[value='A01']" ) );
         }
         catch ( final Exception e ) {
@@ -154,13 +153,13 @@ public class DBAdminStepDefs {
     }
 
     /**
-     * Select Oxycotin
+     * Select an NDC code
      */
-    @When ( "I select code 0832-0086" )
-    public void selectOxycotin () {
+    @When ( "I select code (.+)" )
+    public void selectOxycotin ( String code ) {
 
         try {
-            final WebElement radioBtn = driver.findElement( By.xpath( "//input[@value='0832-0086']" ) );
+            final WebElement radioBtn = driver.findElement( By.xpath( "//input[@value='" + code + "']" ) );
             radioBtn.click();
 
         }
@@ -275,7 +274,7 @@ public class DBAdminStepDefs {
     @Then ( "the code: code (.+), name (.+) is added to the NDC database" )
     public void ndcCodeAdded ( final String code, final String name ) throws InterruptedException {
         selectEditNDC();
-        Thread.sleep( 1500 );
+        Thread.sleep( TIMEOUT );
         try {
             assertEquals( name, driver.findElement( By.cssSelector( "input[value='" + code + "']" ) )
                     .getAttribute( "data-medCode" ) );
@@ -299,7 +298,7 @@ public class DBAdminStepDefs {
     public void ndcCodeNotAdded ( final String code, final String name ) throws InterruptedException {
 
         selectEditNDC();
-        Thread.sleep( 1500 );
+        Thread.sleep( TIMEOUT );
         try {
             assertNotEquals( name, driver.findElement( By.cssSelector( "input[value='" + code + "']" ) )
                     .getAttribute( "data-medCode" ) );
@@ -322,7 +321,7 @@ public class DBAdminStepDefs {
     @Then ( "the code: code (.+), name (.+) is added to the ICD database" )
     public void icdCodeAdded ( final String code, final String name ) throws InterruptedException {
         selectEditICD();
-        Thread.sleep( 1500 );
+        Thread.sleep( TIMEOUT );
         try {
             assertEquals( name, driver.findElement( By.cssSelector( "input[value='" + code + "']" ) )
                     .getAttribute( "data-medCode" ) );
@@ -347,7 +346,7 @@ public class DBAdminStepDefs {
     public void icdCodeNotAdded ( final String code, final String name ) throws InterruptedException {
 
         selectEditICD();
-        Thread.sleep( 1500 );
+        Thread.sleep( TIMEOUT );
         try {
             assertNotEquals( code, driver.findElement( By.cssSelector( "input[value='" + code + "']" ) )
                     .getAttribute( "data-medCode" ) );
@@ -363,24 +362,21 @@ public class DBAdminStepDefs {
      *
      * @throws InterruptedException
      */
-    @Then ( "the code becomes: code 66666-616-30, name Oxycodone instead of: code 0832-0086, name Androxy" )
-    public void cotinToCodone () throws InterruptedException {
+    @Then ( "the code becomes: code (.+), name (.+) instead of: code (.+), name (.+)" )
+    public void cotinToCodone ( String newCode, String newName, String oldCode, String oldName )
+            throws InterruptedException {
 
         selectEditNDC();
-        Thread.sleep( 1500 );
+        Thread.sleep( TIMEOUT );
 
-        // Androxy shouldn't exist
-        try {
-            driver.findElement( By.cssSelector( "input[value='0832-0086']" ) );
-            Assert.fail();
-        }
-        catch ( final Exception e ) {
-            // Exception should be thrown
-        }
+        // The NDC pair (oldName, oldCode) should NOT exist
+        final List<WebElement> oldNames = driver
+                .findElements( By.cssSelector( "input[data-medCode='" + oldName + "']" ) );
+        oldNames.forEach( elm -> assertNotEquals( oldCode, elm.getAttribute( "value" ) ) );
 
-        // Oxycontin should exist
+        // The NDC pair (newName, newCode) should exist
         try {
-            assertEquals( "Oxycodone", driver.findElement( By.cssSelector( "input[value='66666-616-30']" ) )
+            assertEquals( newName, driver.findElement( By.cssSelector( "input[value='" + newCode + "']" ) )
                     .getAttribute( "data-medCode" ) );
 
         }
@@ -395,15 +391,15 @@ public class DBAdminStepDefs {
      *
      * @throws InterruptedException
      */
-    @Then ( "the code stays as: code 0832-0086, name Androxy" )
-    public void cotinNoChange () throws InterruptedException {
+    @Then ( "the code stays as: code (.+), name (.+)" )
+    public void cotinNoChange ( String code, String name ) throws InterruptedException {
 
         selectEditNDC();
-        Thread.sleep( 1500 );
+        Thread.sleep( TIMEOUT );
 
         try {
-            assertEquals( "Androxy",
-                    driver.findElement( By.cssSelector( "input[value='0832-0086']" ) ).getAttribute( "data-medCode" ) );
+            assertEquals( name, driver.findElement( By.cssSelector( "input[value='" + code + "']" ) )
+                    .getAttribute( "data-medCode" ) );
         }
         catch ( final Exception e ) {
             Assert.fail();
@@ -428,7 +424,7 @@ public class DBAdminStepDefs {
     public void choleraChange ( final String newCode, final String newName ) throws InterruptedException {
 
         selectEditICD();
-        Thread.sleep( 1500 );
+        Thread.sleep( TIMEOUT );
 
         try {
             assertEquals( newName, driver.findElement( By.cssSelector( "input[value='" + newCode + "']" ) )
@@ -456,7 +452,7 @@ public class DBAdminStepDefs {
     @Then ( "the code stays as: code A00, name Cholera" )
     public void choleraNoChange () throws InterruptedException {
         selectEditICD();
-        Thread.sleep( 1500 );
+        Thread.sleep( TIMEOUT );
         try {
             assertEquals( "Cholera",
                     driver.findElement( By.cssSelector( "input[value='A00']" ) ).getAttribute( "data-medCode" ) );
