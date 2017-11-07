@@ -22,7 +22,7 @@ public class PrescriptionTest {
         prescriptionForm.setId( "1" );
         // guaranteed to have these in the db from the db generator
         prescriptionForm.setNdcDescription( "Androxy" );
-        prescriptionForm.setNdcCode( "0832-0086" );
+        prescriptionForm.setNdcCode( "0832-0086-00" );
         prescriptionForm.setPatient( "patient" );
         prescriptionForm.setOfficeVisit( null );
         prescriptionForm.setStartDate( "01/01/2018" );
@@ -47,7 +47,7 @@ public class PrescriptionTest {
         final PrescriptionForm prescriptionForm = new PrescriptionForm();
         prescriptionForm.setId( "1" );
         prescriptionForm.setNdcDescription( "!!!!!!!" );
-        prescriptionForm.setNdcCode( "0832-0086" );
+        prescriptionForm.setNdcCode( "0832-0086-00" );
         prescriptionForm.setPatient( "patient" );
         prescriptionForm.setOfficeVisit( null );
         prescriptionForm.setStartDate( "01/01/2017" );
@@ -71,7 +71,7 @@ public class PrescriptionTest {
         final PrescriptionForm prescriptionForm = new PrescriptionForm();
         prescriptionForm.setId( "1" );
         prescriptionForm.setNdcDescription( "Androxy" );
-        prescriptionForm.setNdcCode( "0832-0086" );
+        prescriptionForm.setNdcCode( "0832-0086-00" );
         prescriptionForm.setPatient( "!!!!!!" );
         prescriptionForm.setOfficeVisit( null );
         prescriptionForm.setStartDate( "01/01/2017" );
@@ -95,7 +95,7 @@ public class PrescriptionTest {
         final PrescriptionForm prescriptionForm = new PrescriptionForm();
         prescriptionForm.setId( "1" );
         prescriptionForm.setNdcDescription( "Androxy" );
-        prescriptionForm.setNdcCode( "0832-0086" );
+        prescriptionForm.setNdcCode( "0832-0086-00" );
         prescriptionForm.setPatient( "patient" );
         prescriptionForm.setOfficeVisit( null );
         prescriptionForm.setStartDate( "!!!!!!!" );
@@ -118,7 +118,7 @@ public class PrescriptionTest {
         final PrescriptionForm prescriptionForm = new PrescriptionForm();
         prescriptionForm.setId( "1" );
         prescriptionForm.setNdcDescription( "Androxy" );
-        prescriptionForm.setNdcCode( "0832-0086" );
+        prescriptionForm.setNdcCode( "0832-0086-00" );
         prescriptionForm.setPatient( "patient" );
         prescriptionForm.setOfficeVisit( null );
         prescriptionForm.setStartDate( "01/01/2017" );
@@ -141,7 +141,7 @@ public class PrescriptionTest {
         final PrescriptionForm prescriptionForm = new PrescriptionForm();
         prescriptionForm.setId( "1" );
         prescriptionForm.setNdcDescription( "Androxy" );
-        prescriptionForm.setNdcCode( "0832-0086" );
+        prescriptionForm.setNdcCode( "0832-0086-00" );
         prescriptionForm.setPatient( "patient" );
         prescriptionForm.setOfficeVisit( null );
         prescriptionForm.setStartDate( "01/01/2017" );
@@ -165,7 +165,7 @@ public class PrescriptionTest {
         final PrescriptionForm prescriptionForm = new PrescriptionForm();
         prescriptionForm.setId( "1" );
         prescriptionForm.setNdcDescription( "Androxy" );
-        prescriptionForm.setNdcCode( "0832-0086" );
+        prescriptionForm.setNdcCode( "0832-0086-00" );
         prescriptionForm.setPatient( "patient" );
         prescriptionForm.setOfficeVisit( null );
         prescriptionForm.setStartDate( "01/01/2017" );

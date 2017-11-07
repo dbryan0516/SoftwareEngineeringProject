@@ -7,6 +7,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -26,6 +27,7 @@ import edu.ncsu.csc.itrust2.forms.admin.NDCForm;
 import edu.ncsu.csc.itrust2.models.persistent.ICD;
 import edu.ncsu.csc.itrust2.models.persistent.NDC;
 import edu.ncsu.csc.itrust2.mvc.config.WebMvcConfiguration;
+import edu.ncsu.csc.itrust2.utils.HibernateDataGenerator;
 
 /**
  * Test for the API functionality for interacting with appointment requests
@@ -49,6 +51,14 @@ public class APIDatabaseTest {
     @Before
     public void setup () {
         mvc = MockMvcBuilders.webAppContextSetup( context ).build();
+    }
+
+    /**
+     * Reset DB after each test
+     */
+    @After
+    public void tearDown () {
+        HibernateDataGenerator.refreshDB();
     }
 
     /**
