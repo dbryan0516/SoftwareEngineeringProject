@@ -59,9 +59,7 @@ public class APIDatabaseController extends APIController {
             return new ResponseEntity( gson.toJson( icd ), HttpStatus.OK );
         }
         catch ( final Exception e ) {
-            return new ResponseEntity( gson.toJson(
-                    "Error occured while validating or saving " + icdf.toString() + " because of " + e.getMessage() ),
-                    HttpStatus.BAD_REQUEST );
+            return new ResponseEntity( gson.toJson( e.getMessage() ), HttpStatus.BAD_REQUEST );
         }
     }
 
@@ -101,9 +99,7 @@ public class APIDatabaseController extends APIController {
             return new ResponseEntity( gson.toJson( icd ), HttpStatus.OK );
         }
         catch ( final Exception e ) {
-            return new ResponseEntity(
-                    gson.toJson( "Could not update " + icdf.toString() + " because of " + e.getMessage() ),
-                    HttpStatus.BAD_REQUEST );
+            return new ResponseEntity( gson.toJson( e.getMessage() ), HttpStatus.BAD_REQUEST );
         }
     }
 

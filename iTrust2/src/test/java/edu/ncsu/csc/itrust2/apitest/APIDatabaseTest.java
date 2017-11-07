@@ -60,7 +60,7 @@ public class APIDatabaseTest {
     @Test
     public void testUpdateNonExistentICD () throws Exception {
         final ICDForm icdf = new ICDForm();
-        icdf.setCode( "ZZZZZZZ" );
+        icdf.setCode( "Z99" );
         icdf.setDescription( "Fake ICD" );
         mvc.perform( put( "/api/v1/updateICD/-1" ).contentType( MediaType.APPLICATION_JSON )
                 .content( TestUtils.asJsonString( icdf ) ) ).andExpect( status().isNotFound() );
@@ -89,14 +89,17 @@ public class APIDatabaseTest {
      */
     @Test
     public void testICD () throws Exception {
-        final ICDForm icdf = new ICDForm();
-        icdf.setCode( "TEST-1" );
+
+        /* Create a VALID ICD */
+        ICDForm icdf = new ICDForm();
+        icdf.setCode( "A00" );
         icdf.setDescription( "Test object in APIDatabaseTest" );
         mvc.perform( post( "/api/v1/addICD" ).contentType( MediaType.APPLICATION_JSON )
                 .content( TestUtils.asJsonString( icdf ) ) );
 
+        /* Update a VALID ICD */
         icdf.setDescription( "Test update object in APIDatabaseTest" );
-        ICD icd = ICD.getByCode( "TEST-1" );
+        ICD icd = ICD.getByCode( "A00" );
         Long id = null;
         try {
             assert icd != null;
@@ -110,7 +113,8 @@ public class APIDatabaseTest {
         mvc.perform( put( "/api/v1/updateICD/" + id.toString() ).contentType( MediaType.APPLICATION_JSON )
                 .content( TestUtils.asJsonString( icdf ) ) );
 
-        icd = ICD.getByCode( "TEST-1" );
+        // Verify the update worked
+        icd = ICD.getByCode( "A00" );
         try {
             assert icd != null;
             Assert.assertTrue( icd.getDescription().contains( "update" ) );
@@ -119,9 +123,32 @@ public class APIDatabaseTest {
             e.printStackTrace();
             fail();
         }
-
         mvc.perform( get( "/api/v1/ICDEntries" ) ).andExpect( status().isOk() )
                 .andExpect( content().contentType( MediaType.APPLICATION_JSON_UTF8_VALUE ) );
+
+        /* Try to create a INVALID ICD */
+        icdf = new ICDForm();
+        icdf.setCode( "A0" );
+        icdf.setDescription( "Garbage object in APIDatabaseTest" );
+        mvc.perform( post( "/api/v1/addICD" ).contentType( MediaType.APPLICATION_JSON )
+                .content( TestUtils.asJsonString( icdf ) ) ).andExpect( status().isBadRequest() );
+
+        /* Try to update a VALID ICD to an INVALID ICD */
+        icdf.setDescription( "Garbage update object in APIDatabaseTest" );
+        icdf.setCode( "A" );
+        icd = ICD.getByCode( "A00" );
+        id = null;
+        try {
+            assert icd != null;
+            id = icd.getId();
+            icdf.setId( id.toString() );
+        }
+        catch ( final NullPointerException e ) {
+            e.printStackTrace();
+            fail();
+        }
+        mvc.perform( put( "/api/v1/updateICD/" + id.toString() ).contentType( MediaType.APPLICATION_JSON )
+                .content( TestUtils.asJsonString( icdf ) ) ).andExpect( status().isBadRequest() );
     }
 
     /**
@@ -134,7 +161,7 @@ public class APIDatabaseTest {
     public void testNDC () throws Exception {
 
         /* Create a VALID NDC */
-        final NDCForm ndcf = new NDCForm();
+        NDCForm ndcf = new NDCForm();
         ndcf.setCode( "1234-5678-90" );
         ndcf.setDescription( "Test object in APIDatabaseTest" );
         mvc.perform( post( "/api/v1/addNDC" ).contentType( MediaType.APPLICATION_JSON )
@@ -171,6 +198,7 @@ public class APIDatabaseTest {
                 .andExpect( content().contentType( MediaType.APPLICATION_JSON_UTF8_VALUE ) );
 
         /* Try to create an INVALID NDC */
+        ndcf = new NDCForm();
         ndcf.setCode( "1234-5678-900" );
         ndcf.setDescription( "Garbage object in APIDatabaseTest" );
         mvc.perform( post( "/api/v1/addNDC" ).contentType( MediaType.APPLICATION_JSON )

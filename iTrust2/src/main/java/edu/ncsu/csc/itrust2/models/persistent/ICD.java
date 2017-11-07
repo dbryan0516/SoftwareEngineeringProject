@@ -1,6 +1,7 @@
 package edu.ncsu.csc.itrust2.models.persistent;
 
 import java.util.List;
+import java.util.regex.Pattern;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -113,6 +114,13 @@ public class ICD extends DomainObject<ICD> {
     public ICD ( final ICDForm form ) {
         if ( form.getId() != null ) {
             setId( Long.valueOf( form.getId() ) );
+        }
+        /*
+         * Valid ICD codes are in the form: A00 with an optional decimal and
+         * unlimited decimals after it). Ex: A00.01, A00, A00.0101010
+         */
+        if ( !Pattern.matches( "[A-Z]\\d{2}(\\.\\d+)?", form.getCode() ) ) {
+            throw new IllegalArgumentException( "ICD code doesn't follow valid ICD format" );
         }
         setCode( form.getCode() );
         setDescription( form.getDescription() );
