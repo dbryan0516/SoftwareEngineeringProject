@@ -157,12 +157,10 @@ public class OfficeVisit extends DomainObject<OfficeVisit> {
         setPatient( User.getByNameAndRole( ovf.getPatient(), Role.ROLE_PATIENT ) );
         setHcp( User.getByNameAndRole( ovf.getHcp(), Role.ROLE_HCP ) );
         setNotes( ovf.getNotes() );
-
+      
         if ( ovf.getIcd() != null )
             setIcd( ICD.getByCode( ovf.getIcd() ) );
-        if ( ovf.getPrescription() != null )
-            setPrescription( Prescription.getById( Long.parseLong( ovf.getPrescription() ) ) );
-
+      
         if ( ovf.getId() != null ) {
             setId( Long.parseLong( ovf.getId() ) );
         }
@@ -447,6 +445,7 @@ public class OfficeVisit extends DomainObject<OfficeVisit> {
 
     /**
      * Get the ICD.
+     * 
      * @return The ICD.
      */
     public ICD getIcd () {
@@ -455,26 +454,12 @@ public class OfficeVisit extends DomainObject<OfficeVisit> {
 
     /**
      * Set the ICD.
-     * @param icd The new ICD.
+     * 
+     * @param icd
+     *            The new ICD.
      */
-    public void setIcd ( ICD icd ) {
+    public void setIcd ( final ICD icd ) {
         this.icd = icd;
-    }
-
-    /**
-     * Get the prescription.
-     * @return The prescription.
-     */
-    public Prescription getPrescription () {
-        return prescription;
-    }
-
-    /**
-     * Set the prescription.
-     * @param prescription The new prescription.
-     */
-    public void setPrescription ( Prescription prescription ) {
-        this.prescription = prescription;
     }
 
     /**
@@ -545,14 +530,7 @@ public class OfficeVisit extends DomainObject<OfficeVisit> {
      */
     @ManyToOne
     @JoinColumn ( name = "icd_id" )
-    private ICD icd;
-
-    /**
-     * The prescription.
-     */
-    @OneToOne
-    @JoinColumn ( name = "prescription_id" )
-    private Prescription prescription;
+    private ICD                icd;
 
     /**
      * Overrides the basic domain object save in order to save basic health
