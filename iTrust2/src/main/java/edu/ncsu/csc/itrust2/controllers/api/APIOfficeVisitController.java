@@ -107,7 +107,6 @@ public class APIOfficeVisitController extends APIController {
             // check if prescription exists
             if ( visitF.getNdcCode() != null && visitF.getStartDate() != null && visitF.getEndDate() != null
                     && visitF.getDosage() != null && visitF.getNumRenewals() != null ) {
-                System.out.println( "\n\n\n\n HERE \n\n\n\n\n" );
                 // make prescription object and save
                 final PrescriptionForm pform = new PrescriptionForm();
                 pform.setNdcCode( visitF.getNdcCode() );
@@ -150,7 +149,6 @@ public class APIOfficeVisitController extends APIController {
             // find prescription that office visit references if it exists
             final Prescription prescription = (Prescription) Prescription
                     .getWhere( Prescription.class, " office_visit_id = " + visit.getId() ).get( 0 );
-            System.out.println( "\n\n\n\n\n" + prescription.getNdc().getDescription() + "\n\n\n\n" );
             if ( prescription != null ) {
                 // delete reference to office visit
                 prescription.setVisit( null );
