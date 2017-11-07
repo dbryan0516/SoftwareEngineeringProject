@@ -218,7 +218,6 @@ public class APIOfficeVisitTest {
 
         // Reset ID to old id
         visit.setId( id.toString() );
-        System.out.println( "/n/n/n/n" + id + " \n\n\n\n\n\n\n" );
 
         mvc.perform( delete( "/api/v1/officevisits/" + id ) ).andExpect( status().isOk() );
 
