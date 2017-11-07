@@ -270,6 +270,12 @@ public class DocumentOfficeVisitStepDefs {
 
     }
 
+    @Then ( "^The diagnosis (.+) is successfully recorded$" )
+    public void diagnosisSuccessfullyRecorded (final String diagnosis) {
+        // we wipe officevisits before the tests so we should only have 1 visit
+        assertEquals( diagnosis, OfficeVisit.getOfficeVisits().get(0).getIcd().getDescription() );
+    }
+
     /**
      * Ensures that the correct health metrics have been entered
      *
@@ -547,6 +553,118 @@ public class DocumentOfficeVisitStepDefs {
              * Intentionally ignoring.
              */
         }
+        wait.until( ExpectedConditions.visibilityOfElementLocated( By.name( "submit" ) ) );
+        final WebElement submit = driver.findElement( By.name( "submit" ) );
+        submit.click();
+        // Give the data time to save to the database
+        Thread.sleep( 2000 );
+    }
+
+    /**
+     * Documents an office visit with specific information.
+     *
+     * @param dateString
+     *            The current date.
+     * @param weightString
+     *            The weight of the patient.
+     * @param lengthString
+     *            The length of the patient.
+     * @param headString
+     *            The head circumference of the patient.
+     * @param smokingStatus
+     *            The smoking status of the patient's household.
+     * @param note
+     *            The note that the doctor includes.
+     * @throws InterruptedException
+     */
+    @When ( "^I fill in information on the office visit for an infant with date: (.+), weight: (.+), length: (.+), head circumference: (.+), household smoking status: (.+), note: (.+), and diagnosis: (.+)$" )
+    public void documentOVWithSpecificInformation ( final String dateString, final String weightString,
+                                                    final String lengthString, final String headString, final String smokingStatus, final String note, final String diagnosis )
+            throws InterruptedException {
+        wait.until( ExpectedConditions.visibilityOfElementLocated( By.name( "notes" ) ) );
+        final WebElement notes = driver.findElement( By.name( "notes" ) );
+        notes.clear();
+        notes.sendKeys( note );
+
+        wait.until( ExpectedConditions.visibilityOfElementLocated( By.cssSelector( "input[value=\"patient\"]" ) ) );
+        final WebElement patient = driver.findElement( By.cssSelector( "input[value=\"patient\"]" ) );
+        patient.click();
+
+        wait.until( ExpectedConditions.visibilityOfElementLocated( By.name( "type" ) ) );
+        final WebElement type = driver.findElement( By.name( "type" ) );
+        type.click();
+
+        wait.until( ExpectedConditions.visibilityOfElementLocated( By.name( "hospital" ) ) );
+        final WebElement hospital = driver.findElement( By.name( "hospital" ) );
+        hospital.click();
+
+        final WebElement date = driver.findElement( By.name( "date" ) );
+        date.clear();
+        date.sendKeys( dateString );
+        date.click();
+
+        final WebElement time = driver.findElement( By.name( "time" ) );
+        time.clear();
+        time.sendKeys( "9:30 AM" );
+
+        expectedBhm = new BasicHealthMetrics();
+
+        wait.until( ExpectedConditions.visibilityOfElementLocated( By.name( "head" ) ) );
+        final WebElement head = driver.findElement( By.name( "head" ) );
+        head.clear();
+        head.sendKeys( headString );
+        try {
+            expectedBhm.setHeadCircumference( Float.parseFloat( headString ) );
+        }
+        catch ( final IllegalArgumentException e ) {
+            /*
+             * This means that the test data provided was intentionally invalid,
+             * which is okay
+             */
+        }
+
+        final WebElement heightLength = driver.findElement( By.name( "height" ) );
+        heightLength.clear();
+        heightLength.sendKeys( lengthString );
+        try {
+            expectedBhm.setHeight( Float.parseFloat( lengthString ) );
+        }
+        catch ( final IllegalArgumentException e ) {
+            /*
+             * This means that the test data provided was intentionally invalid,
+             * which is okay
+             */
+        }
+
+        final WebElement weight = driver.findElement( By.name( "weight" ) );
+        weight.clear();
+        weight.sendKeys( weightString );
+        try {
+            expectedBhm.setWeight( Float.parseFloat( weightString ) );
+        }
+        catch ( final IllegalArgumentException e ) {
+            /*
+             * This means that the test data provided was intentionally invalid,
+             * which is okay
+             */
+        }
+        try {
+            final WebElement smoking = driver.findElement( By.cssSelector(
+                    "input[value=\"" + HouseholdSmokingStatus.getName( Integer.parseInt( smokingStatus ) ) + "\"]" ) );
+            smoking.click();
+            expectedBhm.setHouseSmokingStatus( HouseholdSmokingStatus.parseValue( Integer.parseInt( smokingStatus ) ) );
+        }
+        catch ( final Exception e ) {
+            /*
+             * This means that the element wasn't found, which is expected if we
+             * enter an invalid value (as one of the test cases does).
+             * Intentionally ignoring.
+             */
+        }
+
+        final WebElement diagnosisElement = driver.findElement( By.cssSelector("input[data-medcode=\"" + diagnosis + "\"]"));
+        diagnosisElement.click();
+
         wait.until( ExpectedConditions.visibilityOfElementLocated( By.name( "submit" ) ) );
         final WebElement submit = driver.findElement( By.name( "submit" ) );
         submit.click();

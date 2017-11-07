@@ -159,7 +159,7 @@ public class OfficeVisit extends DomainObject<OfficeVisit> {
         setNotes( ovf.getNotes() );
 
         if ( ovf.getIcd() != null )
-            setIcd( ICD.getByDescription( ovf.getIcd() ) );
+            setIcd( ICD.getByCode( ovf.getIcd() ) );
         if ( ovf.getPrescription() != null )
             setPrescription( Prescription.getById( Long.parseLong( ovf.getPrescription() ) ) );
 
