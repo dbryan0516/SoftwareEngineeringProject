@@ -30,37 +30,32 @@ public class PatientController {
     /**
      * Returns the form page for a patient to view all OfficeVisits
      *
-     * @param model
-     *            The data for the front end
      * @return Page to display to the user
      */
     @GetMapping ( "/patient/viewOfficeVisits" )
     @PreAuthorize ( "hasRole('ROLE_PATIENT')" )
-    public String viewOfficeVisits ( final Model model ) {
+    public String viewOfficeVisits() {
         return "/patient/viewOfficeVisits";
     }
 
     /**
      * Returns the form page for a patient to view their prescriptions.
-     * @param model The data for the front end.
      * @return Page to display to the user.
      */
     @GetMapping ( "/patient/viewPrescriptions" )
     @PreAuthorize( "hasRole('ROLE_PATIENT')" )
-    public String viewPrescriptions ( final Model model ) {
+    public String viewPrescriptions() {
         return "/patient/viewPrescriptions";
     }
 
     /**
      * Landing screen for a Patient when they log in
      *
-     * @param model
-     *            The data from the front end
      * @return The page to show to the user
      */
     @RequestMapping ( value = "patient/index" )
     @PreAuthorize ( "hasRole('ROLE_PATIENT')" )
-    public String index ( final Model model ) {
+    public String index() {
         return edu.ncsu.csc.itrust2.models.enums.Role.ROLE_PATIENT.getLanding();
     }
 
