@@ -18,7 +18,7 @@ import cucumber.api.java.en.When;
 import edu.ncsu.csc.itrust2.utils.HibernateDataGenerator;
 
 /**
- * Step definitions for AddHosptial feature
+ * Step definitions for Admin editing medical codes (NDC and ICD) feature
  *
  * @author dwdeans
  * @author Joshua Kayani (jkayani@ncsu.edu)
@@ -100,10 +100,11 @@ public class DBAdminStepDefs {
     public void ndcExists () {
         try {
             Thread.sleep( TIMEOUT );
-            driver.findElement( By.cssSelector( "input[value='0832-0086-00']" ) );
+            assertEquals( "Androxy", driver.findElement( By.cssSelector( "input[value='0832-0086-00']" ) )
+                    .getAttribute( "data-medCode" ) );
         }
         catch ( final Exception e ) {
-            Assert.fail();
+            Assert.fail( e.getMessage() );
         }
     }
 
@@ -115,10 +116,11 @@ public class DBAdminStepDefs {
     public void ndc2Exists () {
         try {
             Thread.sleep( TIMEOUT );
-            driver.findElement( By.cssSelector( "input[value='0832-0087-00']" ) );
+            assertEquals( "Androxy2", driver.findElement( By.cssSelector( "input[value='0832-0087-00']" ) )
+                    .getAttribute( "data-medCode" ) );
         }
         catch ( final Exception e ) {
-            Assert.fail();
+            Assert.fail( e.getMessage() );
         }
     }
 
@@ -130,10 +132,11 @@ public class DBAdminStepDefs {
     public void icdExists () {
         try {
             Thread.sleep( TIMEOUT );
-            driver.findElement( By.cssSelector( "input[value='A00']" ) );
+            assertEquals( "Cholera",
+                    driver.findElement( By.cssSelector( "input[value='A00']" ) ).getAttribute( "data-medCode" ) );
         }
         catch ( final Exception e ) {
-            Assert.fail();
+            Assert.fail( e.getMessage() );
         }
     }
 
@@ -145,18 +148,19 @@ public class DBAdminStepDefs {
     public void icd2Exists () {
         try {
             Thread.sleep( TIMEOUT );
-            driver.findElement( By.cssSelector( "input[value='A01']" ) );
+            assertEquals( "Cholera2",
+                    driver.findElement( By.cssSelector( "input[value='A01']" ) ).getAttribute( "data-medCode" ) );
         }
         catch ( final Exception e ) {
-            Assert.fail();
+            Assert.fail( e.getMessage() );
         }
     }
 
     /**
-     * Select an NDC code
+     * Select a medical code (NDC or ICD)
      */
     @When ( "I select code (.+)" )
-    public void selectOxycotin ( String code ) {
+    public void selectMedCode ( String code ) {
 
         try {
             final WebElement radioBtn = driver.findElement( By.xpath( "//input[@value='" + code + "']" ) );
@@ -166,22 +170,6 @@ public class DBAdminStepDefs {
         catch ( final Exception e ) {
             /* Assume the code already exists & carry on */
         }
-    }
-
-    /**
-     * Select Cholera
-     */
-    @When ( "I select code A00" )
-    public void selectCholera () {
-        try {
-            final WebElement radioBtn = driver.findElement( By.xpath( "//input[@value='A00']" ) );
-            radioBtn.click();
-
-        }
-        catch ( final Exception e ) {
-            /* Assume the code already exists & carry on */
-        }
-
     }
 
     /**
@@ -201,24 +189,6 @@ public class DBAdminStepDefs {
         final WebElement nameInput = driver.findElement( By.name( "description" ) );
         nameInput.clear();
         nameInput.sendKeys( name );
-
-    }
-
-    /**
-     * Fill in new form for Oxycotin incorrectly
-     *
-     * @param code
-     *            the code of the drug
-     */
-    @When ( "And I fill out the fields with code (.+), name Oxycontin Drugs" )
-    public void fillCotinToCodonefieldsIncorrect ( final String code ) {
-        final WebElement codeInput = driver.findElement( By.name( "code" ) );
-        codeInput.clear();
-        codeInput.sendKeys( code );
-
-        final WebElement name = driver.findElement( By.name( "description" ) );
-        name.clear();
-        name.sendKeys( "Oxycontin Drugs" );
 
     }
 
@@ -273,14 +243,13 @@ public class DBAdminStepDefs {
      */
     @Then ( "the code: code (.+), name (.+) is added to the NDC database" )
     public void ndcCodeAdded ( final String code, final String name ) throws InterruptedException {
-        selectEditNDC();
         Thread.sleep( TIMEOUT );
         try {
             assertEquals( name, driver.findElement( By.cssSelector( "input[value='" + code + "']" ) )
                     .getAttribute( "data-medCode" ) );
         }
         catch ( final Exception e ) {
-            Assert.fail();
+            Assert.fail( e.getMessage() );
         }
     }
 
@@ -297,7 +266,6 @@ public class DBAdminStepDefs {
     @Then ( "the code: code (.+), name (.+) is not added to the NDC database" )
     public void ndcCodeNotAdded ( final String code, final String name ) throws InterruptedException {
 
-        selectEditNDC();
         Thread.sleep( TIMEOUT );
         try {
             assertNotEquals( name, driver.findElement( By.cssSelector( "input[value='" + code + "']" ) )
@@ -320,14 +288,13 @@ public class DBAdminStepDefs {
      */
     @Then ( "the code: code (.+), name (.+) is added to the ICD database" )
     public void icdCodeAdded ( final String code, final String name ) throws InterruptedException {
-        selectEditICD();
         Thread.sleep( TIMEOUT );
         try {
             assertEquals( name, driver.findElement( By.cssSelector( "input[value='" + code + "']" ) )
                     .getAttribute( "data-medCode" ) );
         }
         catch ( final Exception e ) {
-            Assert.fail();
+            Assert.fail( e.getMessage() );
         }
 
     }
@@ -345,7 +312,6 @@ public class DBAdminStepDefs {
     @Then ( "the code: code (.+), name (.+) is not added to the ICD database" )
     public void icdCodeNotAdded ( final String code, final String name ) throws InterruptedException {
 
-        selectEditICD();
         Thread.sleep( TIMEOUT );
         try {
             assertNotEquals( code, driver.findElement( By.cssSelector( "input[value='" + code + "']" ) )
@@ -363,10 +329,9 @@ public class DBAdminStepDefs {
      * @throws InterruptedException
      */
     @Then ( "the code becomes: code (.+), name (.+) instead of: code (.+), name (.+)" )
-    public void cotinToCodone ( String newCode, String newName, String oldCode, String oldName )
+    public void changeHappens ( String newCode, String newName, String oldCode, String oldName )
             throws InterruptedException {
 
-        selectEditNDC();
         Thread.sleep( TIMEOUT );
 
         // The NDC pair (oldName, oldCode) should NOT exist
@@ -381,7 +346,7 @@ public class DBAdminStepDefs {
 
         }
         catch ( final Exception e ) {
-            Assert.fail();
+            Assert.fail( e.getMessage() );
         }
 
     }
@@ -392,9 +357,8 @@ public class DBAdminStepDefs {
      * @throws InterruptedException
      */
     @Then ( "the code stays as: code (.+), name (.+)" )
-    public void cotinNoChange ( String code, String name ) throws InterruptedException {
+    public void changeNotHappen ( String code, String name ) throws InterruptedException {
 
-        selectEditNDC();
         Thread.sleep( TIMEOUT );
 
         try {
@@ -402,65 +366,8 @@ public class DBAdminStepDefs {
                     .getAttribute( "data-medCode" ) );
         }
         catch ( final Exception e ) {
-            Assert.fail();
+            Assert.fail( e.getMessage() );
         }
-    }
-
-    /**
-     * Cholera changed successfully
-     *
-     * @param newCode
-     *            the new code for the ICD formerly known as Cholera
-     *
-     * @param newName
-     *            the new name for the ICD formerly known as Cholera
-     * @throws InterruptedException
-     *
-     */
-
-    // the code becomes: code <ICD_new_code>, name <ICD_new_name> instead of:
-    // code A00, name Cholera
-    @Then ( "the code becomes: code (.+), name (.+) instead of: code A00, name Cholera" )
-    public void choleraChange ( final String newCode, final String newName ) throws InterruptedException {
-
-        selectEditICD();
-        Thread.sleep( TIMEOUT );
-
-        try {
-            assertEquals( newName, driver.findElement( By.cssSelector( "input[value='" + newCode + "']" ) )
-                    .getAttribute( "data-medCode" ) );
-        }
-        catch ( final Exception e ) {
-            Assert.fail();
-        }
-
-        try {
-            assertNotEquals( "Cholera",
-                    driver.findElement( By.cssSelector( "input[value='A00']" ) ).getAttribute( "data-medCode" ) );
-        }
-        catch ( final Exception e ) {
-            // Exception should be thrown, sometimes.
-        }
-
-    }
-
-    /**
-     * Cholera not changed
-     *
-     * @throws InterruptedException
-     */
-    @Then ( "the code stays as: code A00, name Cholera" )
-    public void choleraNoChange () throws InterruptedException {
-        selectEditICD();
-        Thread.sleep( TIMEOUT );
-        try {
-            assertEquals( "Cholera",
-                    driver.findElement( By.cssSelector( "input[value='A00']" ) ).getAttribute( "data-medCode" ) );
-        }
-        catch ( final Exception e ) {
-            Assert.fail();
-        }
-
     }
 
     /**
