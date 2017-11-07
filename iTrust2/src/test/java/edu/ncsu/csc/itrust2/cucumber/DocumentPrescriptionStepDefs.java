@@ -9,6 +9,7 @@ import org.openqa.selenium.htmlunit.HtmlUnitDriver;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
+import edu.ncsu.csc.itrust2.utils.HibernateDataGenerator;
 
 /**
  * Steps for documenting a prescription at /hcp/documentPrescription
@@ -115,5 +116,10 @@ public class DocumentPrescriptionStepDefs {
         catch ( final Exception e ) {
             Assert.fail( e.getMessage() );
         }
+    }
+
+    @Then ( "The prescription database is cleared" )
+    public void nukeDB () {
+        HibernateDataGenerator.refreshDB();
     }
 }
