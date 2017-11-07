@@ -1,6 +1,6 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:include="layout :: head(title=~{::title},links=~{})">
-<title>Modify Database</title>
+<title>Edit Medical Codes</title>
 </head>
 <body th:include="layout :: body" th:with="content=~{::content}">
 	<div th:fragment="content">
@@ -182,8 +182,8 @@
 										User</a></li>
 								<li><a href="/iTrust2/admin/deleteHospital"
 									id="deletehospital">Delete Hospital</a></li>
-								<li><a href="/iTrust2/admin/modifyDatabase"
-									id="modifyDatabase">Modify Database</a></li>
+								<li><a href="/iTrust2/admin/editMedicalCodes"
+									id="modifyDatabase">Edit Medical Codes</a></li>
 							</ul></li>
 						<li class="dropdown"><a class="dropdown-toggle"
 							data-toggle="dropdown" href="#">Edit<span class="caret"></span></a>
@@ -194,7 +194,7 @@
 					</ul>
 				</div>
 			</nav>
-			<h1>Modify Database</h1>
+			<h1>Edit Medical Codes</h1>
 			<button id="addNDC" ng-click="changeForm('addNDCForm')">Add NDC Code</button>
 			<button id="updateNDC" ng-click="changeForm('updateNDCForm')">Edit NDC Code</button>
 			<button id="addICD" ng-click="changeForm('addICDForm')">Add ICD Code</button>

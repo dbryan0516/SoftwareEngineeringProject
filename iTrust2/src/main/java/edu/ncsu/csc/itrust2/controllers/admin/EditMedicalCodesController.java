@@ -12,16 +12,17 @@ import org.springframework.web.bind.annotation.GetMapping;
  *
  */
 @Controller
-public class ModifyDatabaseController {
+public class EditMedicalCodesController {
 
     /**
-     * Serves the modifyDatabase page for the admin to modify NDC and ICD codes
+     * Serves the editMedicalCodes page for the admin to modify NDC and ICD
+     * codes
      *
      * @return The path to the right webpage
      */
-    @GetMapping ( "/admin/modifyDatabase" )
+    @GetMapping ( "/admin/editMedicalCodes" )
     @PreAuthorize ( "hasRole('ROLE_ADMIN')" )
-    public String modifyDatabase () {
-        return "/admin/modifyDatabase";
+    public String editMedicalCodes () {
+        return "/admin/editMedicalCodes";
     }
 }
