@@ -71,6 +71,12 @@
 									$scope.patientsmoking = response.data;
 								});
 
+                                $http.get("/iTrust2/api/v1/ICDEntries").then(function(response) {
+                                    $scope.ICDCodes = response.data;
+                                }, function(rejection) {
+                                    console.log(rejection);
+                                });
+
 								$http.get("/iTrust2/api/v1/hospitals").then(
 								function(response) {
 									$scope.hospitals = response.data;
@@ -87,7 +93,6 @@
 									}
 									return num;
 								}
-
 
 								
 								$scope.populateVisit = function () {
@@ -118,7 +123,11 @@
 											$scope.selectedVisit.tri = $scope.visits[i].basicHealthMetrics.tri;
 											$scope.selectedVisit.houseSmokingStatus = $scope.visits[i].basicHealthMetrics.houseSmokingStatus;
 											$scope.selectedVisit.patientSmokingStatus = $scope.visits[i].basicHealthMetrics.patientSmokingStatus;
-										     $scope.three = false;
+                                            $scope.selectedVisit.currentDiagnosis = $scope.visits[i].icd.code;
+
+
+
+                                            $scope.three = false;
 										     $scope.threeAndUp = false;
 										     $scope.twelveAndUp = false;
 										     var month = $scope.visits[i].date.month;
@@ -149,13 +158,22 @@
 										}
 									}
 								}
+
+                                function isInvalid(str) {
+                                    return str === "" || str === null || str === undefined;
+                                };
 								
 								$scope.submit = function() {
 									console.log($scope.selectedVisit)
 									$scope.selectedVisit.hcp = /*[[${#httpServletRequest.remoteUser}]]*/null; /* Ugly hack; use this to retrieve the name of the HCP who is currently logged in.  This grabs it from Thymeleaf */
 									$scope.errorMsg = "";
 									$scope.selectedVisit.status = "PENDING";
-									
+
+                                    if (isInvalid($scope.currentDiagnosis.icdDescription) || isInvalid($scope.currentDiagnosis.icdCode)) {
+                                        $scope.errorMsg += "An ICD code must be associated with this Prescription \n";
+                                    }
+
+
 									if ($scope.selectedVisit.type == null) {
 										$scope.errorMsg += "Please select a visit type\n";
 									}
@@ -410,7 +428,21 @@
 						</ul>
 					</td>
 				</tr>
+				<tr >
+					<td style="text-align:right;padding:5px"><b>Patient Diagnosis:</b></td>
+					<input style="width:50%;" type="text" id="icdCodeSearch" name="icdCodeSearch" ng-model="icdSearchFilter" placeholder="Search by Disease name" />
+					<td >
+						<ul>
+							<li ng-repeat="code in ICDCodes"><label>
+								<input type="radio" ng-model="selectedVisit.currentDiagnosis"
+									   name="currentDiagnosis" value="{{code.code}}" required="true" />
+								{{code.description}} ({{code.code}})
+							</label></li>
+						</ul>
+					</td>
+				</tr>
 			</table>
+
 						<button ng-click="submit()" name="submit">Edit Office
 				Visit</button>
 				<div name="errorMsg"><pre>{{errorMsg}}</pre></div>
@@ -421,7 +453,6 @@
 			<br />
 
 		</div>
-
 
 
 

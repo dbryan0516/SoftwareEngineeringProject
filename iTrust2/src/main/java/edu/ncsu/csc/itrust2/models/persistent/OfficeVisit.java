@@ -157,10 +157,10 @@ public class OfficeVisit extends DomainObject<OfficeVisit> {
         setPatient( User.getByNameAndRole( ovf.getPatient(), Role.ROLE_PATIENT ) );
         setHcp( User.getByNameAndRole( ovf.getHcp(), Role.ROLE_HCP ) );
         setNotes( ovf.getNotes() );
-
-        if ( ovf.getIcd() != null ) {
-            setIcd( ICD.getByDescription( ovf.getIcd() ) );
-        }
+      
+        if ( ovf.getIcd() != null )
+            setIcd( ICD.getByCode( ovf.getIcd() ) );
+      
         if ( ovf.getId() != null ) {
             setId( Long.parseLong( ovf.getId() ) );
         }

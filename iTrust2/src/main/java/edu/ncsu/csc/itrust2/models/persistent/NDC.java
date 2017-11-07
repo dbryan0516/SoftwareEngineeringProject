@@ -1,6 +1,7 @@
 package edu.ncsu.csc.itrust2.models.persistent;
 
 import java.util.List;
+import java.util.regex.Pattern;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -113,6 +114,16 @@ public class NDC extends DomainObject<NDC> {
     public NDC ( final NDCForm form ) {
         if ( form.getId() != null ) {
             setId( Long.valueOf( form.getId() ) );
+        }
+
+        /*
+         * Valid codes are in the form: 1234-5678-90, 12345-678-90, or
+         * 12345-6789-0
+         * https://www.accessdata.fda.gov/scripts/cder/ndc/default.cfm
+         */
+        if ( !Pattern.matches( "^(\\d{4}-\\d{4}-\\d{2})|(\\d{5}-\\d{4}-\\d{1})|(\\d{5}-\\d{3}-\\d{2})$",
+                form.getCode() ) ) {
+            throw new IllegalArgumentException( "NDC code doesn't follow valid NDC format" );
         }
         setCode( form.getCode() );
         setDescription( form.getDescription() );

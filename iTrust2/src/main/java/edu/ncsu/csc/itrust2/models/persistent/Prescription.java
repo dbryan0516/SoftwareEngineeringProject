@@ -122,7 +122,7 @@ public class Prescription extends DomainObject<Prescription> {
         setEndDate( sdf.parse( form.getEndDate() ) );
         // validate data that is not checked in persistent object
         if ( getStartDate().after( getEndDate() ) ) {
-            throw new IllegalArgumentException( "start date can't be after the end date" );
+            throw new IllegalArgumentException( "Start date can't be after the end date" );
         }
         if ( form.getNumRenewals() < 0 ) {
             throw new IllegalArgumentException( "Renewals must be greater than or equal to zero" );
