@@ -24,8 +24,6 @@
 									$scope.NDCCodes = [];
 									$scope.patients = [];
 									$scope.currentPrescription = {};
-									$scope.officeVisitsForPatient = [];
-									$scope.allOfficeVisits = {};
 
 
 									/* Fetches the NDC codes from DB */
@@ -47,42 +45,16 @@
 											url : baseUrl + "/patients",
 										}).then(function(response) {
 											$scope.patients = response.data;
-
-											// Now that we have the Patients, let's get a list of office visits
-											$scope.getAllOfficeVisits();
 										}, function(rejection) {
 											console.log(rejection);
 										});
-									};
-
-									$scope.getAllOfficeVisits = function() {
-										$http({
-												method : "GET",
-												url : baseUrl + "/officevisits",
-											}).then(function(response) {
-
-												// Populate a map of OfficeVisits, where key is username and value is a list of visits
-												// for that user
-												response.data.forEach(function(elm) {
-													if ($scope.allOfficeVisits[elm.patient.username] === undefined) {
-														$scope.allOfficeVisits[elm.patient.username] = [];
-													}
-													$scope.allOfficeVisits[elm.patient.username].push(elm);
-												});
-
-												console.log($scope.allOfficeVisits);
-											}, function(rejection) {
-												console.log(rejection);
-											});	
-									};							
-								
+									};						
 									
 									/* Set the Patient associated with this Prescription and update the list of OfficeVisits*/
 									$scope.selectPatient = function(patient) {
 										$scope.resetForm();
 										$scope.message = "";
 										$scope.currentPrescription.patient = patient.self.username;
-										$scope.officeVisitsForPatient = $scope.allOfficeVisits[patient.self.username];
 									};
 
 									/* Set the NDC associated with this Prescription */
@@ -132,6 +104,7 @@
 										var dateRegex = /^\d{2}\/\d{2}\/\d{4}$/;
 										var intRegex = /^\d{1,}$/;
 										var p = $scope.currentPrescription;
+										var validDate = true;
 										$scope.errorMsg = "";
 
 										// No patient selected
@@ -147,11 +120,23 @@
 										// Invalid start date
 										if (!dateRegex.test(p.startDate)) {
 											$scope.errorMsg += "Start date must be in the format: mm/dd/yyyy \n";
+											validDate = false;
 										}
 
 										// Invalid end date
 										if (!dateRegex.test(p.endDate)) {
 											$scope.errorMsg += "End date must be in the format: mm/dd/yyyy \n";
+											validDate = false;
+										}
+										
+										// Valid date, but start date isn't before end date
+										if (validDate) {
+											var sDate = new Date(p.startDate);
+											var eDate = new Date(p.endDate);
+											if (sDate > eDate) {
+												$scope.errorMsg += "Start date must be before end date \n";
+												validDate = false;
+											}
 										}
 
 										// Invalid dosage (non-integers and 0 value)
@@ -171,29 +156,28 @@
 
 									$scope.resetForm = function() {
 										$scope.currentPrescription = {};
-										$scope.officeVisitsForPatient = [];
 										$scope.errorMsg = "";
 									}
 									
 									/* Send data to backend */
 									$scope.submit = function() {
-										var url = baseUrl + "/prescription";	
+										var url = baseUrl + "/prescriptions";	
 										$scope.message = "";
 										console.log($scope.currentPrescription);	
 										if ($scope.validateData()) {
-											$scope.message = "Valid data given!";
 											$http({
 												method : "POST",
 												url : url,
 												data : $scope.currentPrescription
 											}).then(function(response) {
+												$scope.message = response.data;
+												$scope.resetForm();
 												console.log(response);
 											}, function(rejection) {
+												$scope.message = "An error occurred";
+												$scope.errorMsg += rejection.data;
 												console.log(rejection);
-											});	
-
-											// Reset the form
-											$scope.resetForm();						
+											});				
 										}
 										else {
 											$scope.message = "An error occurred"
@@ -221,7 +205,7 @@
 								<li><a href="/iTrust2/hcp/documentOfficeVisit"
 									id="documentOfficeVisit">Document Office Visit</a></li>
 								<li><a href="/iTrust2/hcp/documentPrescription"
-									id="documentOfficeVisit">Document Prescription</a></li>
+									id="documentPrescription">Document Prescription</a></li>
 							</ul></li>
 						<li class="dropdown"><a class="dropdown-toggle"
 							data-toggle="dropdown" href="#">Edit<span class="caret"></span></a>
@@ -262,19 +246,6 @@
 						<li ng-repeat="code in NDCCodes | filter:ndcSearchFilter">
 							<input id="{{code.code}}" type="radio" ng-model="currentPrescription.ndcCode" ng-change="selectNDC(code)" name="ndcCode" data-medCode="{{code.description}}" value="{{code.code}}" />
 							<label for="{{code.code}}">{{code.description}} ({{code.code}})</label>
-						</li>
-					</ul>
-				</div>
-				<br />
-				Select an office visit to associate with this prescription (optional):
-				<div class="officeVisits">
-					<ul>
-						<li ng-repeat="visit in officeVisitsForPatient">
-							<input id="visit-{{visit.id}}" type="radio" ng-model="currentPrescription.officeVisit" ng-change="selectOfficeVisit(visit.id)" name="officeVisit" value="{{visit.id}}" />
-							<label for="visit-{{visit.id}}">
-								{{visit.type}} on 
-								{{prettyDate(visit.date)}}
-							</label>
 						</li>
 					</ul>
 				</div>

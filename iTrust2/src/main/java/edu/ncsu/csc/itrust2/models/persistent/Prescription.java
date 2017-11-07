@@ -1,14 +1,25 @@
 package edu.ncsu.csc.itrust2.models.persistent;
 
-import edu.ncsu.csc.itrust2.forms.admin.PrescriptionForm;
-import edu.ncsu.csc.itrust2.models.enums.Role;
-import edu.ncsu.csc.itrust2.utils.DomainObjectCache;
-
-import javax.persistence.*;
-import javax.validation.constraints.NotNull;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
+
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
+
+import edu.ncsu.csc.itrust2.forms.hcp.PrescriptionForm;
+import edu.ncsu.csc.itrust2.models.enums.Role;
+import edu.ncsu.csc.itrust2.utils.DomainObjectCache;
 
 /**
  * Represents a Prescription.
@@ -16,7 +27,9 @@ import java.util.*;
  * @author gjabell
  * @author gtstewar
  */
-@Entity @Table ( name = "Prescriptions" ) public class Prescription extends DomainObject<Prescription> {
+@Entity
+@Table ( name = "Prescriptions" )
+public class Prescription extends DomainObject<Prescription> {
     /**
      * Caches the Prescriptions to prevent additional DB calls.
      */
@@ -25,7 +38,8 @@ import java.util.*;
     /**
      * Gets a Prescription by its id.
      *
-     * @param id The id of the Prescription.
+     * @param id
+     *            The id of the Prescription.
      * @return Returns the Prescription with the given id.
      */
     public static Prescription getById ( final Long id ) {
@@ -45,7 +59,8 @@ import java.util.*;
     /**
      * Gets the Prescriptions for a given patient.
      *
-     * @param patientName The patient username.
+     * @param patientName
+     *            The patient username.
      * @return Returns the list of Prescriptions.
      */
     public static List<Prescription> getForPatient ( final String patientName ) {
@@ -57,7 +72,8 @@ import java.util.*;
      *
      * @return The list of Prescriptions.
      */
-    @SuppressWarnings ( "unchecked" ) public List<Prescription> getPrescriptions () {
+    @SuppressWarnings ( "unchecked" )
+    public List<Prescription> getPrescriptions () {
         final List<Prescription> prescriptions = (List<Prescription>) getAll( Prescription.class );
         prescriptions.sort( Comparator.comparing( Prescription::getStartDate ) );
         return prescriptions;
@@ -66,10 +82,12 @@ import java.util.*;
     /**
      * Get the list of Prescriptions by the given where query.
      *
-     * @param where The where query.
+     * @param where
+     *            The where query.
      * @return Returns the list of Prescriptions.
      */
-    @SuppressWarnings ( "unchecked" ) private static List<Prescription> getWhere ( final String where ) {
+    @SuppressWarnings ( "unchecked" )
+    private static List<Prescription> getWhere ( final String where ) {
         return (List<Prescription>) getWhere( Prescription.class, where );
     }
 
@@ -82,20 +100,37 @@ import java.util.*;
     /**
      * Creates a Prescription based on the given PrescriptionForm.
      *
-     * @param form The PrescriptionForm.
-     * @throws ParseException Throws a ParseException if there is an error during creation.
+     * @param form
+     *            The PrescriptionForm.
+     * @throws ParseException
+     *             Throws a ParseException if there is an error during creation.
      */
     public Prescription ( final PrescriptionForm form ) throws ParseException {
-        if ( form.getId() != null )
+        if ( form.getId() != null ) {
             setId( Long.parseLong( form.getId() ) );
+        }
+        if ( form.getNdcCode() == null || form.getNdcDescription() == null ) {
+            throw new IllegalArgumentException( "ndc code and description cannot be null" );
+        }
         setPatient( User.getByNameAndRole( form.getPatient(), Role.ROLE_PATIENT ) );
-        setNdc( NDC.getByDescription( form.getNdc() ) );
-        if ( form.getOfficeVisit() != null )
+        setNdc( NDC.getByCode( form.getNdcCode() ) );
+        if ( form.getOfficeVisit() != null ) {
             setVisit( OfficeVisit.getById( Long.parseLong( form.getOfficeVisit() ) ) );
+        }
         final SimpleDateFormat sdf = new SimpleDateFormat( "MM/dd/yyyy", Locale.ENGLISH );
         setStartDate( sdf.parse( form.getStartDate() ) );
         setEndDate( sdf.parse( form.getEndDate() ) );
+        // validate data that is not checked in persistent object
+        if ( getStartDate().after( getEndDate() ) ) {
+            throw new IllegalArgumentException( "Start date can't be after the end date" );
+        }
+        if ( form.getNumRenewals() < 0 ) {
+            throw new IllegalArgumentException( "Renewals must be greater than or equal to zero" );
+        }
         setNumRenewals( form.getNumRenewals() );
+        if ( form.getDosage() <= 0 ) {
+            throw new IllegalArgumentException( "Dosage must be a non zero positive number" );
+        }
         setDosage( form.getDosage() );
     }
 
@@ -104,16 +139,18 @@ import java.util.*;
      *
      * @return The ID.
      */
-    @Override public Long getId () {
+    @Override
+    public Long getId () {
         return id;
     }
 
     /**
      * Set the ID.
      *
-     * @param id The new ID.
+     * @param id
+     *            The new ID.
      */
-    public void setId ( Long id ) {
+    public void setId ( final Long id ) {
         this.id = id;
     }
 
@@ -129,9 +166,10 @@ import java.util.*;
     /**
      * Set the NDC.
      *
-     * @param ndc The new NDC.
+     * @param ndc
+     *            The new NDC.
      */
-    public void setNdc ( NDC ndc ) {
+    public void setNdc ( final NDC ndc ) {
         this.ndc = ndc;
     }
 
@@ -147,9 +185,10 @@ import java.util.*;
     /**
      * Set the Patient.
      *
-     * @param patient The new Patient.
+     * @param patient
+     *            The new Patient.
      */
-    public void setPatient ( User patient ) {
+    public void setPatient ( final User patient ) {
         this.patient = patient;
     }
 
@@ -165,9 +204,10 @@ import java.util.*;
     /**
      * Set the OfficeVisit.
      *
-     * @param visit The new OfficeVisit.
+     * @param visit
+     *            The new OfficeVisit.
      */
-    public void setVisit ( OfficeVisit visit ) {
+    public void setVisit ( final OfficeVisit visit ) {
         this.visit = visit;
     }
 
@@ -183,9 +223,10 @@ import java.util.*;
     /**
      * Set the start date.
      *
-     * @param startDate The new start date.
+     * @param startDate
+     *            The new start date.
      */
-    public void setStartDate ( Date startDate ) {
+    public void setStartDate ( final Date startDate ) {
         this.startDate = startDate;
     }
 
@@ -201,9 +242,10 @@ import java.util.*;
     /**
      * Set the end date.
      *
-     * @param endDate The new end date.
+     * @param endDate
+     *            The new end date.
      */
-    public void setEndDate ( Date endDate ) {
+    public void setEndDate ( final Date endDate ) {
         this.endDate = endDate;
     }
 
@@ -219,9 +261,10 @@ import java.util.*;
     /**
      * Set the number of of renewals.
      *
-     * @param numRenewals The new number of renewals.
+     * @param numRenewals
+     *            The new number of renewals.
      */
-    public void setNumRenewals ( Integer numRenewals ) {
+    public void setNumRenewals ( final Integer numRenewals ) {
         this.numRenewals = numRenewals;
     }
 
@@ -237,49 +280,64 @@ import java.util.*;
     /**
      * Sets the dosage.
      *
-     * @param dosage The new dosage.
+     * @param dosage
+     *            The new dosage.
      */
-    public void setDosage ( Integer dosage ) {
+    public void setDosage ( final Integer dosage ) {
         this.dosage = dosage;
     }
 
     /**
      * The primary key in the database.
      */
-    @Id @GeneratedValue ( strategy = GenerationType.AUTO ) private Long id;
+    @Id
+    @GeneratedValue ( strategy = GenerationType.AUTO )
+    private Long        id;
 
     /**
      * The NDC.
      */
-    @NotNull @ManyToOne @JoinColumn ( name = "ndc_id" ) private NDC ndc;
+    @NotNull
+    @ManyToOne
+    @JoinColumn ( name = "ndc_id" )
+    private NDC         ndc;
 
     /**
      * The Patient.
      */
-    @NotNull @ManyToOne @JoinColumn ( name = "patient_id" ) private User patient;
+    @NotNull
+    @ManyToOne
+    @JoinColumn ( name = "patient_id" )
+    private User        patient;
 
     /**
      * The OfficeVisit.
      */
-    @OneToOne @JoinColumn ( name = "office_visit_id" ) private OfficeVisit visit;
+    @OneToOne
+    @JoinColumn ( name = "office_visit_id" )
+    private OfficeVisit visit;
 
     /**
      * The start date.
      */
-    @NotNull private Date startDate;
+    @NotNull
+    private Date        startDate;
 
     /**
      * The end date.
      */
-    @NotNull private Date endDate;
+    @NotNull
+    private Date        endDate;
 
     /**
      * The number of renewals.
      */
-    @NotNull private Integer numRenewals;
+    @NotNull
+    private Integer     numRenewals;
 
     /**
      * The dosage.
      */
-    @NotNull private Integer dosage;
+    @NotNull
+    private Integer     dosage;
 }

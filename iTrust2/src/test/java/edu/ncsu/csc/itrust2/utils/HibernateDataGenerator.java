@@ -8,7 +8,7 @@ import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.boot.spi.MetadataImplementor;
 import org.hibernate.tool.hbm2ddl.SchemaExport;
 
-import edu.ncsu.csc.itrust2.forms.admin.PrescriptionForm;
+import edu.ncsu.csc.itrust2.forms.hcp.PrescriptionForm;
 import edu.ncsu.csc.itrust2.models.enums.Role;
 import edu.ncsu.csc.itrust2.models.persistent.Hospital;
 import edu.ncsu.csc.itrust2.models.persistent.ICD;
@@ -111,12 +111,12 @@ public class HibernateDataGenerator {
         admin.save();
 
         final NDC ndc = new NDC();
-        ndc.setCode( "0832-0086" );
+        ndc.setCode( "0832-0086-00" );
         ndc.setDescription( "Androxy" );
         ndc.save();
 
         final NDC ndc2 = new NDC();
-        ndc2.setCode( "0832-0087" );
+        ndc2.setCode( "0832-0087-00" );
         ndc2.setDescription( "Androxy2" );
         ndc2.save();
 
@@ -131,10 +131,11 @@ public class HibernateDataGenerator {
         icd2.save();
 
         final PrescriptionForm prescriptionForm = new PrescriptionForm();
-        prescriptionForm.setNdc( "Androxy" );
+        prescriptionForm.setNdcDescription( "Androxy" );
+        prescriptionForm.setNdcCode( "0832-0086-00" );
         prescriptionForm.setPatient( "patient" );
         prescriptionForm.setOfficeVisit( null );
-        prescriptionForm.setStartDate( "01/01/2017" );
+        prescriptionForm.setStartDate( "01/01/2018" );
         prescriptionForm.setEndDate( "01/01/2035" );
         prescriptionForm.setNumRenewals( 1000 );
         prescriptionForm.setDosage( 50000 );
