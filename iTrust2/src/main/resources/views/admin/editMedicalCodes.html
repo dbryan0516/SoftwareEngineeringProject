@@ -114,6 +114,7 @@
 									/* Resets the form fields and back-end state */
 									$scope.resetForm = function() {
 										$scope.message = "";
+										$scope.errorMsg = "";
 										$scope.medCode = {};
 										$scope.medCodeEdited = {};
 										jQuery("input[type='text']").val("");
@@ -128,39 +129,65 @@
 										$scope.medCodeEdited.description = code.description;
 										$scope.medCodeEdited.code = code.code;
 									};
+
+									/* Validate data */
+									var isValid = function() {
+										var validNDC = /(^\d{4}-\d{4}-\d{2}$)|(^\d{5}-\d{4}-\d{1}$)|(^\d{5}-\d{3}-\d{2}$)/;
+										var validICD = /^[A-Z]\d{2}(\.\d+)?$/;
+										console.log($scope.medCodeEdited);
+										if ($scope.medCodeType === "NDC") {
+											if (!validNDC.test($scope.medCodeEdited.code)) {
+												$scope.errorMsg = "NDC code doesn't match a valid NDC format";
+											}
+										}
+										else {
+											if (!validICD.test($scope.medCodeEdited.code)) {
+												$scope.errorMsg = "ICD code doesn't match a valid ICD format";
+											}
+										}
+										return $scope.errorMsg === "";
+									}
 									
 									/* Send data to backend */
 									$scope.submit = function() {
-										var url = baseUrl + "/" + $scope.formMode + $scope.medCodeType;
-										var requestType;
-										if ($scope.formMode === "add") {
-											requestType = "POST";
+										$scope.message = "";
+										$scope.errorMsg = "";
+										if (isValid()) {
+											var url = baseUrl + "/" + $scope.formMode + $scope.medCodeType;
+											var requestType;
+											if ($scope.formMode === "add") {
+												requestType = "POST";
+											}
+											else {
+												requestType = "PUT";
+												
+												// The id has to be added as a URL parameter
+												url += "/" + $scope.medCodeEdited.id;
+											}
+											console.log(url);
+											console.log($scope.medCodeEdited);
+											$http({
+												method : requestType,
+												url : url,
+												data : $scope.medCodeEdited
+											}).then(function(response) {
+												
+												// Refresh the lists of both types of codes, and reload the form to show 
+												// update code listing
+												$scope.getNDCCodes();
+												$scope.getICDCodes();
+												$scope.changeForm($scope.formMode + $scope.medCodeType + "Form");
+												$scope.message = "Database modification successful";
+												console.log(response);
+											}, function(rejection) {
+												$scope.message = "Database modification failed";
+												$scope.errorMsg = rejection.data;
+												console.log(rejection);
+											});
 										}
 										else {
-											requestType = "PUT";
-											
-											// The id has to be added as a URL parameter
-											url += "/" + $scope.medCodeEdited.id;
+											$scope.message = "Database modification failed";
 										}
-										console.log(url);
-										console.log($scope.medCodeEdited);
-										$http({
-											method : requestType,
-											url : url,
-											data : $scope.medCodeEdited
-										}).then(function(response) {
-											
-											// Refresh the lists of both types of codes, and reload the form to show 
-											// update code listing
-											$scope.getNDCCodes();
-											$scope.getICDCodes();
-											$scope.changeForm($scope.formMode + $scope.medCodeType + "Form");
-											$scope.message="Database modification successful";
-											console.log(response);
-										}, function(rejection) {
-											$scope.message="Database modification failed";
-											console.log(rejection);
-										});
 									};
 									
 									$scope.getNDCCodes();
@@ -239,6 +266,7 @@
 					 </tr>
 				 </table>
 				<button ng-click="submit()" name="submit">Submit</button>
+				<div name="errorMsg"><pre>{{errorMsg}}</pre></div>
 				<p id="status" value={{message}}>{{message}}</p>
 			</div>
 		</div>
