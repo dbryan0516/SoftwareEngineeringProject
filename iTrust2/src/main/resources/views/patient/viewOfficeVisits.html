@@ -96,6 +96,7 @@
 											$scope.selectedVisit.currentDiagnosis = $scope.visits[i].icd;
 											console
 													.log($scope.selectedVisit.metrics);
+                                            $scope.selectedVisit.currentPrescription = $scope.visits[i].ndcDescription;
 											$scope.three = false;
 											$scope.threeAndUp = false;
 											$scope.twelveAndUp = false;
@@ -262,10 +263,15 @@
 						<tr>
 							<td style="text-align: right; padding: 5px"><b>Description
 									(Code):</b></td>
-							<td ng-show="selectedVisit.currentDiagnosis == null"><input
-								type="text" name="diagnosisnull" value="No Diagnosis" disabled /></td>
+							<td ng-show="selectedVisit.currentDiagnosis == null">None</td>
 							<td ng-show="selectedVisit.currentDiagnosis != null">{{selectedVisit.currentDiagnosis.description}}
 								({{selectedVisit.currentDiagnosis.code}})</td>
+						</tr>
+						<tr>
+							<td style="text-align:right;padding:5px"><b>Prescription:</b></td>
+							<td ng-show="selectedVisit.prescription == null">None</td>
+							<td ng-show="selectedVisit.prescription != null">{{selectedVisit.currentPrescription.description}}</td>
+							</td>
 						</tr>
 
 					</table>
