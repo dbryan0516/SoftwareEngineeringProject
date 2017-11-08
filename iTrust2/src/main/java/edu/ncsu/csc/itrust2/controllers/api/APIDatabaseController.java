@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -40,6 +41,7 @@ public class APIDatabaseController extends APIController {
      *            the form from the frontend
      * @return response
      */
+    @PreAuthorize ( "hasRole('ROLE_ADMIN')" )
     @PostMapping ( BASE_PATH + "/addICD" )
     public ResponseEntity addICDEntry ( @RequestBody final ICDForm icdf ) {
         try {
@@ -72,6 +74,7 @@ public class APIDatabaseController extends APIController {
      *            the form from the frontend
      * @return response
      */
+    @PreAuthorize ( "hasRole('ROLE_ADMIN')" )
     @PutMapping ( BASE_PATH + "/updateICD/{id}" )
     public ResponseEntity updateICDEntry ( @PathVariable ( "id" ) final Long id, @RequestBody final ICDForm icdf ) {
         try {
@@ -110,6 +113,7 @@ public class APIDatabaseController extends APIController {
      *            the form from the frontend
      * @return response
      */
+    @PreAuthorize ( "hasRole('ROLE_ADMIN')" )
     @PostMapping ( BASE_PATH + "/addNDC" )
     public ResponseEntity addNDCEntry ( @RequestBody final NDCForm ndcf ) {
         try {
@@ -142,6 +146,7 @@ public class APIDatabaseController extends APIController {
      *            the form from the frontend
      * @return response
      */
+    @PreAuthorize ( "hasRole('ROLE_ADMIN')" )
     @PutMapping ( BASE_PATH + "/updateNDC/{id}" )
     public ResponseEntity updateNDCEntry ( @PathVariable ( "id" ) final Long id, @RequestBody final NDCForm ndcf ) {
         try {
