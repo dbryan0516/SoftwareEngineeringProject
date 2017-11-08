@@ -173,6 +173,7 @@ public class OfficeVisitForm implements Serializable {
     private Integer                dosage;
 
     /**
+     * Gets the NDC description.
      * @return the ndcDescription
      */
     public String getNdcDescription () {
@@ -180,6 +181,7 @@ public class OfficeVisitForm implements Serializable {
     }
 
     /**
+     * Sets the NDC description.
      * @param ndcDescription
      *            the ndcDescription to set
      */
@@ -188,6 +190,7 @@ public class OfficeVisitForm implements Serializable {
     }
 
     /**
+     * Gets the NDC code.
      * @return the ndcCode
      */
     public String getNdcCode () {
@@ -195,6 +198,7 @@ public class OfficeVisitForm implements Serializable {
     }
 
     /**
+     * Sets the NDC code.
      * @param ndcCode
      *            the ndcCode to set
      */
@@ -203,6 +207,7 @@ public class OfficeVisitForm implements Serializable {
     }
 
     /**
+     * Gets the start date.
      * @return the startDate
      */
     public String getStartDate () {
@@ -210,6 +215,7 @@ public class OfficeVisitForm implements Serializable {
     }
 
     /**
+     * Sets the start date.
      * @param startDate
      *            the startDate to set
      */
@@ -218,6 +224,7 @@ public class OfficeVisitForm implements Serializable {
     }
 
     /**
+     * Gets the end date.
      * @return the endDate
      */
     public String getEndDate () {
@@ -225,6 +232,7 @@ public class OfficeVisitForm implements Serializable {
     }
 
     /**
+     * Sets the end date.
      * @param endDate
      *            the endDate to set
      */
@@ -233,6 +241,7 @@ public class OfficeVisitForm implements Serializable {
     }
 
     /**
+     * Gets the number of renewals.
      * @return the numRenewals
      */
     public Integer getNumRenewals () {
@@ -240,6 +249,7 @@ public class OfficeVisitForm implements Serializable {
     }
 
     /**
+     * Sets the number of renewals.
      * @param numRenewals
      *            the numRenewals to set
      */
@@ -248,6 +258,7 @@ public class OfficeVisitForm implements Serializable {
     }
 
     /**
+     * Gets the dosage.
      * @return the dosage
      */
     public Integer getDosage () {
@@ -255,6 +266,7 @@ public class OfficeVisitForm implements Serializable {
     }
 
     /**
+     * Sets the dosage.
      * @param dosage
      *            the dosage to set
      */

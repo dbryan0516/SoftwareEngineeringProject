@@ -171,7 +171,7 @@ public class APIOfficeVisitTest {
 
         // test for valid prescription
         visit.setNdcDescription( "Androxy" );
-        visit.setNdcCode( "0832-0086" );
+        visit.setNdcCode( "0832-0086-00" );
         visit.setPatient( "patient" );
         visit.setStartDate( "01/07/2018" );
         visit.setEndDate( "01/07/2035" );

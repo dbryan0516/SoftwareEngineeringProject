@@ -21,7 +21,7 @@ public class OfficeVisitTest {
         form.setType( AppointmentType.GENERAL_CHECKUP.toString() );
         form.setHospital( "General Hospital" );
         // guaranteed
-        form.setIcd( "Cholera" );
+        form.setIcd( "A00" );
 
         final OfficeVisit visit = new OfficeVisit( form );
         assertEquals( "Cholera", visit.getIcd().getDescription() );
