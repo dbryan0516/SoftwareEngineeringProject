@@ -21,6 +21,11 @@ import edu.ncsu.csc.itrust2.models.persistent.Prescription;
 import edu.ncsu.csc.itrust2.models.persistent.User;
 import edu.ncsu.csc.itrust2.utils.LoggerUtil;
 
+/**
+ * API endpoints for prescriptions.
+ *
+ * @author gtstewar
+ */
 @RestController
 @SuppressWarnings ( { "unchecked", "rawtypes" } )
 public class APIPrescriptionController extends APIController {
