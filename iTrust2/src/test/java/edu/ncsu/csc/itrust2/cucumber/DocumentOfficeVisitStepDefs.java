@@ -1,7 +1,6 @@
 package edu.ncsu.csc.itrust2.cucumber;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -47,7 +46,7 @@ public class DocumentOfficeVisitStepDefs {
     private final String          hospitalName = "Office Visit Hospital" + ( new Random() ).nextInt();
     BasicHealthMetrics            expectedBhm;
 
-    WebDriverWait                 wait         = new WebDriverWait( driver, 2 );
+    WebDriverWait                 wait         = new WebDriverWait( driver, 5 );
 
     @Given ( "The required facilities exist" )
     public void personnelExists () throws Exception {
@@ -263,17 +262,18 @@ public class DocumentOfficeVisitStepDefs {
 
     @Then ( "The office visit is documented successfully" )
     public void documentedSuccessfully () {
-        wait.until( ExpectedConditions.visibilityOfElementLocated( By.name( "success" ) ) );
+        wait.until( ExpectedConditions.not( ExpectedConditions.textToBePresentInElementLocated( By.name( "success" ),
+                "Error occurred creating office visit" ) ) );
         final WebElement message = driver.findElement( By.name( "success" ) );
 
-        assertFalse( message.getText().contains( "Error occurred creating office visit" ) );
+        assertTrue( message.getText().contains( "Office visit created successfully" ) );
 
     }
 
     @Then ( "^The diagnosis (.+) is successfully recorded$" )
-    public void diagnosisSuccessfullyRecorded (final String diagnosis) {
+    public void diagnosisSuccessfullyRecorded ( final String diagnosis ) {
         // we wipe officevisits before the tests so we should only have 1 visit
-        assertEquals( diagnosis, OfficeVisit.getOfficeVisits().get(0).getIcd().getDescription() );
+        assertEquals( diagnosis, OfficeVisit.getOfficeVisits().get( 0 ).getIcd().getDescription() );
     }
 
     /**
@@ -579,8 +579,8 @@ public class DocumentOfficeVisitStepDefs {
      */
     @When ( "^I fill in information on the office visit for an infant with date: (.+), weight: (.+), length: (.+), head circumference: (.+), household smoking status: (.+), note: (.+), and diagnosis: (.+)$" )
     public void documentOVWithSpecificInformation ( final String dateString, final String weightString,
-                                                    final String lengthString, final String headString, final String smokingStatus, final String note, final String diagnosis )
-            throws InterruptedException {
+            final String lengthString, final String headString, final String smokingStatus, final String note,
+            final String diagnosis ) throws InterruptedException {
         wait.until( ExpectedConditions.visibilityOfElementLocated( By.name( "notes" ) ) );
         final WebElement notes = driver.findElement( By.name( "notes" ) );
         notes.clear();
@@ -662,7 +662,8 @@ public class DocumentOfficeVisitStepDefs {
              */
         }
 
-        final WebElement diagnosisElement = driver.findElement( By.cssSelector("input[data-medcode=\"" + diagnosis + "\"]"));
+        final WebElement diagnosisElement = driver
+                .findElement( By.cssSelector( "input[data-medcode=\"" + diagnosis + "\"]" ) );
         diagnosisElement.click();
 
         wait.until( ExpectedConditions.visibilityOfElementLocated( By.name( "submit" ) ) );

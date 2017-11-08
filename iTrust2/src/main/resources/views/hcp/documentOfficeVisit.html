@@ -20,10 +20,13 @@
                     $scope.three = false;
                     $scope.threeAndUp = false;
                     $scope.twelveAndUp = false;
+                    $scope.visit = {};
+                    $scope.currentPrescription = {};
                     $scope.currentDiagnosis = {};
+                    $scope.NDCCodes = [];
                     $scope.ICDCodes = [];
-
-
+                    $scope.hasPrescription = false;
+                    $scope.hasDiagnosis = false;
 
                     $scope.getICDCodes = function() {
                         $http({
@@ -34,6 +37,17 @@
                         }, function(rejection) {
                             console.log(rejection);
                         });
+                    };
+
+                    $scope.getNDCCodes = function() {
+                        $http({
+                            method : "GET",
+                            url : baseUrl + "/NDCEntries",
+                        }).then(function(response) {
+                            $scope.NDCCodes = response.data;
+                        }, function(rejection) {
+                            console.log(rejection);
+                        }); 
                     };
 
                     //ran when patient is selected
@@ -97,7 +111,18 @@
                         $scope.message = "";
                     };
 
-                    $scope.validateData = function() {
+                    $scope.selectNDC = function(ndcCode) {
+                        $scope.currentPrescription.ndcCode = ndcCode.code;
+                        $scope.currentPrescription.ndcDescription = ndcCode.description;
+                    };
+
+                     /* Validates the data in the form */
+                    function isInvalid(str) {
+                        return str === "" || str === null || str === undefined;
+                    };
+
+
+                    $scope.validateDiagnosis = function() {
                         var p = $scope.currentDiagnosis;
 
                         // No ICD selected
@@ -109,10 +134,53 @@
                         }
                     }
 
-					/* Validates the data in the form */
-                    function isInvalid(str) {
-                        return str === "" || str === null || str === undefined;
-                    };
+                    $scope.validatePrescription = function() {
+                        var dateRegex = /^\d{2}\/\d{2}\/\d{4}$/;
+                        var intRegex = /^\d{1,}$/;
+                        var p = $scope.currentPrescription;
+                        var validDate = true;
+
+                        // No NDC selected
+                        if (isInvalid(p.ndcDescription) || isInvalid(p.ndcCode)) {
+                            $scope.errorMsg += "An NDC code must be associated with this Prescription \n";
+                        }
+
+                        // Invalid start date
+                        if (!dateRegex.test(p.startDate)) {
+                            $scope.errorMsg += "Start date of prescription must be in the format: mm/dd/yyyy \n";
+                            validDate = false;
+                        }
+
+                        // Invalid end date
+                        if (!dateRegex.test(p.endDate)) {
+                            $scope.errorMsg += "End date of prescription must be in the format: mm/dd/yyyy \n";
+                            validDate = false;
+                        }
+                        
+                        // Valid date, but start date isn't before end date
+                        if (validDate) {
+                            var sDate = new Date(p.startDate);
+                            var eDate = new Date(p.endDate);
+                            if (sDate > eDate) {
+                                $scope.errorMsg += "Start date of prescription must be before end date \n";
+                                validDate = false;
+                            }
+                        }
+
+                        // Invalid dosage (non-integers and 0 value)
+                        if (!intRegex.test(p.dosage) || parseInt(p.dosage) == 0) {
+                            $scope.errorMsg += "Dosage of prescription must be an integer >= 0 \n";
+
+                        }
+
+                        // Invalid renewal count
+                        if (!intRegex.test(p.numRenewals)) {
+                            $scope.errorMsg += "Renewal count of prescription must be an integer \n";
+                        }
+
+                        // No errors mean valid data
+                        return $scope.errorMsg === "";
+                    }
 
 
                     $http.get("/iTrust2/api/v1/patients").then(
@@ -142,14 +210,15 @@
                     console.log($scope);
 
                     $scope.submit = function() {
+                        $scope.message = "";
                         $scope.errorMsg = "";
                         $scope.visit.hcp = /*[[${#httpServletRequest.remoteUser}]]*/null; /* Ugly hack; use this to retrieve the name of the HCP who is currently logged in.  This grabs it from Thymeleaf */
                         $scope.visit.status = "PENDING";
+                        var sendData = true;
 
-                        if ($scope.validateData()) {
-                            $scope.visit.icd = $scope.currentDiagnosis.icdCode;
+                        if (isInvalid($scope.visit.actualPatient)) {
+                            $scope.errorMsg += "Please select a Patient \n";
                         }
-
 
                         if ($scope.visit.type == null) {
                             $scope.errorMsg += "Please select a visit type\n";
@@ -220,27 +289,54 @@
                             }
                         }
 
+                        // Only add the diagnosis and prescription if everything else is good
+                        console.log("Sending a diagnosis: " + $scope.hasDiagnosis);
+                        console.log("Sending a prescription: " + $scope.hasPrescription);
+                        if ($scope.errorMsg === "") {
 
-                        $http({
-                            method : 'POST',
-                            url : '/iTrust2/api/v1/officevisits',
-                            data : $scope.visit
-                        }).then(function(response) {
-                            $scope.message="Office visit created successfully";
-                            console.log(response);
-                        }, function(rejection) {
-                            $scope.message="Error occurred creating office visit";
-                            console.log(rejection);
-                        })
+                            if ($scope.hasDiagnosis) {
+                                if ($scope.validateDiagnosis()) {
+                                    $scope.visit.icd = $scope.currentDiagnosis.icdCode;
+                                }
+                            }
+
+                            if ($scope.hasPrescription) {
+                                 if ($scope.validatePrescription()) {
+
+                                    // Add the currentPrescription fields to the OfficeVisit
+                                    for (var prop in $scope.currentPrescription) {
+                                        $scope.visit [prop] = $scope.currentPrescription [prop];
+                                    }
+                                }
+                            }
+                        }
+
+                        if ($scope.errorMsg === "") {
+                            console.log($scope.visit);
+                            $http({
+                                method : 'POST',
+                                url : '/iTrust2/api/v1/officevisits',
+                                data : $scope.visit
+                            }).then(function(response) {
+                                $scope.message="Office visit created successfully";
+                                console.log(response);
+                            }, function(rejection) {
+                                $scope.message="Error occurred creating office visit";
+                                console.log(rejection);
+                            });
+                        }
+                        else {
+                            $scope.message = "Error occurred creating office visit";
+                        }
                     }
 
                     $scope.resetForm = function() {
                         $scope.currentDiagnosis = {};
+                        $scope.currentPrescription = {};
                     }
 
                     $scope.getICDCodes();
-
-
+                    $scope.getNDCCodes();
                 });
 
 		/*]]>*/
@@ -343,7 +439,7 @@
 				</tr>
 			</table>
 			<h2>Basic Health Metrics</h2>
-
+            <table>
 			<tr>
 				<td style="text-align:right;padding:5px"><b>Height/Length:</b></td>
 				<td><input type="text" name="height" ng-model="visit.height"
@@ -409,17 +505,59 @@
 				</td>
 			</tr>
 			</table>
-
+            <br />
 			<div class="icdCodes">
-				<input style="width:50%;" type="text" id="icdCodeSearch" name="icdCodeSearch" ng-model="icdSearchFilter" placeholder="Search by Disease name" />
-				<ul>
-					<li ng-repeat="code in ICDCodes | filter:icdSearchFilter">
-						<input id="{{code.code}}" type="radio" ng-model="currentDiagnosis.icdCode" ng-change="selectICD(code)" name="icdCode" data-medCode="{{code.description}}" value="{{code.code}}" />
-						<label for="{{code.code}}">{{code.description}} ({{code.code}})</label>
-					</li>
-				</ul>
+                <h2>Diagnosis</h2>
+                <input type="checkbox" id="addDiagnosis" name="addDiagnosis" ng-click="hasDiagnosis = !hasDiagnosis" />
+                <label for="addDiagnosis">Add a Diagnosis</label>
+                <div class="diagnosisForm" ng-show="hasDiagnosis">
+    				<input style="width:50%;" type="text" id="icdCodeSearch" name="icdCodeSearch" ng-model="icdSearchFilter" placeholder="Search by Disease name" />
+    				<ul>
+    					<li ng-repeat="code in ICDCodes | filter:icdSearchFilter">
+    						<input id="{{code.code}}" type="radio" ng-model="currentDiagnosis.icdCode" ng-change="selectICD(code)" name="icdCode" data-medCode="{{code.description}}" value="{{code.code}}" />
+    						<label for="{{code.code}}">{{code.description}} ({{code.code}})</label>
+    					</li>
+    				</ul>
+                </div>
 			</div>
-
+            <br />
+            <div class="prescriptions">
+                <h2>Prescriptions</h2>
+                <input type="checkbox" id="addPrescription" name="addPrescription" ng-click="hasPrescription = !hasPrescription" />
+                <label for="addPrescription">Add a Prescription</label>
+                <div class="prescriptionForm" ng-show="hasPrescription">
+                    Select an NDC code (mandatory):
+                    <div class="ndcCodes">
+                        <input style="width:50%;" type="text" id="ndcCodeSearch" name="ndcCodeSearch" ng-model="ndcSearchFilter" placeholder="Search by Prescription name" />
+                        <ul>
+                            <li ng-repeat="code in NDCCodes | filter:ndcSearchFilter">
+                                <input id="{{code.code}}" type="radio" ng-model="currentPrescription.ndcCode" ng-change="selectNDC(code)" name="ndcCode" data-medCode="{{code.description}}" value="{{code.code}}" />
+                                <label for="{{code.code}}">{{code.description}} ({{code.code}})</label>
+                            </li>
+                        </ul>
+                    </div>
+                    <br />
+                    Mandatory information:
+                    <table>
+                        <tr>
+                            <td>Start Date</td>
+                            <td><input type="text" id="startDate" ng-model="currentPrescription.startDate" placeholder="Format: mm/dd/yyyy" /></td>
+                        </tr>
+                        <tr>
+                            <td>End Date</td>
+                            <td><input type="text" id="endDate" ng-model="currentPrescription.endDate" placeholder="Format: mm/dd/yyyy" /></td>
+                        </tr>
+                        <tr>
+                            <td>Dosage (mg)</td>
+                            <td><input type="text" id="dosage" ng-model="currentPrescription.dosage" placeholder="Dosage in mg" /></td>
+                        </tr>
+                        <tr>
+                            <td>Renewals</td>
+                            <td><input type="text" id="numRenewals" ng-model="currentPrescription.numRenewals" placeholder="Renewal count"></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
 			<br />
 			<button ng-click="submit()" name="submit">Submit Office
 				Visit</button>
@@ -428,15 +566,7 @@
 
 			<div name="success">{{message}}</div>
 		</div>
-
-
-
-
 	</div>
-
-
-
-
 </div>
 </body>
 </html>
