@@ -260,8 +260,11 @@
 					<h2>Diagnosis</h2>
 					<table>
 						<tr>
-							<td style="text-align: right; padding: 5px"><b>Description (Code):</b></td>
-							<td>{{selectedVisit.currentDiagnosis.description}}
+							<td style="text-align: right; padding: 5px"><b>Description
+									(Code):</b></td>
+							<td ng-show="selectedVisit.currentDiagnosis == null"><input
+								type="text" name="diagnosisnull" value="No Diagnosis" disabled /></td>
+							<td ng-show="selectedVisit.currentDiagnosis != null">{{selectedVisit.currentDiagnosis.description}}
 								({{selectedVisit.currentDiagnosis.code}})</td>
 						</tr>
 
