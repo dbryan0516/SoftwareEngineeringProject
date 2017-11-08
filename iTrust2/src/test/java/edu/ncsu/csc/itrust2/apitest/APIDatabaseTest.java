@@ -14,6 +14,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
@@ -67,6 +68,7 @@ public class APIDatabaseTest {
      * @throws Exception
      *             failed test
      */
+    @WithMockUser(roles="ADMIN")
     @Test
     public void testUpdateNonExistentICD () throws Exception {
         final ICDForm icdf = new ICDForm();
@@ -82,6 +84,7 @@ public class APIDatabaseTest {
      * @throws Exception
      *             failed test
      */
+    @WithMockUser(roles="ADMIN")
     @Test
     public void testUpdateNonExistentNDC () throws Exception {
         final NDCForm ndcf = new NDCForm();
@@ -97,6 +100,7 @@ public class APIDatabaseTest {
      * @throws Exception
      *             failed test
      */
+    @WithMockUser(roles="ADMIN")
     @Test
     public void testICD () throws Exception {
 
@@ -167,6 +171,7 @@ public class APIDatabaseTest {
      * @throws Exception
      *             failed test
      */
+    @WithMockUser(roles="ADMIN")
     @Test
     public void testNDC () throws Exception {
 
