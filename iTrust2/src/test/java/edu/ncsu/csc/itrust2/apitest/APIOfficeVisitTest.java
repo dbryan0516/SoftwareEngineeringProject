@@ -29,6 +29,7 @@ import edu.ncsu.csc.itrust2.models.enums.Status;
 import edu.ncsu.csc.itrust2.models.persistent.Hospital;
 import edu.ncsu.csc.itrust2.models.persistent.OfficeVisit;
 import edu.ncsu.csc.itrust2.mvc.config.WebMvcConfiguration;
+import edu.ncsu.csc.itrust2.utils.HibernateDataGenerator;
 
 /**
  * Test for the API functionality for interacting with office visits
@@ -53,6 +54,7 @@ public class APIOfficeVisitTest {
     @Before
     public void setup () {
         mvc = MockMvcBuilders.webAppContextSetup( context ).build();
+        HibernateDataGenerator.refreshDB();
     }
 
     /**
@@ -115,7 +117,7 @@ public class APIOfficeVisitTest {
         visit.setPatient( "patient" );
         visit.setNotes( "Test office visit" );
         visit.setType( AppointmentType.GENERAL_CHECKUP.toString() );
-        visit.setHospital( "iTrust Test Hospital 2" );
+        visit.setHospital( "General Hostpital" );
 
         mvc.perform( post( "/api/v1/officevisits" ).contentType( MediaType.APPLICATION_JSON )
                 .content( TestUtils.asJsonString( visit ) ) ).andExpect( status().isOk() );
@@ -167,9 +169,18 @@ public class APIOfficeVisitTest {
         visit.setType( AppointmentType.GENERAL_CHECKUP.toString() );
         visit.setHospital( "iTrust Test Hospital 2" );
 
+        // test for valid prescription
+        visit.setNdcDescription( "Androxy" );
+        visit.setNdcCode( "0832-0086-00" );
+        visit.setPatient( "patient" );
+        visit.setStartDate( "01/07/2018" );
+        visit.setEndDate( "01/07/2035" );
+        visit.setNumRenewals( 100 );
+        visit.setDosage( 3 );
+
         /* Create the Office Visit */
         mvc.perform( post( "/api/v1/officevisits" ).contentType( MediaType.APPLICATION_JSON )
-                .content( TestUtils.asJsonString( visit ) ) );
+                .content( TestUtils.asJsonString( visit ) ) ).andExpect( status().isOk() );
 
         mvc.perform( get( "/api/v1/officevisits" ) ).andExpect( status().isOk() )
                 .andExpect( content().contentType( MediaType.APPLICATION_JSON_UTF8_VALUE ) );

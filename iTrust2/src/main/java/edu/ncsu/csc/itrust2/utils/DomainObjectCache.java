@@ -64,6 +64,15 @@ public class DomainObjectCache <K extends Object, D extends DomainObject> {
     }
 
     /**
+     * Clears all of the caches in the system (for testing).
+     */
+    static public void clearCaches() {
+        for ( final DomainObjectCache c : cacheByClass.values() ) {
+            c.clear();
+        }
+    }
+
+    /**
      * A CleanUp thread that is used to automatically clean out expired entries
      */
     static private Thread cleanupThread = new Thread( new Runnable() {

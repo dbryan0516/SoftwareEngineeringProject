@@ -140,12 +140,139 @@ public class OfficeVisitForm implements Serializable {
     /**
      * The ICD of the patient (may be null).
      */
-    private String icd;
+    private String                 icd;
 
     /**
-     * The prescription of the patient (may be null).
+     * The description associated with the NDC of the Prescription.
      */
-    private String prescription;
+    private String                 ndcDescription;
+
+    /**
+     * The ndc code
+     */
+    private String                 ndcCode;
+
+    /**
+     * The start date of the prescription.
+     */
+    private String                 startDate;
+
+    /**
+     * The end date of the prescription.
+     */
+    private String                 endDate;
+
+    /**
+     * The number of renewals of the prescription.
+     */
+    private Integer                numRenewals;
+
+    /**
+     * The dosage of the prescription.
+     */
+    private Integer                dosage;
+
+    /**
+     * Gets the NDC description.
+     * @return the ndcDescription
+     */
+    public String getNdcDescription () {
+        return ndcDescription;
+    }
+
+    /**
+     * Sets the NDC description.
+     * @param ndcDescription
+     *            the ndcDescription to set
+     */
+    public void setNdcDescription ( final String ndcDescription ) {
+        this.ndcDescription = ndcDescription;
+    }
+
+    /**
+     * Gets the NDC code.
+     * @return the ndcCode
+     */
+    public String getNdcCode () {
+        return ndcCode;
+    }
+
+    /**
+     * Sets the NDC code.
+     * @param ndcCode
+     *            the ndcCode to set
+     */
+    public void setNdcCode ( final String ndcCode ) {
+        this.ndcCode = ndcCode;
+    }
+
+    /**
+     * Gets the start date.
+     * @return the startDate
+     */
+    public String getStartDate () {
+        return startDate;
+    }
+
+    /**
+     * Sets the start date.
+     * @param startDate
+     *            the startDate to set
+     */
+    public void setStartDate ( final String startDate ) {
+        this.startDate = startDate;
+    }
+
+    /**
+     * Gets the end date.
+     * @return the endDate
+     */
+    public String getEndDate () {
+        return endDate;
+    }
+
+    /**
+     * Sets the end date.
+     * @param endDate
+     *            the endDate to set
+     */
+    public void setEndDate ( final String endDate ) {
+        this.endDate = endDate;
+    }
+
+    /**
+     * Gets the number of renewals.
+     * @return the numRenewals
+     */
+    public Integer getNumRenewals () {
+        return numRenewals;
+    }
+
+    /**
+     * Sets the number of renewals.
+     * @param numRenewals
+     *            the numRenewals to set
+     */
+    public void setNumRenewals ( final Integer numRenewals ) {
+        this.numRenewals = numRenewals;
+    }
+
+    /**
+     * Gets the dosage.
+     * @return the dosage
+     */
+    public Integer getDosage () {
+        return dosage;
+    }
+
+    /**
+     * Sets the dosage.
+     * @param dosage
+     *            the dosage to set
+     */
+    public void setDosage ( final Integer dosage ) {
+        this.dosage = dosage;
+    }
 
     /**
      * Creates an OfficeVisitForm from the OfficeVisit provided
@@ -163,8 +290,7 @@ public class OfficeVisitForm implements Serializable {
         setNotes( ov.getNotes() );
         setId( ov.getId().toString() );
         setPreScheduled( ( (Boolean) ( ov.getAppointment() != null ) ).toString() );
-        setIcd( ov.getIcd() == null ? null : ov.getIcd().getDescription() );
-        setPrescription( ov.getPrescription() == null ? null : ov.getPrescription().getId().toString() );
+        setIcd( ov.getIcd() == null ? null : ov.getIcd().getCode() );
     }
 
     /**
@@ -530,6 +656,7 @@ public class OfficeVisitForm implements Serializable {
 
     /**
      * Get the ICD.
+     *
      * @return The ICD.
      */
     public String getIcd () {
@@ -538,25 +665,12 @@ public class OfficeVisitForm implements Serializable {
 
     /**
      * Set the ICD.
-     * @param icd The new ICD.
+     *
+     * @param icd
+     *            The new ICD.
      */
-    public void setIcd ( String icd ) {
+    public void setIcd ( final String icd ) {
         this.icd = icd;
     }
 
-    /**
-     * Get the prescription.
-     * @return The prescription.
-     */
-    public String getPrescription () {
-        return prescription;
-    }
-
-    /**
-     * Set the prescription.
-     * @param prescription The new prescription.
-     */
-    public void setPrescription ( String prescription ) {
-        this.prescription = prescription;
-    }
 }

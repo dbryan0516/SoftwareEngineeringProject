@@ -1,0 +1,415 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:include="layout :: head(title=~{::title},links=~{})">
+    <title>Document Office Visit</title>
+</head>
+<body th:include="layout :: body" th:with="content=~{::content}">
+<div th:fragment="content">
+
+    <script th:inline="javascript">
+        /* Otherwise Thymeleaf tries to parse Javascript as XML and breaks itself sometimes.  Sigh */
+        /*<![CDATA[*/
+
+        var app = angular.module('myApp', []);
+        app.controller('editPatientCtrl', function ($scope, $http) {
+            var BASE_API = '/iTrust2/api/v1';
+
+            // run when a patient is chosen
+            $scope.patientSelect = function (patient) {
+                $scope.patient = patient;
+            };
+
+            $http.get(BASE_API + '/patients').then(
+                function (response) {
+                    $scope.patients = response.data;
+                    $scope.patients.forEach(function (patient, index) {
+                        // pull the username out of each patient
+                        $scope.patients[index].self = patient.self.username;
+                        $scope.patients[index].dateOfBirth = parseDate(patient.dateOfBirth);
+                        $scope.patients[index].dateOfDeath = parseDate(patient.dateOfDeath);
+                    });
+                }
+            );
+
+            $http.get(BASE_API + '/state').then(
+                function (response) {
+                    $scope.states = response.data;
+                }
+            );
+
+            $http.get(BASE_API + '/bloodtype').then(
+                function (response) {
+                    $scope.bloodTypes = response.data;
+                }
+            );
+
+            $http.get(BASE_API + '/ethnicity').then(
+                function (response) {
+                    $scope.ethnicities = response.data;
+                }
+            );
+
+            $http.get(BASE_API + '/gender').then(
+                function (response) {
+                    $scope.genders = response.data;
+                }
+            );
+
+            console.log($scope);
+
+            $scope.submit = function () {
+                $scope.errorMsg = validate.firstName() +
+                    validate.lastName() +
+                    validate.preferredName() +
+                    validate.mother() +
+                    validate.father() +
+                    validate.email() +
+                    validate.address1() +
+                    validate.address2() +
+                    validate.city() +
+                    validate.state() +
+                    validate.zip() +
+                    validate.phone() +
+                    validate.dateOfBirth() +
+                    validate.dateOfBirth() +
+                    validate.causeOfDeath() +
+                    validate.bloodType() +
+                    validate.ethnicity() +
+                    validate.gender();
+                if ($scope.errorMsg === '') {
+                    $http({
+                        method: 'PUT',
+                        url: BASE_API + '/patients/' + $scope.patient.self,
+                        data: $scope.patient
+                    }).then(
+                        function () {
+                            $scope.message = 'Demographics updated successfully';
+                            $scope.patient = null;
+                        },
+                        function () {
+                            $scope.errorMsg = 'Error occurred while updating demographics';
+                        }
+                    )
+                }
+            };
+
+            var validName = /^[A-Za-z\-' ]*$/;
+            var validUser = /^[A-Za-z]*$/;
+            var validEmail = /^[\w.@ ]*$/;
+            var validAddress = /^[A-Za-z0-9. ]*$/;
+            var validCity = /^[A-Za-z]*$/;
+            var validZip = /^\d{5}(-\d{4})?$/;
+            var validPhone = /^\d{3}-\d{3}-\d{4}$/;
+            var validDate = /^\d{2}\/\d{2}\/\d{4}$/;
+            var validDeath = /^[A-Za-z ]*$/;
+
+            var validate = {
+                'firstName': function () {
+                    if (isEmpty($scope.patient.firstName) ||
+                        $scope.patient.firstName.length > 20 ||
+                        !validName.test($scope.patient.firstName))
+                        return 'First name is missing or invalid\n';
+                    return '';
+                },
+                'lastName': function () {
+                    if (isEmpty($scope.patient.lastName) ||
+                        $scope.patient.lastName.length > 20 ||
+                        !validName.test($scope.patient.lastName))
+                        return 'Last name is missing or invalid\n';
+                    return '';
+                },
+                'preferredName': function () {
+                    if (!isEmpty($scope.patient.preferredName) &&
+                        $scope.patient.preferredName.length > 30 ||
+                        !validName.test($scope.patient.preferredName))
+                        return 'Preferred name is invalid\n';
+                    return '';
+                },
+                'mother': function () {
+                    if (!isEmpty($scope.patient.mother) &&
+                        $scope.patient.mother.length > 20 ||
+                        !validUser.test($scope.patient.mother))
+                        return 'Mother username is invalid\n';
+                    return '';
+                },
+                'father': function () {
+                    if (!isEmpty($scope.patient.father) &&
+                        $scope.patient.father.length > 20 ||
+                        !validUser.test($scope.patient.father))
+                        return 'Father username is invalid\n';
+                    return '';
+                },
+                'email': function () {
+                    if (isEmpty($scope.patient.email) ||
+                        $scope.patient.email.length > 30 ||
+                        !validEmail.test($scope.patient.email))
+                        return 'Email is missing or invalid\n';
+                    return '';
+                },
+                'address1': function () {
+                    if (isEmpty($scope.patient.address1) ||
+                        $scope.patient.address1.length > 50 ||
+                        !validAddress.test($scope.patient.address1))
+                        return 'Address 1 is missing or invalid\n';
+                    return '';
+                },
+                'address2': function () {
+                    if (!isEmpty($scope.patient.address2) &&
+                        $scope.patient.address2.length > 50 ||
+                        !validAddress.test($scope.patient.address2))
+                        return 'Address 2 is invalid\n';
+                    return '';
+                },
+                'city': function () {
+                    if (isEmpty($scope.patient.city) ||
+                        $scope.patient.city.length > 15 ||
+                        !validCity.test($scope.patient.city))
+                        return 'City is missing or invalid\n';
+                    return '';
+                },
+                'state': function () {
+                    if (isEmpty($scope.patient.state))
+                        return 'State is missing\n';
+                    return '';
+                },
+                'zip': function () {
+                    if (isEmpty($scope.patient.zip) ||
+                        !validZip.test($scope.patient.zip))
+                        return 'Zip is missing or invalid\n';
+                    return '';
+                },
+                'phone': function () {
+                    if (isEmpty($scope.patient.phone) ||
+                        !validPhone.test($scope.patient.phone))
+                        return 'Phone is missing or invalid\n';
+                    return '';
+                },
+                'dateOfBirth': function () {
+                    if (isEmpty($scope.patient.dateOfBirth) ||
+                        !validDate.test($scope.patient.dateOfBirth))
+                        return 'Date of Birth is missing or invalid\n';
+                    return '';
+                },
+                'dateOfDeath': function () {
+                    if (!isEmpty($scope.patient.dateOfDeath) &&
+                        !validDate.test($scope.patient.dateOfDeath))
+                        return 'Date of Birth is invalid\n';
+                    return '';
+                },
+                'causeOfDeath': function () {
+                    if (!isEmpty($scope.patient.causeOfDeath) &&
+                        $scope.patient.causeOfDeath.length > 50 ||
+                        !validDeath.test($scope.patient.causeOfDeath))
+                        return 'Cause of Death is invalid\n';
+                    return '';
+                },
+                'bloodType': function () {
+                    if (isEmpty($scope.patient.bloodType))
+                        return 'Blood type is missing\n';
+                    return '';
+                },
+                'ethnicity': function () {
+                    if (isEmpty($scope.patient.ethnicity))
+                        return 'Ethnicity is missing\n';
+                    return '';
+                },
+                'gender': function () {
+                    if (isEmpty($scope.patient.gender))
+                        return 'Gender is missing\n';
+                    return '';
+                }
+            };
+
+            function isEmpty(field) {
+                return field === undefined || field === null || field === '';
+            }
+
+            /**
+             * Parses a JS Date object from the given patient date.
+             */
+            function parseDate(date) {
+                if (date === null || date === undefined)
+                    return null;
+                date.month += 1; // js months are 0-11
+                return (date.month < 10 ? '0' + date.month : date.month) + '/' +
+                    (date.dayOfMonth < 10 ? '0' + date.dayOfMonth : date.dayOfMonth) + '/' +
+                    (date.year < 10 ? '0' + date.year : date.year);
+            }
+        })
+        ;
+
+        /*]]>*/
+    </script>
+
+    <div ng-app="myApp" ng-controller="editPatientCtrl">
+        <div style="float:left;width:30%;height:75%;overflow-y:auto">
+            <h2>Patients:</h2>
+            <!-- info on filtering taken from here: https://www.w3schools.com/angular/angular_filters.asp
+                and https://docs.angularjs.org/api/ng/filter/filter -->
+            <h4>Search: <input type="text" ng-model="searchFilter.self"/></h4>
+            <!-- Info on scrolling taken from here: https://www.w3schools.com/cssref/pr_pos_overflow.asp -->
+            <!-- and here: https://stackoverflow.com/questions/9560330/how-to-hide-a-vertical-scroll-bar-when-not-needed -->
+            <ul style="overflow:auto;height:90%;">
+                <!-- Information on how labels wor from here: https://stackoverflow.com/questions/7863251/clicking-the-text-to-select-corresponding-radio-button -->
+                <li ng-repeat="patient in patients | filter:searchFilter"><h4><label>
+                    <input type="radio" ng-model="$parent.patient"
+                           name="name" value="{{patient.self}}" id="{{patient.self}}" required="true"
+                           ng-change='patientSelect(patient)'/>&nbsp;{{patient.self}}</label>
+                </h4></li>
+            </ul>
+        </div>
+        <!-- information on vertical rule found here: https://stackoverflow.com/questions/571900/is-there-a-vr-vertical-rule-in-html  -->
+        <div style="float:left;width:70%;border-left:1px solid #bbb;padding: 3%;height:75%;overflow-y:auto">
+            <h2>Patient: {{patient.self}}</h2>
+            <h2>Patient Demographics</h2>
+            <table>
+                <tr>
+                    <td>First Name</td>
+                    <td>
+                        <input type="text" ng-model="patient.firstName" id="firstName" required/>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>Last Name</td>
+                    <td>
+                        <input type="text" ng-model="patient.lastName" id="lastName" required/>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>Preferred Name</td>
+                    <td>
+                        <input type="text" ng-model="patient.preferredName" id="preferredName"/>
+                    </td>
+                </tr>
+
+
+                <tr>
+                    <td>Mother (username)</td>
+                    <td>
+                        <input type="text" ng-model="patient.mother" id="mother"/>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>Father (username)</td>
+                    <td>
+                        <input type="text" ng-model="patient.father" id="father"/>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>Email</td>
+                    <td>
+                        <input type="text" ng-model="patient.email" id="email" required/>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>Address Line 1</td>
+                    <td>
+                        <input type="text" ng-model="patient.address1" id="address1" required/>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>Address Line 2</td>
+                    <td>
+                        <input type="text" ng-model="patient.address2" id="address2"/>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>City</td>
+                    <td>
+                        <input type="text" ng-model="patient.city" id="city" required/>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>State</td>
+                    <td>
+                        <select ng-model="patient.state" ng-options="state for state in states" id="state" required>
+                            <option value>Select a State</option>
+                        </select>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>Zip</td>
+                    <td>
+                        <input type="text" ng-model="patient.zip" id="zip" required/>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>Phone</td>
+                    <td>
+                        <input type="text" ng-model="patient.phone" id="phone" required/>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>Date of Birth</td>
+                    <td>
+                        <input type="text" ng-model="patient.dateOfBirth" id="dateOfBirth" required/>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>Date of Death</td>
+                    <td>
+                        <input type="text" ng-model="patient.dateOfDeath" id="dateOfDeath"/>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>Cause of Death</td>
+                    <td>
+                        <input type="text" ng-model="patient.causeOfDeath" id="causeOfDeath"/>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>Blood Type</td>
+                    <td>
+                        <select ng-model="patient.bloodType" ng-options="bloodType for bloodType in bloodTypes"
+                                id="bloodType" required>
+                            <option value>Select a Blood Type</option>
+                        </select>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>Ethnicity</td>
+                    <td>
+                        <select ng-model="patient.ethnicity" ng-options="ethnicity for ethnicity in ethnicities"
+                                id="ethnicity" required>
+                            <option value>Select an Ethnicity</option>
+                        </select>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>Gender</td>
+                    <td>
+                        <select ng-model="patient.gender" ng-options="gender for gender in genders" id="gender"
+                                required>
+                            <option value>Select a Gender</option>
+                        </select>
+                    </td>
+                </tr>
+            </table>
+            <br/>
+            <button ng-click="submit()" name="submit">Submit Patient Demographics</button>
+
+            <div name="errorMsg">
+                <pre>{{errorMsg}}</pre>
+            </div>
+
+            <div name="success">{{message}}</div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

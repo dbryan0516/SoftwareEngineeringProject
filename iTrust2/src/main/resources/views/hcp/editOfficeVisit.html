@@ -15,6 +15,9 @@
 							'editOfficeVisitCtrl',
 							function($scope, $http) {
 								
+								$scope.hasDiagnosis = false;
+								$scope.hasPrescription = false;
+
 								$scope.getTime = function getTime(date) {									
 									var hour = date.hourOfDay;
 									var suffix;
@@ -71,6 +74,18 @@
 									$scope.patientsmoking = response.data;
 								});
 
+                                $http.get("/iTrust2/api/v1/ICDEntries").then(function(response) {
+                                    $scope.ICDCodes = response.data;
+                                }, function(rejection) {
+                                    console.log(rejection);
+                                });
+
+                                $http.get("/iTrust2/api/v1/NDCEntries").then(function(response) {
+                                    $scope.NDCCodes = response.data;
+                                }, function(rejection) {
+                                    console.log(rejection);
+                                });
+
 								$http.get("/iTrust2/api/v1/hospitals").then(
 								function(response) {
 									$scope.hospitals = response.data;
@@ -88,11 +103,13 @@
 									return num;
 								}
 
-
 								
 								$scope.populateVisit = function () {
 									var visitsLength = $scope.visits.length;
 									$scope.noVisitSelected = false;
+									$scope.hasDiagnosis = false;
+									$scope.hasPrescription = false;
+									$scope.selectedVisit = {};
 									for (var i = 0; i < visitsLength; i++) {
 										if ($scope.visits[i].id == $scope.selectedVisitID) {
 											$http({
@@ -118,7 +135,18 @@
 											$scope.selectedVisit.tri = $scope.visits[i].basicHealthMetrics.tri;
 											$scope.selectedVisit.houseSmokingStatus = $scope.visits[i].basicHealthMetrics.houseSmokingStatus;
 											$scope.selectedVisit.patientSmokingStatus = $scope.visits[i].basicHealthMetrics.patientSmokingStatus;
-										     $scope.three = false;
+				
+											if ($scope.visits [i].icd != undefined) {
+												$scope.hasDiagnosis = true;
+                                            	$scope.selectedVisit.currentDiagnosis = $scope.visits[i].icd.code;
+                                            }
+                                            if ($scope.visits [i].ndc != undefined) {
+                                            	$scope.hasPrescription = true;
+                                            	$scope.selectedVisit.currentPrescription = $scope.visits[i].ndc;
+                                            }
+
+                                            console.log($scope.selectedVisit);
+                                            $scope.three = false;
 										     $scope.threeAndUp = false;
 										     $scope.twelveAndUp = false;
 										     var month = $scope.visits[i].date.month;
@@ -138,24 +166,38 @@
 										     if (age < 3) {
 										    	 	$scope.three = true;
 										     }
-										    	 if (age >= 3) {
-										    		 $scope.threeAndUp = true;
-										    	 }
-										    	 if (age >= 12) {
-										    		 $scope.twelveAndUp = true;
-										    	 }
+											 if (age >= 3) {
+												 $scope.threeAndUp = true;
+											 }
+											 if (age >= 12) {
+												 $scope.twelveAndUp = true;
+											 }
 										    	 
 											break;
 										}
 									}
-								}
+								};
+
+                                function isInvalid(str) {
+                                    return str === "" || str === null || str === undefined;
+                                };
 								
 								$scope.submit = function() {
 									console.log($scope.selectedVisit)
 									$scope.selectedVisit.hcp = /*[[${#httpServletRequest.remoteUser}]]*/null; /* Ugly hack; use this to retrieve the name of the HCP who is currently logged in.  This grabs it from Thymeleaf */
 									$scope.errorMsg = "";
 									$scope.selectedVisit.status = "PENDING";
-									
+
+									if ($scope.hasDiagnosis) {
+	                                    if (isInvalid($scope.selectedVisit.currentDiagnosis)) {
+	                                        $scope.errorMsg += "An ICD code must be associated with this Prescription \n";
+	                                    }
+	                                    else {
+	                                    	$scope.selectedVisit.icd = $scope.selectedVisit.currentDiagnosis;
+	                                    }
+	                                }
+
+
 									if ($scope.selectedVisit.type == null) {
 										$scope.errorMsg += "Please select a visit type\n";
 									}
@@ -304,23 +346,8 @@
 					<tr><td style="text-align:right;padding:5px"><b>Date:</b></td><td> <input type="text" id="date" name="date" ng-model="selectedVisit.date"
 					 
 						required="true" />
-				<!--</td>
-					<td> -->
-					<!-- ng-pattern="/^(((1[012])|(0[1-9]))/(([12]\d)|(0[1-9])|(3[01]))/\d\d\d\d)?$/" -->
-					<!--  <div class="has-error" ng-show="editForm.date.$dirty">
-							<span ng-show="editForm.date.$error.required">This is a required field.</span>
-							<span ng-show="editForm.date.$invalid">Valid date format is MM/dd/YYYY.</span>
-						</div></td>
-					</tr> -->
 					<tr><td style="text-align:right;padding:5px"><b>Time:</b></td><td><input type="text" id="time" name="time" ng-model="selectedVisit.time" 
 						required="true" />
-				<!-- </td>
-					<td> -->
-					<!-- ng-pattern="/^(((1[0-2])|(0\d)):[0-6]\d\s(am|pm))?$/" -->
-						<!-- <div class="has-error" ng-show=firs"editForm.time.$dirty">
-							<span ng-show="editForm.time.$error.required">This is a required field.</span>
-							<span ng-show="editForm.time.$invalid">Valid time format is hh:dd am/pm.</span>
-						</div></td> -->
 					</tr>
 					<tr><td style="text-align:right;padding:5px"><b>Hospital:</b></td><td> <ul>
 							<li ng-repeat="hospital in hospitals"><label>
@@ -410,9 +437,28 @@
 						</ul>
 					</td>
 				</tr>
+				<tr ng-show="hasDiagnosis">
+					<td style="text-align:right;padding:5px"><b>Patient Diagnosis:</b></td>
+					<input style="width:50%;" type="text" id="icdCodeSearch" name="icdCodeSearch" ng-model="icdSearchFilter" placeholder="Search by Disease name" />
+					<td >
+						<ul>
+							<li ng-repeat="code in ICDCodes"><label>
+								<input type="radio" ng-model="selectedVisit.currentDiagnosis"
+									   name="currentDiagnosis" value="{{code.code}}" required="true" />
+								{{code.description}} ({{code.code}})
+							</label></li>
+						</ul>
+					</td>
+				</tr>
+				<tr ng-show="hasPrescription">
+					<td style="text-align:right;padding:5px"><b>Prescription:</b></td>
+					<td ng-show="selectedVisit.prescription == null"><input type="text" name="prescription" value="No Prescription" disabled/></td>
+					<td ng-show="selectedVisit.prescription != null"><input type="text" name="prescription" ng-model="selectedVisit.prescription" disabled/></td>
+					</td>
+				</tr>
 			</table>
-						<button ng-click="submit()" name="submit">Edit Office
-				Visit</button>
+
+						<button ng-click="submit()" name="submit">Edit Office Visit</button>
 				<div name="errorMsg"><pre>{{errorMsg}}</pre></div>
 							<div name="success">{{message}}</div>
 			</div>
@@ -421,7 +467,6 @@
 			<br />
 
 		</div>
-
 
 
 

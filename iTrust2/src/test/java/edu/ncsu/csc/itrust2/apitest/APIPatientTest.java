@@ -7,6 +7,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import edu.ncsu.csc.itrust2.utils.HibernateDataGenerator;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -52,6 +53,7 @@ public class APIPatientTest {
     @Before
     public void setup () {
         mvc = MockMvcBuilders.webAppContextSetup( context ).build();
+        HibernateDataGenerator.refreshDB();
     }
 
     /**

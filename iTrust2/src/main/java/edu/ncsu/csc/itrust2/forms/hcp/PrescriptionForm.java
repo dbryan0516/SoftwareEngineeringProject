@@ -1,11 +1,12 @@
-package edu.ncsu.csc.itrust2.forms.admin;
-
-import edu.ncsu.csc.itrust2.models.persistent.Prescription;
-import org.hibernate.validator.constraints.NotEmpty;
+package edu.ncsu.csc.itrust2.forms.hcp;
 
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
+
+import org.hibernate.validator.constraints.NotEmpty;
+
+import edu.ncsu.csc.itrust2.models.persistent.Prescription;
 
 /**
  * Represents a PrescriptionForm.
@@ -28,11 +29,13 @@ public class PrescriptionForm implements Serializable {
     /**
      * Makes a PrescriptionForm based on a Prescription.
      *
-     * @param prescription The Prescription.
+     * @param prescription
+     *            The Prescription.
      */
-    public PrescriptionForm ( Prescription prescription ) {
+    public PrescriptionForm ( final Prescription prescription ) {
         setId( prescription.getId() == null ? null : prescription.getId().toString() );
-        setNdc( prescription.getNdc().getDescription() );
+        setNdcDescription( prescription.getNdc().getDescription() );
+        setNdcCode( prescription.getNdc().getCode() );
         setPatient( prescription.getPatient().getUsername() );
         final SimpleDateFormat date = new SimpleDateFormat( "MM/dd/yyyy", Locale.ENGLISH );
         setOfficeVisit( prescription.getVisit() == null ? null : prescription.getVisit().getId().toString() );
@@ -54,28 +57,49 @@ public class PrescriptionForm implements Serializable {
     /**
      * Set the ID.
      *
-     * @param id The ID.
+     * @param id
+     *            The ID.
      */
-    public void setId ( String id ) {
+    public void setId ( final String id ) {
         this.id = id;
     }
 
     /**
-     * Get the NDC.
+     * Get the NDC description.
      *
      * @return The NDC.
      */
-    public String getNdc () {
-        return ndc;
+    public String getNdcDescription () {
+        return ndcDescription;
     }
 
     /**
-     * Set the NDC.
+     * Set the NDC description.
      *
-     * @param ndc The NDC.
+     * @param ndc
+     *            description.
      */
-    public void setNdc ( String ndc ) {
-        this.ndc = ndc;
+    public void setNdcDescription ( final String ndc ) {
+        this.ndcDescription = ndc;
+    }
+
+    /**
+     * returns the ndc code
+     * 
+     * @return the ndcCode
+     */
+    public String getNdcCode () {
+        return ndcCode;
+    }
+
+    /**
+     * set the ndc code
+     * 
+     * @param ndcCode
+     *            the ndcCode to set
+     */
+    public void setNdcCode ( final String ndcCode ) {
+        this.ndcCode = ndcCode;
     }
 
     /**
@@ -90,9 +114,10 @@ public class PrescriptionForm implements Serializable {
     /**
      * Set the Patient.
      *
-     * @param patient The Patient.
+     * @param patient
+     *            The Patient.
      */
-    public void setPatient ( String patient ) {
+    public void setPatient ( final String patient ) {
         this.patient = patient;
     }
 
@@ -108,9 +133,10 @@ public class PrescriptionForm implements Serializable {
     /**
      * Set the OfficeVisit.
      *
-     * @param officeVisit The OfficeVisit.
+     * @param officeVisit
+     *            The OfficeVisit.
      */
-    public void setOfficeVisit ( String officeVisit ) {
+    public void setOfficeVisit ( final String officeVisit ) {
         this.officeVisit = officeVisit;
     }
 
@@ -126,9 +152,10 @@ public class PrescriptionForm implements Serializable {
     /**
      * Set the start date.
      *
-     * @param startDate The start date.
+     * @param startDate
+     *            The start date.
      */
-    public void setStartDate ( String startDate ) {
+    public void setStartDate ( final String startDate ) {
         this.startDate = startDate;
     }
 
@@ -144,9 +171,10 @@ public class PrescriptionForm implements Serializable {
     /**
      * Set the end date.
      *
-     * @param endDate The end date.
+     * @param endDate
+     *            The end date.
      */
-    public void setEndDate ( String endDate ) {
+    public void setEndDate ( final String endDate ) {
         this.endDate = endDate;
     }
 
@@ -162,9 +190,10 @@ public class PrescriptionForm implements Serializable {
     /**
      * Sets the number of renewals.
      *
-     * @param numRenewals The number of renewals.
+     * @param numRenewals
+     *            The number of renewals.
      */
-    public void setNumRenewals ( Integer numRenewals ) {
+    public void setNumRenewals ( final Integer numRenewals ) {
         this.numRenewals = numRenewals;
     }
 
@@ -180,49 +209,63 @@ public class PrescriptionForm implements Serializable {
     /**
      * Sets the dosage.
      *
-     * @param dosage The dosage.
+     * @param dosage
+     *            The dosage.
      */
-    public void setDosage ( Integer dosage ) {
+    public void setDosage ( final Integer dosage ) {
         this.dosage = dosage;
     }
 
     /**
      * The ID of the Prescription.
      */
-    @NotEmpty private String id;
+    @NotEmpty
+    private String  id;
 
     /**
-     * The NDC of the Prescription.
+     * The description associated with the NDC of the Prescription.
      */
-    @NotEmpty private String ndc;
+    @NotEmpty
+    private String  ndcDescription;
+
+    /**
+     * The ndc code
+     */
+    @NotEmpty
+    private String  ndcCode;
 
     /**
      * The Patient of the Prescription.
      */
-    @NotEmpty private String patient;
+    @NotEmpty
+    private String  patient;
 
     /**
      * The office visit of the Prescription.
      */
-    private String officeVisit;
+    private String  officeVisit;
 
     /**
      * The start date of the prescription.
      */
-    @NotEmpty private String startDate;
+    @NotEmpty
+    private String  startDate;
 
     /**
      * The end date of the prescription.
      */
-    @NotEmpty private String endDate;
+    @NotEmpty
+    private String  endDate;
 
     /**
      * The number of renewals of the prescription.
      */
-    @NotEmpty private Integer numRenewals;
+    @NotEmpty
+    private Integer numRenewals;
 
     /**
      * The dosage of the prescription.
      */
-    @NotEmpty private Integer dosage;
+    @NotEmpty
+    private Integer dosage;
 }

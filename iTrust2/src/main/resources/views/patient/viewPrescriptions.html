@@ -1,0 +1,68 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:include="layout :: head(title=~{::title},links=~{})">
+    <title>View Prescriptions</title>
+</head>
+<body th:include="layout :: body" th:with="content=~{::content}">
+<div th:fragment="content">
+
+    <script th:inline="javascript">
+        /* Otherwise Thymeleaf tries to parse Javascript as XML and breaks itself sometimes.  Sigh */
+        /*<![CDATA[*/
+
+        var app = angular.module('myApp', []);
+        app.controller('viewPrescriptionCtrl', function ($scope, $http) {
+            $http.get('/iTrust2/api/v1/prescriptions/patient/myprescriptions').then(
+                function (response) {
+                    var prescriptions = response.data;
+                    prescriptions.forEach(function (p, index) {
+                        if (prescriptions[index].officeVisit != null) prescriptions[index].officeVisit.date = parseDate(p.officeVisit.date);
+                        prescriptions[index].startDate = parseDate(p.startDate);
+                        prescriptions[index].endDate = parseDate(p.endDate);
+                    });
+                    $scope.prescriptions = response.data;
+                }
+            );
+
+            /**
+             * Parses a JS Date object from the given patient date.
+             */
+            function parseDate(date) {
+                if (date == null)
+                    return null;
+                return new Date(date);
+            }
+        });
+
+        /*]]>*/
+    </script>
+
+
+    <div ng-app="myApp" ng-controller="viewPrescriptionCtrl">
+        <div>
+            <table class="table table-hover">
+                <thead>
+                <tr>
+                    <th>Prescription</th>
+                    <th>Visit Date</th>
+                    <th>Prescribed Date</th>
+                    <th>End Date</th>
+                    <th>Total Renewals</th>
+                    <th>Dosage (mg)</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="p in prescriptions">
+                    <td name="{{ p.ndc.description }}">{{ p.ndc.description }}</td>
+                    <td>{{ p.officeVisit == null ? 'None' : p.officeVisit.date.toLocaleDateString() }}</td>
+                    <td>{{ p.startDate.toLocaleDateString() }}</td>
+                    <td>{{ p.endDate.toLocaleDateString() }}</td>
+                    <td>{{ p.numRenewals }}</td>
+                    <td>{{ p.dosage }}</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</body>
+</html>
