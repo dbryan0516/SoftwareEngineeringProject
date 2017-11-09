@@ -52,6 +52,23 @@ public class APIPrescriptionController extends APIController {
     }
 
     /**
+     * Fetches the prescription associated with a given office visit
+     *
+     * @param id
+     *            The id of the office visit
+     * @return a prescription
+     */
+    @GetMapping ( BASE_PATH + "/prescriptions/officevisit/{id}" )
+    @PreAuthorize ( "hasRole('ROLE_HCP')" )
+    public Prescription getPrescriptionForOfficeVisit ( @PathVariable ( "id" ) final String id ) {
+        final List p = Prescription.getWhere( Prescription.class, " office_visit_id = " + id );
+        if ( p.size() != 0 ) {
+            return (Prescription) p.get( 0 );
+        }
+        return null;
+    }
+
+    /**
      * Updates the Prescription with the id provided by overwriting it with the
      * new Prescription that is provided. If the ID provided does not match the
      * ID set in the Prescription provided, the update will not take place
