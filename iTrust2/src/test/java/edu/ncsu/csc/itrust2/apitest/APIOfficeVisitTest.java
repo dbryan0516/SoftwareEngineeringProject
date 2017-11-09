@@ -171,7 +171,7 @@ public class APIOfficeVisitTest {
 
         // test for valid prescription
         visit.setNdcDescription( "Androxy" );
-        visit.setNdcCode( "0832-0086" );
+        visit.setNdcCode( "0832-0086-00" );
         visit.setPatient( "patient" );
         visit.setStartDate( "01/07/2018" );
         visit.setEndDate( "01/07/2035" );
@@ -180,7 +180,7 @@ public class APIOfficeVisitTest {
 
         /* Create the Office Visit */
         mvc.perform( post( "/api/v1/officevisits" ).contentType( MediaType.APPLICATION_JSON )
-                .content( TestUtils.asJsonString( visit ) ) );
+                .content( TestUtils.asJsonString( visit ) ) ).andExpect( status().isOk() );
 
         mvc.perform( get( "/api/v1/officevisits" ) ).andExpect( status().isOk() )
                 .andExpect( content().contentType( MediaType.APPLICATION_JSON_UTF8_VALUE ) );

@@ -36,6 +36,7 @@ Examples:
 	| Caldwell | Hudson  | 09/29/2015 | 10/28/2017 | 15.2   | 30     | 19   | 2       | Diagnosed with strep throat. Avoid contact with others for first 24 hours of antibiotics. |
 	| Brynn    | McClain | 05/01/2017 | 10/28/2017 | 8.2    | 24.7   | 15.4 | 1       | Diagnosed with strep throat. Avoid contact with others for first 24 hours of antibiotics. |
 	
+		
 Scenario Outline: Document an Office Visit with invalid Basic Health Metrics
 Given The required facilities exist
 And A patient exists with name: <first> <last> and date of birth: <birthday>
