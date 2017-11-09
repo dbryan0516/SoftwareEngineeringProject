@@ -1,13 +1,13 @@
 package edu.ncsu.csc.itrust2.cucumber;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.util.List;
 import java.util.Random;
 
+import org.junit.Assert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
@@ -31,6 +31,7 @@ import edu.ncsu.csc.itrust2.models.enums.PatientSmokingStatus;
 import edu.ncsu.csc.itrust2.models.persistent.BasicHealthMetrics;
 import edu.ncsu.csc.itrust2.models.persistent.OfficeVisit;
 import edu.ncsu.csc.itrust2.mvc.config.WebMvcConfiguration;
+import edu.ncsu.csc.itrust2.utils.HibernateDataGenerator;
 
 @ContextConfiguration ( classes = { RootConfiguration.class, WebMvcConfiguration.class } )
 @WebAppConfiguration
@@ -47,12 +48,11 @@ public class DocumentOfficeVisitStepDefs {
     private final String          hospitalName = "Office Visit Hospital" + ( new Random() ).nextInt();
     BasicHealthMetrics            expectedBhm;
 
-    WebDriverWait                 wait         = new WebDriverWait( driver, 2 );
+    WebDriverWait                 wait         = new WebDriverWait( driver, 5 );
 
     @Given ( "The required facilities exist" )
     public void personnelExists () throws Exception {
-        OfficeVisit.deleteAll( OfficeVisit.class );
-        BasicHealthMetrics.deleteAll( BasicHealthMetrics.class );
+        HibernateDataGenerator.refreshDB();
 
         // All tests can safely assume the existence of the 'hcp', 'admin', and
         // 'patient' users
@@ -262,18 +262,17 @@ public class DocumentOfficeVisitStepDefs {
     }
 
     @Then ( "The office visit is documented successfully" )
-    public void documentedSuccessfully () {
-        wait.until( ExpectedConditions.visibilityOfElementLocated( By.name( "success" ) ) );
+    public void documentedSuccessfully () throws InterruptedException {
+        Thread.sleep( 1500 );
         final WebElement message = driver.findElement( By.name( "success" ) );
-
-        assertFalse( message.getText().contains( "Error occurred creating office visit" ) );
+        assertTrue( message.getText().contains( "Office visit created successfully" ) );
 
     }
 
     @Then ( "^The diagnosis (.+) is successfully recorded$" )
-    public void diagnosisSuccessfullyRecorded (final String diagnosis) {
+    public void diagnosisSuccessfullyRecorded ( final String diagnosis ) {
         // we wipe officevisits before the tests so we should only have 1 visit
-        assertEquals( diagnosis, OfficeVisit.getOfficeVisits().get(0).getIcd().getDescription() );
+        assertEquals( diagnosis, OfficeVisit.getOfficeVisits().get( 0 ).getIcd().getDescription() );
     }
 
     /**
@@ -561,7 +560,7 @@ public class DocumentOfficeVisitStepDefs {
     }
 
     /**
-     * Documents an office visit with specific information.
+     * Documents an office visit with specific information AND PRESCRIPTIONS
      *
      * @param dateString
      *            The current date.
@@ -577,9 +576,10 @@ public class DocumentOfficeVisitStepDefs {
      *            The note that the doctor includes.
      * @throws InterruptedException
      */
-    @When ( "^I fill in information on the office visit for an infant with date: (.+), weight: (.+), length: (.+), head circumference: (.+), household smoking status: (.+), note: (.+), and diagnosis: (.+)$" )
+    @When ( "^I fill in information on the office visit for an infant with date: (.+), weight: (.+), length: (.+), head circumference: (.+), household smoking status: (.+), note: (.+), diagnosis: (.+), drug: (.+), start date: (.+), end date: (.+), dosage: (.+), renewals: (.+)$" )
     public void documentOVWithSpecificInformation ( final String dateString, final String weightString,
-                                                    final String lengthString, final String headString, final String smokingStatus, final String note, final String diagnosis )
+            final String lengthString, final String headString, final String smokingStatus, final String note,
+            final String diagnosis, String drug, String sDate, String eDate, String dosage, String renewals )
             throws InterruptedException {
         wait.until( ExpectedConditions.visibilityOfElementLocated( By.name( "notes" ) ) );
         final WebElement notes = driver.findElement( By.name( "notes" ) );
@@ -662,8 +662,38 @@ public class DocumentOfficeVisitStepDefs {
              */
         }
 
-        final WebElement diagnosisElement = driver.findElement( By.cssSelector("input[data-medcode=\"" + diagnosis + "\"]"));
-        diagnosisElement.click();
+        /* Diagnoses */
+        driver.findElement( By.name( "addDiagnosis" ) ).click();
+
+        // Wait for the disease to appear and click it
+        String css = "input[data-medcode=\"" + diagnosis + "\"]";
+        wait.until( ExpectedConditions.visibilityOfElementLocated( By.cssSelector( css ) ) );
+        driver.findElement( By.cssSelector( css ) ).click();
+
+        /* Prescriptions */
+        driver.findElement( By.name( "addPrescription" ) ).click();
+
+        // Wait for the drug to appear and click it
+        css = "input[value=\"" + drug + "\"]";
+        wait.until( ExpectedConditions.visibilityOfElementLocated( By.cssSelector( css ) ) );
+        driver.findElement( By.cssSelector( css ) ).click();
+
+        try {
+            driver.findElement( By.id( "startDate" ) ).clear();
+            driver.findElement( By.id( "startDate" ) ).sendKeys( sDate );
+
+            driver.findElement( By.id( "endDate" ) ).clear();
+            driver.findElement( By.id( "endDate" ) ).sendKeys( eDate );
+
+            driver.findElement( By.id( "dosage" ) ).clear();
+            driver.findElement( By.id( "dosage" ) ).sendKeys( dosage );
+
+            driver.findElement( By.id( "numRenewals" ) ).clear();
+            driver.findElement( By.id( "numRenewals" ) ).sendKeys( renewals );
+        }
+        catch ( final Exception e ) {
+            Assert.fail( e.getMessage() );
+        }
 
         wait.until( ExpectedConditions.visibilityOfElementLocated( By.name( "submit" ) ) );
         final WebElement submit = driver.findElement( By.name( "submit" ) );
@@ -979,6 +1009,123 @@ public class DocumentOfficeVisitStepDefs {
              * which is okay
              */
         }
+
+        wait.until( ExpectedConditions.visibilityOfElementLocated( By.name( "submit" ) ) );
+        final WebElement submit = driver.findElement( By.name( "submit" ) );
+        submit.click();
+        // Give the data time to save to the database
+        Thread.sleep( 2000 );
+    }
+
+    /**
+     * Documents an office visit with specific information AND DIAGNOSES
+     *
+     * @param dateString
+     *            The current date.
+     * @param weightString
+     *            The weight of the patient.
+     * @param lengthString
+     *            The length of the patient.
+     * @param headString
+     *            The head circumference of the patient.
+     * @param smokingStatus
+     *            The smoking status of the patient's household.
+     * @param note
+     *            The note that the doctor includes.
+     * @throws InterruptedException
+     */
+    @When ( "^I fill in information on the office visit for an infant with date: (.+), weight: (.+), length: (.+), head circumference: (.+), household smoking status: (.+), note: (.+), and diagnosis: (.+)$" )
+    public void documentOVWithSpecificInformation ( final String dateString, final String weightString,
+            final String lengthString, final String headString, final String smokingStatus, final String note,
+            final String diagnosis ) throws InterruptedException {
+        wait.until( ExpectedConditions.visibilityOfElementLocated( By.name( "notes" ) ) );
+        final WebElement notes = driver.findElement( By.name( "notes" ) );
+        notes.clear();
+        notes.sendKeys( note );
+
+        wait.until( ExpectedConditions.visibilityOfElementLocated( By.cssSelector( "input[value=\"patient\"]" ) ) );
+        final WebElement patient = driver.findElement( By.cssSelector( "input[value=\"patient\"]" ) );
+        patient.click();
+
+        wait.until( ExpectedConditions.visibilityOfElementLocated( By.name( "type" ) ) );
+        final WebElement type = driver.findElement( By.name( "type" ) );
+        type.click();
+
+        wait.until( ExpectedConditions.visibilityOfElementLocated( By.name( "hospital" ) ) );
+        final WebElement hospital = driver.findElement( By.name( "hospital" ) );
+        hospital.click();
+
+        final WebElement date = driver.findElement( By.name( "date" ) );
+        date.clear();
+        date.sendKeys( dateString );
+        date.click();
+
+        final WebElement time = driver.findElement( By.name( "time" ) );
+        time.clear();
+        time.sendKeys( "9:30 AM" );
+
+        expectedBhm = new BasicHealthMetrics();
+
+        wait.until( ExpectedConditions.visibilityOfElementLocated( By.name( "head" ) ) );
+        final WebElement head = driver.findElement( By.name( "head" ) );
+        head.clear();
+        head.sendKeys( headString );
+        try {
+            expectedBhm.setHeadCircumference( Float.parseFloat( headString ) );
+        }
+        catch ( final IllegalArgumentException e ) {
+            /*
+             * This means that the test data provided was intentionally invalid,
+             * which is okay
+             */
+        }
+
+        final WebElement heightLength = driver.findElement( By.name( "height" ) );
+        heightLength.clear();
+        heightLength.sendKeys( lengthString );
+        try {
+            expectedBhm.setHeight( Float.parseFloat( lengthString ) );
+        }
+        catch ( final IllegalArgumentException e ) {
+            /*
+             * This means that the test data provided was intentionally invalid,
+             * which is okay
+             */
+        }
+
+        final WebElement weight = driver.findElement( By.name( "weight" ) );
+        weight.clear();
+        weight.sendKeys( weightString );
+        try {
+            expectedBhm.setWeight( Float.parseFloat( weightString ) );
+        }
+        catch ( final IllegalArgumentException e ) {
+            /*
+             * This means that the test data provided was intentionally invalid,
+             * which is okay
+             */
+        }
+        try {
+            final WebElement smoking = driver.findElement( By.cssSelector(
+                    "input[value=\"" + HouseholdSmokingStatus.getName( Integer.parseInt( smokingStatus ) ) + "\"]" ) );
+            smoking.click();
+            expectedBhm.setHouseSmokingStatus( HouseholdSmokingStatus.parseValue( Integer.parseInt( smokingStatus ) ) );
+        }
+        catch ( final Exception e ) {
+            /*
+             * This means that the element wasn't found, which is expected if we
+             * enter an invalid value (as one of the test cases does).
+             * Intentionally ignoring.
+             */
+        }
+
+        /* Diagnoses */
+        driver.findElement( By.name( "addDiagnosis" ) ).click();
+
+        // Wait for the disease to appear and click it
+        final String css = "input[data-medcode=\"" + diagnosis + "\"]";
+        wait.until( ExpectedConditions.visibilityOfElementLocated( By.cssSelector( css ) ) );
+        driver.findElement( By.cssSelector( css ) ).click();
 
         wait.until( ExpectedConditions.visibilityOfElementLocated( By.name( "submit" ) ) );
         final WebElement submit = driver.findElement( By.name( "submit" ) );

@@ -180,7 +180,7 @@ public class APIOfficeVisitTest {
 
         /* Create the Office Visit */
         mvc.perform( post( "/api/v1/officevisits" ).contentType( MediaType.APPLICATION_JSON )
-                .content( TestUtils.asJsonString( visit ) ) );
+                .content( TestUtils.asJsonString( visit ) ) ).andExpect( status().isOk() );
 
         mvc.perform( get( "/api/v1/officevisits" ) ).andExpect( status().isOk() )
                 .andExpect( content().contentType( MediaType.APPLICATION_JSON_UTF8_VALUE ) );
