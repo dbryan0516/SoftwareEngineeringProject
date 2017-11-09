@@ -15,6 +15,9 @@
 							'editOfficeVisitCtrl',
 							function($scope, $http) {
 								
+								$scope.hasDiagnosis = false;
+								$scope.hasPrescription = false;
+
 								$scope.getTime = function getTime(date) {									
 									var hour = date.hourOfDay;
 									var suffix;
@@ -104,6 +107,9 @@
 								$scope.populateVisit = function () {
 									var visitsLength = $scope.visits.length;
 									$scope.noVisitSelected = false;
+									$scope.hasDiagnosis = false;
+									$scope.hasPrescription = false;
+									$scope.selectedVisit = {};
 									for (var i = 0; i < visitsLength; i++) {
 										if ($scope.visits[i].id == $scope.selectedVisitID) {
 											$http({
@@ -129,10 +135,17 @@
 											$scope.selectedVisit.tri = $scope.visits[i].basicHealthMetrics.tri;
 											$scope.selectedVisit.houseSmokingStatus = $scope.visits[i].basicHealthMetrics.houseSmokingStatus;
 											$scope.selectedVisit.patientSmokingStatus = $scope.visits[i].basicHealthMetrics.patientSmokingStatus;
-                                            $scope.selectedVisit.currentDiagnosis = $scope.visits[i].icd.code;
-                                            $scope.selectedVisit.currentPrescription = $scope.visits[i].ndcDescription;
+				
+											if ($scope.visits [i].icd != undefined) {
+												$scope.hasDiagnosis = true;
+                                            	$scope.selectedVisit.currentDiagnosis = $scope.visits[i].icd.code;
+                                            }
+                                            if ($scope.visits [i].ndc != undefined) {
+                                            	$scope.hasPrescription = true;
+                                            	$scope.selectedVisit.currentPrescription = $scope.visits[i].ndc;
+                                            }
 
-
+                                            console.log($scope.selectedVisit);
                                             $scope.three = false;
 										     $scope.threeAndUp = false;
 										     $scope.twelveAndUp = false;
@@ -175,9 +188,14 @@
 									$scope.errorMsg = "";
 									$scope.selectedVisit.status = "PENDING";
 
-                                    if (isInvalid($scope.currentDiagnosis.icdDescription) || isInvalid($scope.currentDiagnosis.icdCode)) {
-                                        $scope.errorMsg += "An ICD code must be associated with this Prescription \n";
-                                    }
+									if ($scope.hasDiagnosis) {
+	                                    if (isInvalid($scope.selectedVisit.currentDiagnosis)) {
+	                                        $scope.errorMsg += "An ICD code must be associated with this Prescription \n";
+	                                    }
+	                                    else {
+	                                    	$scope.selectedVisit.icd = $scope.selectedVisit.currentDiagnosis;
+	                                    }
+	                                }
 
 
 									if ($scope.selectedVisit.type == null) {
@@ -419,7 +437,7 @@
 						</ul>
 					</td>
 				</tr>
-				<tr >
+				<tr ng-show="hasDiagnosis">
 					<td style="text-align:right;padding:5px"><b>Patient Diagnosis:</b></td>
 					<input style="width:50%;" type="text" id="icdCodeSearch" name="icdCodeSearch" ng-model="icdSearchFilter" placeholder="Search by Disease name" />
 					<td >
@@ -432,7 +450,7 @@
 						</ul>
 					</td>
 				</tr>
-				<tr>
+				<tr ng-show="hasPrescription">
 					<td style="text-align:right;padding:5px"><b>Prescription:</b></td>
 					<td ng-show="selectedVisit.prescription == null"><input type="text" name="prescription" value="No Prescription" disabled/></td>
 					<td ng-show="selectedVisit.prescription != null"><input type="text" name="prescription" ng-model="selectedVisit.prescription" disabled/></td>
