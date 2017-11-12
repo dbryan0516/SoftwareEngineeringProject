@@ -9,9 +9,18 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 public class CustomAuthenticationProvider implements AuthenticationProvider {
     /**
+     * The user is disabled in the system.
+     */
+    private static final int USER_DISABLED = 0;
+
+    /**
      * THe number of milliseconds in an hour.
      */
     private static final int MILLIS_IN_HOUR = 3600000;
+
+    private static final String DISABLED_TEXT = "User is disabled. Please contact the system administrator.";
+    private static final String LOCKED_TEXT = "Account is locked for 1 hour due to failed login attempts.";
+    public static final String BAD_CREDENTIALS_TEXT = "Username or password is invalid.";
 
     /**
      * Performs authentication with the same contract as
@@ -26,47 +35,56 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
      * <code>Authentication</code> class will be tried.
      * @throws AuthenticationException if authentication fails.
      */
-    @Override public Authentication authenticate ( Authentication authentication ) throws AuthenticationException {
+    @Override
+    public Authentication authenticate( Authentication authentication ) throws AuthenticationException {
         String username = authentication.getName().trim();
         String password = authentication.getCredentials().toString().trim();
 
         User user = User.getByName( username );
-        if ( user != null ) {
-            // If the user is disabled, fail
-            if ( user.getEnabled() == 0 )
-                throw new DisabledException( "User is disabled. Please contact the system administrator." );
-            // if the user's password is invalid:
-            if ( !user.getPassword().equals( password ) ) {
-                // check the total number of failed attempts
-                int currentFailedAttempts = user.getNumFailAttempts();
-                // if they are under 3 attempts, increase their failed attempt count
-                if ( currentFailedAttempts < User.MAX_LOGIN_ATTEMPTS - 1 )
-                    user.setNumFailAttempts( currentFailedAttempts + 1 );
-                else // number of attempts > MAX_LOGIN_ATTEMPTS, so they are disabled
-                    if ( currentFailedAttempts == User.MAX_LOGIN_ATTEMPTS - 1 ) {
-                        // locked for the first time
-                        long lockoutTime = System.currentTimeMillis();
-                        user.setNumFailAttempts( User.MAX_LOGIN_ATTEMPTS );
-                        user.setResetTimeout( lockoutTime );
-                        Lockout lockout = new Lockout( username, lockoutTime );
-                        lockout.save();
-                        // TODO add permalockout check
-                        throw new LockedException( "Account is locked for 1 hour due to failed login attempts." );
-                    }
-                    else
-                        throw new LockedException( "Account is locked for 1 hour due to failed login attempts." );
-                throw new BadCredentialsException( "Username or password is invalid." );
-            }
-            else {
-                // check if they are locked
+        if ( user == null ) throw new UsernameNotFoundException( BAD_CREDENTIALS_TEXT );
+        // user exists in system
+        if ( user.getEnabled() == USER_DISABLED ) throw new DisabledException( DISABLED_TEXT );
+        // user is enabled
+        int numFailAttempts = user.getNumFailAttempts();
+        if ( user.getPassword().equals( password ) ) {
+            // user's password is correct
+            if ( numFailAttempts >= User.MAX_LOGIN_ATTEMPTS ) {
+                // check if timeout has passed
                 long currentTime = System.currentTimeMillis();
-                if ( currentTime >= user.getResetTimeout() + MILLIS_IN_HOUR ) {
-
-                }
-                return new UsernamePasswordAuthenticationToken( username, password );
+                long lockTime = user.getResetTimeout(); // TODO this should be a different field
+                if ( currentTime < lockTime ) throw new LockedException( LOCKED_TEXT );
             }
+            // user isn't locked, clear num failed attempts and return a login token
+            user.setNumFailAttempts( 0 );
+            user.setResetTimeout( null );
+            user.save();
+            return new UsernamePasswordAuthenticationToken( username, password );
         }
-        throw new UsernameNotFoundException( "Username or password is invalid." );
+        // password is incorrect
+        if ( numFailAttempts >= User.MAX_LOGIN_ATTEMPTS ) throw new LockedException( LOCKED_TEXT );
+        // account not locked, attempts < MAX_LOGIN_ATTEMPTS
+        if ( numFailAttempts < User.MAX_LOGIN_ATTEMPTS - 1 ) {
+            // increase the number of failed attempts and return bad credentials
+            user.setNumFailAttempts( numFailAttempts + 1 );
+            user.save();
+            throw new BadCredentialsException( BAD_CREDENTIALS_TEXT );
+        }
+        // attempts == MAX_LOGIN_ATTEMPTS - 1 (ie, this failed attempt will lock account)
+        long currentTime = System.currentTimeMillis();
+        Lockout lockout = new Lockout( username, currentTime );
+        lockout.save();
+        // find out how many lockouts they have in the past 24 hours
+        // TODO add call to get lockouts
+        boolean disabled = false;
+        if ( disabled )
+            user.setEnabled( USER_DISABLED );
+        user.setNumFailAttempts( User.MAX_LOGIN_ATTEMPTS );
+        user.setResetTimeout( currentTime + MILLIS_IN_HOUR );
+        user.save();
+        if ( disabled )
+            throw new DisabledException( DISABLED_TEXT );
+        else
+            throw new LockedException( LOCKED_TEXT );
     }
 
     /**
@@ -89,7 +107,8 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
      * @return <code>true</code> if the implementation can more closely evaluate the
      * <code>Authentication</code> class presented
      */
-    @Override public boolean supports ( Class<?> authentication ) {
+    @Override
+    public boolean supports( Class< ? > authentication ) {
         return false;
     }
 }
