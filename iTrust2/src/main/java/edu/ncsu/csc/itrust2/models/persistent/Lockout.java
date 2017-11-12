@@ -14,8 +14,8 @@ import java.util.List;
  * @author dbryan
  */
 @Entity
-@Table( name = "Users" )
-public class Lockout extends DomainObject<User> implements Serializable {
+@Table( name = "Lockouts" )
+public class Lockout extends DomainObject<Lockout> implements Serializable {
 
     /**
      * The UID of the lockout
