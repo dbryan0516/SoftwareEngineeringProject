@@ -1,5 +1,7 @@
 package edu.ncsu.csc.itrust2.models.persistent;
 
+import edu.ncsu.csc.itrust2.utils.DomainObjectCache;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
@@ -26,6 +28,8 @@ public class Lockout extends DomainObject<Lockout> implements Serializable {
      * The maximum number a users account can be locked out in 24 hours
      */
     public static final int MAX_LOCKOUT = 3;
+
+    static private DomainObjectCache<Long, Lockout> cache = new DomainObjectCache<>( Lockout.class );
 
     /**
      * returns the lockout logs for the number of locks in the past 24 hours
