@@ -32,6 +32,7 @@ import edu.ncsu.csc.itrust2.forms.admin.UserForm;
 import edu.ncsu.csc.itrust2.forms.hcp.OfficeVisitForm;
 import edu.ncsu.csc.itrust2.forms.hcp.PrescriptionForm;
 import edu.ncsu.csc.itrust2.models.enums.AppointmentType;
+import edu.ncsu.csc.itrust2.models.enums.HouseholdSmokingStatus;
 import edu.ncsu.csc.itrust2.models.enums.Role;
 import edu.ncsu.csc.itrust2.models.persistent.OfficeVisit;
 import edu.ncsu.csc.itrust2.models.persistent.Prescription;
@@ -43,6 +44,7 @@ import edu.ncsu.csc.itrust2.utils.HibernateDataGenerator;
  *
  * @author Grady Stewart - gtstewar
  *
+ *
  */
 @RunWith ( SpringJUnit4ClassRunner.class )
 @ContextConfiguration ( classes = { RootConfiguration.class, WebMvcConfiguration.class } )
@@ -51,6 +53,8 @@ import edu.ncsu.csc.itrust2.utils.HibernateDataGenerator;
 public class APIPresciptionTest {
 
     private MockMvc               mvc;
+
+    private static Gson           gson = new Gson();
 
     @Autowired
     private WebApplicationContext context;
@@ -171,30 +175,15 @@ public class APIPresciptionTest {
      */
     @Test
     @WithMockUser ( username = "hcp", roles = { "USER", "HCP" } )
-    public void testOfficeVisitViewPrescription () throws Exception {
+    public void testPrescriptionWithOfficeVisit () throws Exception {
 
         /* Create an Office Visit with a Prescription */
-        final OfficeVisitForm visit = new OfficeVisitForm();
-        visit.setDate( "4/16/2048" );
-        visit.setTime( "9:50 AM" );
-        visit.setHcp( "hcp" );
-        visit.setPatient( "patient" );
-        visit.setNotes( "Test office visit" );
-        visit.setType( AppointmentType.GENERAL_CHECKUP.toString() );
-        visit.setHospital( "General Hostpital" );
-        visit.setNdcDescription( "Androxy" );
-        visit.setNdcCode( "0832-0086-00" );
-        visit.setStartDate( "01/07/2018" );
-        visit.setEndDate( "01/07/2035" );
-        visit.setNumRenewals( 100 );
-        visit.setDosage( 3 );
-        mvc.perform( post( "/api/v1/officevisits" ).contentType( MediaType.APPLICATION_JSON )
-                .content( TestUtils.asJsonString( visit ) ) ).andExpect( status().isOk() );
+        documentOfficeVisit( "patient", true );
 
         // Fetch the resulting id
         Long id = OfficeVisit.getForPatient( "patient" ).get( 0 ).getId();
 
-        /* Now, verify that the Prescription comes back with the Office Visit */
+        // Now, verify that the Prescription comes back with the Office Visit
         final PrescriptionForm p = new PrescriptionForm();
         p.setNdcDescription( "Androxy" );
         p.setNdcCode( "0832-0086-00" );
@@ -204,13 +193,10 @@ public class APIPresciptionTest {
         p.setNumRenewals( 100 );
         p.setDosage( 3 );
         p.setOfficeVisit( id.toString() );
-
         final Prescription p2 = new Prescription( p );
-
         String resultJSON = mvc.perform( get( "/api/v1/prescriptions/officevisit/" + id ) ).andExpect( status().isOk() )
                 .andReturn().getResponse().getContentAsString();
         final Prescription result = gson.fromJson( resultJSON, Prescription.class );
-
         p2.setId( result.getId() );
 
         // Prescription doesn't have an equals() method, so JSON string
@@ -220,14 +206,7 @@ public class APIPresciptionTest {
         /* Test the API's response when an Office Visit has no Prescriptions */
 
         // Create an Office Visit w/o Prescription
-        visit.setNdcDescription( null );
-        visit.setNdcCode( null );
-        visit.setStartDate( null );
-        visit.setEndDate( null );
-        visit.setNumRenewals( null );
-        visit.setDosage( null );
-        mvc.perform( post( "/api/v1/officevisits" ).contentType( MediaType.APPLICATION_JSON )
-                .content( TestUtils.asJsonString( visit ) ) ).andExpect( status().isOk() );
+        documentOfficeVisit( "patient", false );
 
         // Fetch the resulting id
         id = OfficeVisit.getForPatient( "patient" ).get( 1 ).getId();
@@ -235,9 +214,101 @@ public class APIPresciptionTest {
         // Attempt to fetch it's non-existent Prescription
         resultJSON = mvc.perform( get( "/api/v1/prescriptions/officevisit/" + id ) ).andExpect( status().isOk() )
                 .andReturn().getResponse().getContentAsString();
-
         assertEquals( "", resultJSON );
-
     }
 
+    /**
+     * Documents an office visit for either 'patient' or 'TimTheOneYearOld'.
+     * Won't work for anyone else b/c BHM
+     *
+     * @param patient
+     * @param includePrescription
+     * @throws Exception
+     */
+    @WithMockUser ( username = "hcp", roles = { "USER", "HCP" } )
+    private void documentOfficeVisit ( String patient, boolean includePrescription ) throws Exception {
+
+        /* Create an Office Visit with a Prescription */
+        final OfficeVisitForm visit = new OfficeVisitForm();
+        visit.setDate( "4/16/2017" );
+        visit.setTime( "9:50 AM" );
+        visit.setHcp( "hcp" );
+        visit.setPatient( patient );
+        visit.setNotes( "Test office visit" );
+        visit.setType( AppointmentType.GENERAL_CHECKUP.toString() );
+        visit.setHospital( "General Hostpital" );
+
+        // Add basic health metrics so that this will work for users 'patient'
+        // and 'TimTheOneYearOld'
+        visit.setHeight( new Float( 1 ) );
+        visit.setWeight( new Float( 1 ) );
+        visit.setHeadCircumference( new Float( 1 ) );
+        visit.setHouseSmokingStatus( HouseholdSmokingStatus.INDOOR );
+
+        // Add prescription if necessary
+        if ( includePrescription ) {
+            visit.setNdcDescription( "Androxy" );
+            visit.setNdcCode( "0832-0086-00" );
+            visit.setStartDate( "01/07/2018" );
+            visit.setEndDate( "01/07/2035" );
+            visit.setNumRenewals( 100 );
+            visit.setDosage( 3 );
+        }
+        mvc.perform( post( "/api/v1/officevisits" ).contentType( MediaType.APPLICATION_JSON )
+                .content( TestUtils.asJsonString( visit ) ) ).andExpect( status().isOk() );
+    }
+
+    /**
+     * Tests fetching a Prescription associated with an Office Visit for
+     * currently logged in Patient
+     *
+     * @throws Exception
+     */
+    @Test
+    @WithMockUser ( username = "patient", roles = { "USER", "PATIENT" } )
+    public void testPrescriptionWithOfficeVisitByPatient () throws Exception {
+
+        /* Create an Office Visit for Patient "patient" with a Prescription */
+        documentOfficeVisit( "patient", true );
+
+        // Fetch the resulting id
+        Long id = OfficeVisit.getForPatient( "patient" ).get( 0 ).getId();
+
+        // Now, verify that the Prescription comes back with the Office Visit
+        final PrescriptionForm p = new PrescriptionForm();
+        p.setNdcDescription( "Androxy" );
+        p.setNdcCode( "0832-0086-00" );
+        p.setPatient( "patient" );
+        p.setStartDate( "01/07/2018" );
+        p.setEndDate( "01/07/2035" );
+        p.setNumRenewals( 100 );
+        p.setDosage( 3 );
+        p.setOfficeVisit( id.toString() );
+        final Prescription p2 = new Prescription( p );
+        final String resultJSON = mvc.perform( get( "/api/v1/prescriptions/patient/officevisit/" + id ) )
+                .andExpect( status().isOk() ).andReturn().getResponse().getContentAsString();
+        final Prescription result = gson.fromJson( resultJSON, Prescription.class );
+        p2.setId( result.getId() );
+        assertEquals( gson.toJson( p2 ), resultJSON );
+
+        /* Try to read another Patients Prescription */
+
+        // Create an OfficeVisit for Patient "TimeTheOneYearOld" with a
+        // Prescription
+        documentOfficeVisit( "TimTheOneYearOld", true );
+        id = OfficeVisit.getForPatient( "TimTheOneYearOld" ).get( 0 ).getId();
+
+        // Attempt to read it - should come back empty
+        assertEquals( "", mvc.perform( get( "/api/v1/prescriptions/patient/officevisit/" + id ) )
+                .andExpect( status().isOk() ).andReturn().getResponse().getContentAsString() );
+
+        /* Test API's response when a Office Visit has no Prescription */
+
+        documentOfficeVisit( "patient", false );
+        id = OfficeVisit.getForPatient( "patient" ).get( 1 ).getId();
+
+        // Should come back empty, since there's no Prescription
+        assertEquals( "", mvc.perform( get( "/api/v1/prescriptions/patient/officevisit/" + id ) )
+                .andExpect( status().isOk() ).andReturn().getResponse().getContentAsString() );
+    }
 }
