@@ -62,8 +62,8 @@ public class Lockout extends DomainObject<Lockout> implements Serializable {
      * Get the id of this lockout
      */
     @Override
-    public String getId () {
-        return null;
+    public Long getId () {
+        return id;
     }
 
     /**
