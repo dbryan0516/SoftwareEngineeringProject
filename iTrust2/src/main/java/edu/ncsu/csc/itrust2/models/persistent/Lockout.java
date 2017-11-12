@@ -42,7 +42,7 @@ public class Lockout extends DomainObject<Lockout> implements Serializable {
      */
     @SuppressWarnings ( "unchecked" )
     public static List<Lockout> getUserLockouts(String username){
-        String where = "username='" + username + "' ORDER BY timestamp DESC LIMIT " + MAX_LOCKOUT;
+        String where = "username='" + username + "' ORDER BY timestamp DESC";
         return (List<Lockout>) getWhere( Lockout.class, where );
     }
 
