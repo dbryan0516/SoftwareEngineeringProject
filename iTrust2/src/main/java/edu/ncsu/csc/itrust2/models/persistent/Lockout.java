@@ -29,12 +29,17 @@ public class Lockout extends DomainObject<User> implements Serializable {
 
     /**
      * returns the lockout logs for the number of locks in the past 24 hours
+     * 
+     *  @SuppressWarnings for Unchecked cast from List<capture#1-of ? extends
+     *                   DomainObject> to List<User> Because get all just
+     *                   returns a list of DomainObjects, the cast is okay.
      * @param username the username
      * @return a list of logs
      */
+    @SuppressWarnings ( "unchecked" )
     public static List<Lockout> getUserLockouts(String username){
         String where = "username=" + username + " ORDER BY timestamp DESC LIMIT " + MAX_LOCKOUT;
-        return null;
+        return (List<Lockout>) getWhere( Lockout.class, where );
     }
 
     /**
