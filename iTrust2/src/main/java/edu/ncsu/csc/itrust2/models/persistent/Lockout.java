@@ -33,7 +33,7 @@ public class Lockout extends DomainObject<User> implements Serializable {
      * @return a list of logs
      */
     public static List<Lockout> getUserLockouts(String username){
-        String where = "username=" + username + " ORDER BY timestamp DESC";
+        String where = "username=" + username + " ORDER BY timestamp DESC LIMIT " + MAX_LOCKOUT;
         return null;
     }
 
