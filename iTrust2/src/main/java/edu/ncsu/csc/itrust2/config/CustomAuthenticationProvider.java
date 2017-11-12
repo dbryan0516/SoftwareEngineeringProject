@@ -65,12 +65,12 @@ public class CustomAuthenticationProvider extends DaoAuthenticationProvider {
             if ( numFailAttempts >= User.MAX_LOGIN_ATTEMPTS ) {
                 // check if timeout has passed
                 long currentTime = System.currentTimeMillis();
-                long lockTime = user.getResetTimeout(); // TODO this should be a different field
+                long lockTime = user.getLockoutTimeout();
                 if ( currentTime < lockTime ) throw new LockedException( LOCKED_TEXT );
             }
             // user isn't locked, clear num failed attempts and return a login token
             user.setNumFailAttempts( 0 );
-            user.setResetTimeout( null );
+            user.setLockoutTimeout( null );
             user.save();
             return new UsernamePasswordAuthenticationToken( username, password, Collections.singletonList( new SimpleGrantedAuthority( user.getRole().toString() ) ) );
         }
@@ -93,7 +93,7 @@ public class CustomAuthenticationProvider extends DaoAuthenticationProvider {
         if ( disabled )
             user.setEnabled( USER_DISABLED );
         user.setNumFailAttempts( User.MAX_LOGIN_ATTEMPTS );
-        user.setResetTimeout( currentTime + MILLIS_IN_HOUR );
+        user.setLockoutTimeout( currentTime + MILLIS_IN_HOUR );
         user.save();
         if ( disabled )
             throw new DisabledException( DISABLED_TEXT );

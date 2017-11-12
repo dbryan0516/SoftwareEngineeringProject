@@ -29,7 +29,7 @@ public class PasswordLockoutStepDefs {
         HibernateDataGenerator.refreshDB();
         User patient = User.getByName( "patient" );
         patient.setNumFailAttempts( User.MAX_LOGIN_ATTEMPTS );
-        patient.setResetTimeout( System.currentTimeMillis() - MILLIS_IN_MINUTE );
+        patient.setLockoutTimeout( System.currentTimeMillis() - MILLIS_IN_MINUTE );
         patient.save();
     }
 
@@ -62,7 +62,7 @@ public class PasswordLockoutStepDefs {
     public void isLockedOutOfSystem() {
         User patient = User.getByName( "patient" );
         assertTrue( patient.getNumFailAttempts() >= User.MAX_LOGIN_ATTEMPTS );
-        assertNotNull( patient.getResetTimeout() );
+        assertNotNull( patient.getLockoutTimeout() );
     }
 
     @Then( "^I cannot log in with my valid password$" )
@@ -81,7 +81,7 @@ public class PasswordLockoutStepDefs {
     public void lockHistoryCleared() {
         User patient = User.getByName( "patient" );
         assertTrue( patient.getNumFailAttempts() == 0 );
-        assertNull( patient.getResetTimeout() );
+        assertNull( patient.getLockoutTimeout() );
     }
 
     @Then( "^My account is disabled$" )
