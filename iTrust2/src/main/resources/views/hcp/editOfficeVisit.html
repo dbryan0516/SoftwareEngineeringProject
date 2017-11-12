@@ -52,7 +52,6 @@
 												(function(i) {
 												$http.get("/iTrust2/api/v1/patients/" + $scope.visits[i].patient.username).then(
 														function (response) {
-															console.log(response.data);
 															$scope.visits[i].actualPatient = response.data;
 														});
 												})(i);
@@ -77,21 +76,17 @@
                                 $http.get("/iTrust2/api/v1/ICDEntries").then(function(response) {
                                     $scope.ICDCodes = response.data;
                                 }, function(rejection) {
-                                    console.log(rejection);
                                 });
 
                                 $http.get("/iTrust2/api/v1/NDCEntries").then(function(response) {
                                     $scope.NDCCodes = response.data;
                                 }, function(rejection) {
-                                    console.log(rejection);
                                 });
 
 								$http.get("/iTrust2/api/v1/hospitals").then(
 								function(response) {
 									$scope.hospitals = response.data;
 								});
-
-								console.log($scope);
 								
 								$scope.selectedVisitID = null;
 								$scope.selectedVisit = {};
@@ -110,6 +105,7 @@
 									$scope.hasDiagnosis = false;
 									$scope.hasPrescription = false;
 									$scope.selectedVisit = {};
+									$scope.message = "";
 									for (var i = 0; i < visitsLength; i++) {
 										if ($scope.visits[i].id == $scope.selectedVisitID) {
 											$http({
@@ -136,16 +132,24 @@
 											$scope.selectedVisit.houseSmokingStatus = $scope.visits[i].basicHealthMetrics.houseSmokingStatus;
 											$scope.selectedVisit.patientSmokingStatus = $scope.visits[i].basicHealthMetrics.patientSmokingStatus;
 				
+											/* Grab the diagnosis with this office visit, if any */
 											if ($scope.visits [i].icd != undefined) {
 												$scope.hasDiagnosis = true;
                                             	$scope.selectedVisit.currentDiagnosis = $scope.visits[i].icd.code;
                                             }
-                                            if ($scope.visits [i].ndc != undefined) {
-                                            	$scope.hasPrescription = true;
-                                            	$scope.selectedVisit.currentPrescription = $scope.visits[i].ndc;
-                                            }
 
-                                            console.log($scope.selectedVisit);
+                                            /* Grab the prescription (if any) that goes with this office visit */
+                                            $http({
+												method : 'GET',
+												url : '/iTrust2/api/v1/prescriptions/officevisit/' + $scope.selectedVisitID,
+											}).then(function(response) {
+                                            	console.log(response);
+                                            	if (typeof(response.data) === "object") {
+                                            		$scope.hasPrescription = true;
+                                            		$scope.selectedVisit.currentPrescription = response.data;
+                                            	}
+											});
+
                                             $scope.three = false;
 										     $scope.threeAndUp = false;
 										     $scope.twelveAndUp = false;
@@ -183,7 +187,6 @@
                                 };
 								
 								$scope.submit = function() {
-									console.log($scope.selectedVisit)
 									$scope.selectedVisit.hcp = /*[[${#httpServletRequest.remoteUser}]]*/null; /* Ugly hack; use this to retrieve the name of the HCP who is currently logged in.  This grabs it from Thymeleaf */
 									$scope.errorMsg = "";
 									$scope.selectedVisit.status = "PENDING";
@@ -272,10 +275,8 @@
 										data : $scope.selectedVisit
 									}).then(function(response) {
 										$scope.message="Office visit edited successfully";
-										console.log(response);
 									}, function(rejection) {
 										$scope.message="Error occurred editing office visit";
-										console.log(rejection);
 									})
 								}
 							});
@@ -286,33 +287,10 @@
 
 
 		<div ng-app="myApp" ng-controller="editOfficeVisitCtrl">
-<nav class="navbar navbar-default">
-			<div class="container-fluid">
-				<ul class="nav navbar-nav">
-					<li class="dropdown"><a class="dropdown-toggle"
-						data-toggle="dropdown" href="#">Patient<span class="caret"></span></a>
-						<ul class="dropdown-menu">
-							<li><a href="/iTrust2/hcp/viewAppointmentRequests"
-								id="viewrequests">View Appointment Requests</a></li>
-							<li><a href="/iTrust2/hcp/viewAppointments"
-								id="upcomingrequests">View Upcoming Appointments</a></li>
-							<li><a href="#">Edit Patient -- Not Implemented</a></li>
-							<li><a href="#">Add Patient -- Not Implemented</a></li>
-							<li><a href="/iTrust2/hcp/documentOfficeVisit.html"
-								id="documentOfficeVisit">Document Office Visit</a></li>
-						</ul></li>
-					<li class="dropdown"><a class="dropdown-toggle"
-						data-toggle="dropdown" href="#">Edit<span class="caret"></span></a>
-						<ul class="dropdown-menu">
-							<li><a href="/iTrust2/personnel/editDemographics"
-								id="editdemographics">Edit Demographics</a></li>
-							<li> <a href="/iTrust2/hcp/editOfficeVisit"
-							      id="editOfficeVisit">Edit Office Visit</a></li>
-						</ul></li>
-				</ul>
-			</div>
-		</nav>
-						<div style="float:left;width:45%;height:75%;overflow-y:auto">
+
+        	<div th:replace="hcp-layout :: menu"></div>
+
+			<div style="float:left;width:45%;height:75%;overflow-y:auto">
 								<h2>Visits:</h2>
 											<!-- info on filtering taken from here: https://www.w3schools.com/angular/angular_filters.asp
 				and https://docs.angularjs.org/api/ng/filter/filter -->
@@ -437,12 +415,19 @@
 						</ul>
 					</td>
 				</tr>
-				<tr ng-show="hasDiagnosis">
-					<td style="text-align:right;padding:5px"><b>Patient Diagnosis:</b></td>
-					<input style="width:50%;" type="text" id="icdCodeSearch" name="icdCodeSearch" ng-model="icdSearchFilter" placeholder="Search by Disease name" />
+			</table>
+			<br />
+			<table ng-show="hasDiagnosis">
+				<tr>
+					<th><b>Patient Diagnosis:</b></th>
+				</tr>
+				<tr>
+					<td><input type="text" id="icdCodeSearch" name="icdCodeSearch" ng-model="icdSearchFilter" placeholder="Search by Disease name" /></td>
+				</tr>
+				<tr>
 					<td >
 						<ul>
-							<li ng-repeat="code in ICDCodes"><label>
+							<li ng-repeat="code in ICDCodes | filter:icdSearchFilter"><label>
 								<input type="radio" ng-model="selectedVisit.currentDiagnosis"
 									   name="currentDiagnosis" value="{{code.code}}" required="true" />
 								{{code.description}} ({{code.code}})
@@ -450,17 +435,37 @@
 						</ul>
 					</td>
 				</tr>
-				<tr ng-show="hasPrescription">
-					<td style="text-align:right;padding:5px"><b>Prescription:</b></td>
-					<td ng-show="selectedVisit.prescription == null"><input type="text" name="prescription" value="No Prescription" disabled/></td>
-					<td ng-show="selectedVisit.prescription != null"><input type="text" name="prescription" ng-model="selectedVisit.prescription" disabled/></td>
-					</td>
+			</table>
+			<br />
+			<table ng-show="hasPrescription">
+				<tr>
+					<th><strong>Medication prescribed during this office visit</strong></th>
 				</tr>
+				<tr>
+					<td>Medication</td>
+					<td>{{selectedVisit.currentPrescription.ndc.description}} ({{selectedVisit.currentPrescription.ndc.code}})</td>
+				</tr>
+                <tr>
+                    <td>Start Date</td>
+                    <td>{{selectedVisit.currentPrescription.startDate}}</td>
+                </tr>
+                <tr>
+                    <td>End Date</td>
+                    <td>{{selectedVisit.currentPrescription.endDate}}</td>
+                </tr>
+                <tr>
+                    <td>Dosage (mg)</td>
+                    <td>{{selectedVisit.currentPrescription.dosage}}</td>
+                </tr>
+                <tr>
+                    <td>Renewals</td>
+                    <td>{{selectedVisit.currentPrescription.numRenewals}}</td>
+                </tr>
 			</table>
 
-						<button ng-click="submit()" name="submit">Edit Office Visit</button>
-				<div name="errorMsg"><pre>{{errorMsg}}</pre></div>
-							<div name="success">{{message}}</div>
+			<button ng-click="submit()" name="submit">Edit Office Visit</button>
+			<div name="errorMsg"><pre>{{errorMsg}}</pre></div>
+			<div name="success">{{message}}</div>
 			</div>
 			</div>
 
