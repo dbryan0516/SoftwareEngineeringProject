@@ -40,6 +40,11 @@ public class User extends DomainObject<User> implements Serializable {
     private static final long                      serialVersionUID = 1L;
 
     /**
+     * The maximum number of login attempts for a user
+     */
+    public static final int MAX_LOGIN_ATTEMPTS = 3;
+
+    /**
      * The cache representation of the user in the database
      */
     static private DomainObjectCache<String, User> cache            = new DomainObjectCache<String, User>( User.class );
@@ -205,6 +210,21 @@ public class User extends DomainObject<User> implements Serializable {
     private Role    role;
 
     /**
+     * The stored token for a user to reset their password with
+     */
+    private String resetToken;
+
+    /**
+     * The time until the user can log in again
+     */
+    private Long resetTimeout;
+
+    /**
+     * The number failed login attempts for a user
+     */
+    private int numFailAttempts;
+
+    /**
      * Get the username of this user
      *
      * @return the username of this user
@@ -278,6 +298,54 @@ public class User extends DomainObject<User> implements Serializable {
      */
     public void setRole ( final Role role ) {
         this.role = role;
+    }
+
+    /**
+     * gets the reset token
+     * @return the token
+     */
+    public String getResetToken() {
+        return resetToken;
+    }
+
+    /**
+     * sets the reset token
+     * @param resetToken the token to set
+     */
+    public void setResetToken(String resetToken) {
+        this.resetToken = resetToken;
+    }
+
+    /**
+     * Gets the time that the user can log in after getting locked out
+     * @return the reset timeout
+     */
+    public Long getResetTimeout() {
+        return resetTimeout;
+    }
+
+    /**
+     * Sets the timeout value
+     * @param resetTimeout the timeout value
+     */
+    public void setResetTimeout(Long resetTimeout) {
+        this.resetTimeout = resetTimeout;
+    }
+
+    /**
+     * Gets the number of failed login attempts for a user
+     * @return the number of failed attempts
+     */
+    public int getNumFailAttempts() {
+        return numFailAttempts;
+    }
+
+    /**
+     * Sets the number of failed attempts for a User
+     * @param numFailAttempts the number of attempts to set
+     */
+    public void setNumFailAttempts(int numFailAttempts) {
+        this.numFailAttempts = numFailAttempts;
     }
 
     /**
