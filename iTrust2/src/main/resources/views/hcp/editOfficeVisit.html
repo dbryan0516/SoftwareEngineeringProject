@@ -140,11 +140,19 @@
 												$scope.hasDiagnosis = true;
                                             	$scope.selectedVisit.currentDiagnosis = $scope.visits[i].icd.code;
                                             }
-                                            if ($scope.visits [i].ndc != undefined) {
-                                            	$scope.hasPrescription = true;
-                                            	$scope.selectedVisit.currentPrescription = $scope.visits[i].ndc;
-                                            }
 
+                                            /* Grab the prescription (if any) that goes with this office visit */
+                                            $http({
+												method : 'GET',
+												url : '/iTrust2/api/v1/prescriptions/officevisit/' + $scope.selectedVisitID,
+											}).then(function(response) {
+                                            	console.log(response);
+                                            	if (typeof(response.data) === "object") {
+                                            		$scope.hasPrescription = true;
+                                            		$scope.selectedVisit.currentPrescription = response.data;
+                                            	}
+											});
+											
                                             console.log($scope.selectedVisit);
                                             $scope.three = false;
 										     $scope.threeAndUp = false;
@@ -437,12 +445,19 @@
 						</ul>
 					</td>
 				</tr>
-				<tr ng-show="hasDiagnosis">
-					<td style="text-align:right;padding:5px"><b>Patient Diagnosis:</b></td>
-					<input style="width:50%;" type="text" id="icdCodeSearch" name="icdCodeSearch" ng-model="icdSearchFilter" placeholder="Search by Disease name" />
+			</table>
+			<br />
+			<table ng-show="hasDiagnosis">
+				<tr>
+					<th><b>Patient Diagnosis:</b></th>
+				</tr>
+				<tr>
+					<td><input type="text" id="icdCodeSearch" name="icdCodeSearch" ng-model="icdSearchFilter" placeholder="Search by Disease name" /></td>
+				</tr>
+				<tr>
 					<td >
 						<ul>
-							<li ng-repeat="code in ICDCodes"><label>
+							<li ng-repeat="code in ICDCodes | filter:icdSearchFilter"><label>
 								<input type="radio" ng-model="selectedVisit.currentDiagnosis"
 									   name="currentDiagnosis" value="{{code.code}}" required="true" />
 								{{code.description}} ({{code.code}})
@@ -450,21 +465,44 @@
 						</ul>
 					</td>
 				</tr>
-				<tr ng-show="hasPrescription">
-					<td style="text-align:right;padding:5px"><b>Prescription:</b></td>
-					<td ng-show="selectedVisit.prescription == null"><input type="text" name="prescription" value="No Prescription" disabled/></td>
-					<td ng-show="selectedVisit.prescription != null"><input type="text" name="prescription" ng-model="selectedVisit.prescription" disabled/></td>
-					</td>
+			</table>
+			<br />
+			<table ng-show="hasPrescription">
+				<tr>
+					<th><strong>Medication prescribed during this office visit</strong></th>
 				</tr>
+				<tr>
+					<td>Medication</td>
+					<td>{{selectedVisit.currentPrescription.ndc.description}} ({{selectedVisit.currentPrescription.ndc.code}})</td>
+				</tr>
+                <tr>
+                    <td>Start Date</td>
+                    <td>{{selectedVisit.currentPrescription.startDate}}</td>
+                </tr>
+                <tr>
+                    <td>End Date</td>
+                    <td>{{selectedVisit.currentPrescription.endDate}}</td>
+                </tr>
+                <tr>
+                    <td>Dosage (mg)</td>
+                    <td>{{selectedVisit.currentPrescription.dosage}}</td>
+                </tr>
+                <tr>
+                    <td>Renewals</td>
+                    <td>{{selectedVisit.currentPrescription.numRenewals}}</td>
+                </tr>
 			</table>
 
-						<button ng-click="submit()" name="submit">Edit Office Visit</button>
-				<div name="errorMsg"><pre>{{errorMsg}}</pre></div>
-							<div name="success">{{message}}</div>
+			<button ng-click="submit()" name="submit">Edit Office Visit</button>
+			<div name="errorMsg"><pre>{{errorMsg}}</pre></div>
+			<div name="success">{{message}}</div>
 			</div>
 			</div>
 
 			<br />
+
+		</div>
+
 
 		</div>
 
