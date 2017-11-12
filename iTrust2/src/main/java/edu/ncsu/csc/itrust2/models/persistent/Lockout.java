@@ -1,7 +1,7 @@
 package edu.ncsu.csc.itrust2.models.persistent;
 
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.List;
 
@@ -66,18 +66,35 @@ public class Lockout extends DomainObject<Lockout> implements Serializable {
         return null;
     }
 
+    /**
+     * Sets the id (needed for Hibernate).
+     * @param id The new ID.
+     */
+    public void setId ( Long id ) {
+        this.id = id;
+    }
+
     /** For Hibernate */
     public Lockout () {
     }
 
     /**
+     * The id of the Lockout.
+     */
+    @Id
+    @GeneratedValue ( strategy = GenerationType.AUTO )
+    private Long id;
+
+    /**
      * The username of the user that is locked out
      */
+    @NotNull
     private String username;
 
     /**
      * The timestamp when the user gets locked out
      */
+    @NotNull
     private Long timestamp;
 
     /**
