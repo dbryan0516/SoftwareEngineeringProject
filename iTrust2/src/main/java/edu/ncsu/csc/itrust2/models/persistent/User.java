@@ -215,7 +215,7 @@ public class User extends DomainObject<User> implements Serializable {
     private String resetToken;
 
     /**
-     * The time until the user can log in again
+     * The timeout value for the reset token (ie if currentTimeMillis is greater than this value, token is invalid).
      */
     private Long resetTimeout;
 
@@ -223,6 +223,11 @@ public class User extends DomainObject<User> implements Serializable {
      * The number failed login attempts for a user
      */
     private int numFailAttempts;
+
+    /**
+     * The timeout for account lockout (ie if the currentTimeMillis is greater than this value, account is no longer locked).
+     */
+    private Long lockoutTimeout;
 
     /**
      * Get the username of this user
@@ -346,6 +351,22 @@ public class User extends DomainObject<User> implements Serializable {
      */
     public void setNumFailAttempts(int numFailAttempts) {
         this.numFailAttempts = numFailAttempts;
+    }
+
+    /**
+     * Gets the lockout timeout value.
+     * @return The lockout timeout.
+     */
+    public Long getLockoutTimeout() {
+        return lockoutTimeout;
+    }
+
+    /**
+     * Sets the lockout timeout value.
+     * @param lockoutTimeout The new lockout timeout.
+     */
+    public void setLockoutTimeout( Long lockoutTimeout ) {
+        this.lockoutTimeout = lockoutTimeout;
     }
 
     /**
