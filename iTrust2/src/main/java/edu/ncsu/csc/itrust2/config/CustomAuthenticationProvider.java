@@ -2,12 +2,24 @@ package edu.ncsu.csc.itrust2.config;
 
 import edu.ncsu.csc.itrust2.models.persistent.Lockout;
 import edu.ncsu.csc.itrust2.models.persistent.User;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.*;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
-public class CustomAuthenticationProvider implements AuthenticationProvider {
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+public class CustomAuthenticationProvider extends DaoAuthenticationProvider {
     /**
      * The user is disabled in the system.
      */
@@ -20,7 +32,9 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
 
     private static final String DISABLED_TEXT = "User is disabled. Please contact the system administrator.";
     private static final String LOCKED_TEXT = "Account is locked for 1 hour due to failed login attempts.";
-    public static final String BAD_CREDENTIALS_TEXT = "Username or password is invalid.";
+    private static final String BAD_CREDENTIALS_TEXT = "Username or password is invalid.";
+
+    private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     /**
      * Performs authentication with the same contract as
@@ -46,7 +60,7 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
         if ( user.getEnabled() == USER_DISABLED ) throw new DisabledException( DISABLED_TEXT );
         // user is enabled
         int numFailAttempts = user.getNumFailAttempts();
-        if ( user.getPassword().equals( password ) ) {
+        if ( passwordEncoder.matches( password, user.getPassword() ) ) {
             // user's password is correct
             if ( numFailAttempts >= User.MAX_LOGIN_ATTEMPTS ) {
                 // check if timeout has passed
@@ -58,7 +72,7 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
             user.setNumFailAttempts( 0 );
             user.setResetTimeout( null );
             user.save();
-            return new UsernamePasswordAuthenticationToken( username, password );
+            return new UsernamePasswordAuthenticationToken( username, password, Collections.singletonList( new SimpleGrantedAuthority( user.getRole().toString() ) ) );
         }
         // password is incorrect
         if ( numFailAttempts >= User.MAX_LOGIN_ATTEMPTS ) throw new LockedException( LOCKED_TEXT );
@@ -71,11 +85,11 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
         }
         // attempts == MAX_LOGIN_ATTEMPTS - 1 (ie, this failed attempt will lock account)
         long currentTime = System.currentTimeMillis();
-        Lockout lockout = new Lockout( username, currentTime );
+        Lockout lockout = new Lockout( username, currentTime + MILLIS_IN_HOUR * 24 );
         lockout.save();
         // find out how many lockouts they have in the past 24 hours
-        // TODO add call to get lockouts
-        boolean disabled = false;
+        List< Lockout > userLockouts = Lockout.getUserLockouts( username ).stream().filter( l -> l.getTimestamp() > currentTime ).collect( Collectors.toList() );
+        boolean disabled = userLockouts.size() >= User.MAX_LOGIN_ATTEMPTS;
         if ( disabled )
             user.setEnabled( USER_DISABLED );
         user.setNumFailAttempts( User.MAX_LOGIN_ATTEMPTS );
@@ -109,6 +123,6 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
      */
     @Override
     public boolean supports( Class< ? > authentication ) {
-        return false;
+        return authentication.equals( UsernamePasswordAuthenticationToken.class );
     }
 }

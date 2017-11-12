@@ -18,8 +18,7 @@ public class LoginAuditingListener implements ApplicationListener<ApplicationEve
         if ( event instanceof InteractiveAuthenticationSuccessEvent ) {
             final InteractiveAuthenticationSuccessEvent authEvent = (InteractiveAuthenticationSuccessEvent) event;
             final Authentication authentication = authEvent.getAuthentication();
-            final UserDetails details = (UserDetails) authentication.getPrincipal();
-            LoggerUtil.log( TransactionType.LOGIN_SUCCESS, details.getUsername() );
+            LoggerUtil.log( TransactionType.LOGIN_SUCCESS, authentication.getName() );
         }
 
         if ( event instanceof AbstractAuthenticationFailureEvent ) {
