@@ -35,7 +35,7 @@ public class Lockout extends DomainObject<Lockout> implements Serializable {
      * returns the lockout logs for the number of locks in the past 24 hours
      * 
      *  @SuppressWarnings for Unchecked cast from List<capture#1-of ? extends
-     *                   DomainObject> to List<User> Because get all just
+     *                   DomainObject> to List<Lockout> Because get all just
      *                   returns a list of DomainObjects, the cast is okay.
      * @param username the username
      * @return a list of logs
@@ -50,7 +50,7 @@ public class Lockout extends DomainObject<Lockout> implements Serializable {
      * Get lockouts where the passed query is true
      *
      * @SuppressWarnings for Unchecked cast from List<capture#1-of ? extends
-     *                   DomainObject> to List<User> Because get all just
+     *                   DomainObject> to List<Lockout> Because get all just
      *                   returns a list of DomainObjects, the cast is okay.
      *
      * @param where
