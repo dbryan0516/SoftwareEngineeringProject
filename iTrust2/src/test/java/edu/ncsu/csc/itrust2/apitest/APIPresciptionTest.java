@@ -57,8 +57,6 @@ public class APIPresciptionTest {
     @Autowired
     private WebApplicationContext context;
 
-    private static Gson           gson = new Gson();
-
     /**
      * Sets up test
      */
