@@ -89,7 +89,7 @@ public class CustomAuthenticationProvider extends DaoAuthenticationProvider {
         lockout.save();
         // find out how many lockouts they have in the past 24 hours
         List< Lockout > userLockouts = Lockout.getUserLockouts( username ).stream().filter( l -> l.getTimestamp() > currentTime ).collect( Collectors.toList() );
-        boolean disabled = userLockouts.size() >= User.MAX_LOGIN_ATTEMPTS;
+        boolean disabled = userLockouts.size() >= Lockout.MAX_LOCKOUT;
         if ( disabled )
             user.setEnabled( USER_DISABLED );
         user.setNumFailAttempts( User.MAX_LOGIN_ATTEMPTS );

@@ -24,10 +24,15 @@ public class PasswordLockoutStepDefs {
     private final WebDriver driver = new HtmlUnitDriver( true );
     private final WebDriverWait wait = new WebDriverWait( driver, 5 );
 
+    @Given( "^A normal patient exists in the system$" )
+    public void normalPatientExists() {
+        HibernateDataGenerator.refreshDB();
+    }
+
     @Given( "^A patient with an old lockout exists in the system$" )
     public void patientWithOldLockoutExists() {
         HibernateDataGenerator.refreshDB();
-        User patient = User.getByName( "patient" );
+        User patient = User.getWhere( "username='patient'" ).get( 0 );
         patient.setNumFailAttempts( User.MAX_LOGIN_ATTEMPTS );
         patient.setLockoutTimeout( System.currentTimeMillis() - MILLIS_IN_MINUTE );
         patient.save();
@@ -36,9 +41,9 @@ public class PasswordLockoutStepDefs {
     @Given( "^A patient with two lockouts exists in the system$" )
     public void patientWithTwoLockoutExists() {
         HibernateDataGenerator.refreshDB();
-        Lockout lockout = new Lockout( "patient", System.currentTimeMillis() - MILLIS_IN_HOUR * 2 );
+        Lockout lockout = new Lockout( "patient", System.currentTimeMillis() + MILLIS_IN_HOUR * 24 );
         lockout.save();
-        lockout = new Lockout( "patient", System.currentTimeMillis() - MILLIS_IN_HOUR );
+        lockout = new Lockout( "patient", System.currentTimeMillis() + MILLIS_IN_HOUR * 23 );
         lockout.save();
     }
 
@@ -60,7 +65,7 @@ public class PasswordLockoutStepDefs {
 
     @Then( "^I am locked out of the system$" )
     public void isLockedOutOfSystem() {
-        User patient = User.getByName( "patient" );
+        User patient = User.getWhere( "username='patient'" ).get( 0 );
         assertTrue( patient.getNumFailAttempts() >= User.MAX_LOGIN_ATTEMPTS );
         assertNotNull( patient.getLockoutTimeout() );
     }
@@ -79,14 +84,14 @@ public class PasswordLockoutStepDefs {
 
     @Then( "^My lock history is cleared$" )
     public void lockHistoryCleared() {
-        User patient = User.getByName( "patient" );
+        User patient = User.getWhere( "username='patient'" ).get( 0 );
         assertTrue( patient.getNumFailAttempts() == 0 );
         assertNull( patient.getLockoutTimeout() );
     }
 
     @Then( "^My account is disabled$" )
     public void accountDisabled() {
-        User patient = User.getByName( "patient" );
+        User patient = User.getWhere( "username='patient'" ).get( 0 );
         assertTrue( patient.getEnabled() == 0 );
     }
 

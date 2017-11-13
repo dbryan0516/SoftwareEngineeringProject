@@ -4,7 +4,7 @@ Feature: Password Lockout
   So that I can prevent unauthorized access to the system
 
   Scenario: Lock user out after failed password attempts
-    Given A default patient exists in the system
+    Given A normal patient exists in the system
     When I navigate to the Login page
     And I incorrectly enter my password
     And I incorrectly enter my password
