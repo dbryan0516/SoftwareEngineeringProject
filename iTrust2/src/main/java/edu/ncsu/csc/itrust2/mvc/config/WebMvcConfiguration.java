@@ -68,6 +68,8 @@ public class WebMvcConfiguration extends WebMvcConfigurerAdapter {
     public void addViewControllers ( final ViewControllerRegistry registry ) {
         registry.addViewController( "/login" ).setViewName( "login" );
         registry.setOrder( Ordered.HIGHEST_PRECEDENCE );
+        registry.addViewController( "/forgotPassword" ).setViewName( "forgotPassword" );
+
     }
 
     /**
