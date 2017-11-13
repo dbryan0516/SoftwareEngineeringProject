@@ -52,6 +52,8 @@ public class APIPresciptionTest {
 
     private MockMvc               mvc;
 
+    private static Gson           gson = new Gson();
+
     @Autowired
     private WebApplicationContext context;
 
