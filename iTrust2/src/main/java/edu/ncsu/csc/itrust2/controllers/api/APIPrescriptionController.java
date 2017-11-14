@@ -45,18 +45,6 @@ public class APIPrescriptionController extends APIController {
     }
 
     /**
-     * Retrieves a list of all prescriptions for current patient logged in
-     *
-     * @return list of prescriptions
-     */
-    @GetMapping ( BASE_PATH + "/prescriptions/patient/myprescriptions" )
-    @PreAuthorize ( "hasRole('ROLE_PATIENT')" )
-    public List<Prescription> getMyPrescriptions () {
-        final User self = User.getByName( SecurityContextHolder.getContext().getAuthentication().getName() );
-        return Prescription.getForPatient( self.getId() );
-    }
-
-    /**
      * Fetches the prescription associated with a given office visit
      *
      * @param id
@@ -174,6 +162,41 @@ public class APIPrescriptionController extends APIController {
         catch ( final Exception e ) {
             return new ResponseEntity( builder.toJson( e.getMessage() ), HttpStatus.BAD_REQUEST );
         }
+    }
+
+    /**
+     * Retrieves a list of all prescriptions for current patient logged in
+     *
+     * @return list of prescriptions
+     */
+    @GetMapping ( BASE_PATH + "/prescriptions/patient/myprescriptions" )
+    @PreAuthorize ( "hasRole('ROLE_PATIENT')" )
+    public List<Prescription> getMyPrescriptions () {
+        final User self = User.getByName( SecurityContextHolder.getContext().getAuthentication().getName() );
+        return Prescription.getForPatient( self.getId() );
+    }
+
+    /**
+     * Fetches the prescription associated with a given office visit for current
+     * patient logged in
+     *
+     * @param id
+     *            The id of the office visit
+     * @return a prescription
+     */
+    @GetMapping ( BASE_PATH + "/prescriptions/patient/officevisit/{id}" )
+    @PreAuthorize ( "hasRole('ROLE_PATIENT')" )
+    public Prescription getPrescriptionForOfficeVisitByPatient ( @PathVariable ( "id" ) final String id ) {
+        final User self = User.getByName( SecurityContextHolder.getContext().getAuthentication().getName() );
+
+        // Use both patient id and office visit id as criteria to ensure no
+        // patient can view the prescriptions of another
+        final List p = Prescription.getWhere( Prescription.class,
+                " office_visit_id = " + id + " and patient_id = '" + self.getId() + "'" );
+        if ( p.size() != 0 ) {
+            return (Prescription) p.get( 0 );
+        }
+        return null;
     }
 
     // // delete method just in case

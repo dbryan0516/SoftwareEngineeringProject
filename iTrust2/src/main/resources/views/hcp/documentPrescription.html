@@ -3,13 +3,7 @@
 	<title>Document Prescriptions</title>
 </head>
 <body th:include="layout :: body" th:with="content=~{::content}">
-	<style>
-		div.prescriptionForm input[type='text'] {
-			width: 50%;
-		}
-	</style>
 	<div th:fragment="content">
-
 		<script th:inline="javascript">
 					/* Otherwise Thymeleaf tries to parse Javascript as XML and breaks itself sometimes.  Sigh */
 				/*<![CDATA[*/
@@ -34,7 +28,6 @@
 										}).then(function(response) {
 											$scope.NDCCodes = response.data;
 										}, function(rejection) {
-											console.log(rejection);
 										});
 									};
 
@@ -46,7 +39,6 @@
 										}).then(function(response) {
 											$scope.patients = response.data;
 										}, function(rejection) {
-											console.log(rejection);
 										});
 									};						
 									
@@ -163,7 +155,6 @@
 									$scope.submit = function() {
 										var url = baseUrl + "/prescriptions";	
 										$scope.message = "";
-										console.log($scope.currentPrescription);	
 										if ($scope.validateData()) {
 											$http({
 												method : "POST",
@@ -172,11 +163,9 @@
 											}).then(function(response) {
 												$scope.message = response.data;
 												$scope.resetForm();
-												console.log(response);
 											}, function(rejection) {
 												$scope.message = "An error occurred";
 												$scope.errorMsg += rejection.data;
-												console.log(rejection);
 											});				
 										}
 										else {
@@ -188,36 +177,10 @@
 									$scope.getPatients();
 								});
 		</script>
-
 	<div ng-app="myApp" ng-controller="documentPrescriptionCtrl">
-		<nav class="navbar navbar-default">
-				<div class="container-fluid">
-					<ul class="nav navbar-nav">
-						<li class="dropdown"><a class="dropdown-toggle"
-							data-toggle="dropdown" href="#">Patient<span class="caret"></span></a>
-							<ul class="dropdown-menu">
-								<li><a href="/iTrust2/hcp/viewAppointmentRequests"
-									id="viewrequests">View Appointment Requests</a></li>
-								<li><a href="/iTrust2/hcp/viewAppointments"
-									id="upcomingrequests">View Upcoming Appointments</a></li>
-								<li><a href="#">Edit Patient -- Not Implemented</a></li>
-								<li><a href="#">Add Patient -- Not Implemented</a></li>
-								<li><a href="/iTrust2/hcp/documentOfficeVisit"
-									id="documentOfficeVisit">Document Office Visit</a></li>
-								<li><a href="/iTrust2/hcp/documentPrescription"
-									id="documentPrescription">Document Prescription</a></li>
-							</ul></li>
-						<li class="dropdown"><a class="dropdown-toggle"
-							data-toggle="dropdown" href="#">Edit<span class="caret"></span></a>
-							<ul class="dropdown-menu">
-								<li><a href="/iTrust2/personnel/editDemographics"
-									id="editdemographics">Edit Demographics</a></li>
-								<li> <a href="/iTrust2/hcp/editOfficeVisit"
-								      id="editOfficeVisit">Edit Office Visit</a></li>
-							</ul></li>
-					</ul>
-				</div>
-		</nav>
+
+		<div th:replace="hcp-layout :: menu"></div>
+
 		<div style="float:left;width:30%;height:75%;overflow-y:auto">
 			<h2>Patients:</h2>
 			<!-- info on filtering taken from here: https://www.w3schools.com/angular/angular_filters.asp
@@ -239,7 +202,7 @@
 			<h2>Patient: {{visit.actualPatient.self.username}}</h2>
 			<h2>Document a new Prescription</h2>
 			<div class="prescriptionForm">
-				Select an NDC code (mandatory):
+				Select a medication:
 				<div class="ndcCodes">
 					<input style="width:50%;" type="text" id="ndcCodeSearch" name="ndcCodeSearch" ng-model="ndcSearchFilter" placeholder="Search by Prescription name" />
 					<ul>
@@ -250,7 +213,6 @@
 					</ul>
 				</div>
 				<br />
-				Mandatory information:
 				<table>
 					<tr>
 						<td>Start Date</td>

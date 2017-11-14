@@ -14,6 +14,7 @@ import edu.ncsu.csc.itrust2.models.persistent.Hospital;
 import edu.ncsu.csc.itrust2.models.persistent.ICD;
 import edu.ncsu.csc.itrust2.models.persistent.NDC;
 import edu.ncsu.csc.itrust2.models.persistent.Patient;
+import edu.ncsu.csc.itrust2.models.persistent.Personnel;
 import edu.ncsu.csc.itrust2.models.persistent.Prescription;
 import edu.ncsu.csc.itrust2.models.persistent.User;
 
@@ -28,6 +29,8 @@ import edu.ncsu.csc.itrust2.models.persistent.User;
  *
  */
 public class HibernateDataGenerator {
+
+    private static final String TEST_EMAIL = "itrust22045@gmail.com";
 
     /**
      * Starts the data generator program.
@@ -62,6 +65,31 @@ public class HibernateDataGenerator {
         final User hcp = new User( "hcp", "$2a$10$EblZqNptyYvcLm/VwDCVAuBjzZOI7khzdyGPBr08PpIi0na624b8.", Role.ROLE_HCP,
                 1 );
         hcp.save();
+
+        // This Patient is perma. disabled. Needed for APIPasswordController
+        // testing.
+        final User disabled = new User( "disabled", "$2a$10$EblZqNptyYvcLm/VwDCVAuBjzZOI7khzdyGPBr08PpIi0na624b8.",
+                Role.ROLE_PATIENT, 0 );
+        disabled.save();
+        final Patient disabledPatient = new Patient();
+        disabledPatient.setSelf( disabled );
+        disabledPatient.setEmail( TEST_EMAIL );
+        disabledPatient.save();
+
+        // This HCP is also old enough to have an email address, so let them
+        // have one. Needed for APIPasswordController testing.
+        final Personnel hcpPersonnel = new Personnel();
+        hcpPersonnel.setSelf( hcp );
+        hcpPersonnel.setEmail( TEST_EMAIL );
+        hcpPersonnel.save();
+
+        // So is this one. Needed for APIPasswordController testing.
+        final User hcp2 = new User( "hcp2", "$2a$10$EblZqNptyYvcLm/VwDCVAuBjzZOI7khzdyGPBr08PpIi0na624b8.",
+                Role.ROLE_HCP, 1 );
+        hcp2.save();
+        final Personnel hcpPersonnel2 = new Personnel();
+        hcpPersonnel2.setSelf( hcp2 );
+        hcpPersonnel2.save();
 
         final User patient = new User( "patient", "$2a$10$EblZqNptyYvcLm/VwDCVAuBjzZOI7khzdyGPBr08PpIi0na624b8.",
                 Role.ROLE_PATIENT, 1 );
@@ -101,6 +129,11 @@ public class HibernateDataGenerator {
         final Calendar aliceBirth = Calendar.getInstance();
         aliceBirth.add( Calendar.YEAR, -13 ); // alice is thirteen years old
         alice.setDateOfBirth( aliceBirth );
+
+        // Alice is old enough to have an email address, so let's give her one.
+        // Needed for APIPasswordController testing.
+        alice.setEmail( TEST_EMAIL );
+
         alice.save();
 
         final Hospital hosp = new Hospital( "General Hostpital", "123 Main St", "12345", "NC" );

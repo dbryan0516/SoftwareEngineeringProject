@@ -31,6 +31,7 @@
 		<mapping class="edu.ncsu.csc.itrust2.models.persistent.NDC" />
 		<mapping class="edu.ncsu.csc.itrust2.models.persistent.ICD" />
 		<mapping class="edu.ncsu.csc.itrust2.models.persistent.Prescription" />
+		<mapping class="edu.ncsu.csc.itrust2.models.persistent.Lockout" />
 
 
 	</session-factory>

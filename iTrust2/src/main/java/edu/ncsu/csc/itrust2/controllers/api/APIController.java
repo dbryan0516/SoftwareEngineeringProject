@@ -1,5 +1,7 @@
 package edu.ncsu.csc.itrust2.controllers.api;
 
+import com.google.gson.Gson;
+
 /**
  * Base class for all of the API controllers for manipulating DomainObjects. Add
  * in any fields or functionality that ought to be shared throughout.
@@ -27,4 +29,7 @@ package edu.ncsu.csc.itrust2.controllers.api;
 public abstract class APIController {
     /** Base path of API */
     static final protected String BASE_PATH = "/api/v1/";
+
+    /** Gson for encoding responses */
+    static final protected Gson gson = new Gson();
 }
