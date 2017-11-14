@@ -25,6 +25,10 @@ public class APIPasswordController extends APIController {
      */
     private static final ResponseEntity INCORRECT_CURRENT_PASSWORD = new ResponseEntity( gson.toJson( "Current password is incorrect" ), HttpStatus.CONFLICT );
     /**
+     * User's reset token is invalid, too old, or doesn't match.
+     */
+    private static final ResponseEntity INVALID_RESET_TOKEN = new ResponseEntity( gson.toJson( "Reset token is invalid" ), HttpStatus.CONFLICT );
+    /**
      * New password(s) is invalid
      */
     private static final ResponseEntity INVALID_NEW_PASSWORD = new ResponseEntity( gson.toJson( "Password is invalid (must be between 6 and 20 characters)" ), HttpStatus.CONFLICT );
@@ -36,10 +40,6 @@ public class APIPasswordController extends APIController {
      * Password updated successfully
      */
     private static final ResponseEntity PASSWORD_UPDATE_SUCCESS = new ResponseEntity( gson.toJson( "Password updated successfully" ), HttpStatus.OK );
-    /**
-     * Password update failed
-     */
-    private static final ResponseEntity PASSWORD_UPDATE_FAILURE = new ResponseEntity( gson.toJson( "Could not update password because of " + e.getMessage() ), HttpStatus.BAD_REQUEST );
 
     /**
      * The password encoder / decoder.
@@ -60,7 +60,7 @@ public class APIPasswordController extends APIController {
             return INCORRECT_USERNAME;
         if ( !encoder.matches( pForm.getPasswordToken(), user.getPassword() ) )
             return INCORRECT_CURRENT_PASSWORD;
-        if ( !validPassword( pForm.getNewPassword1() ) || !validPassword( pForm.getNewPassword2() ) )
+        if ( invalidPassword( pForm.getNewPassword1() ) || invalidPassword( pForm.getNewPassword2() ) )
             return INVALID_NEW_PASSWORD;
         if ( !pForm.getNewPassword1().equals( pForm.getNewPassword2() ) )
             return MISMATCHED_NEW_PASSWORDS;
@@ -69,19 +69,37 @@ public class APIPasswordController extends APIController {
             user.save();
             return PASSWORD_UPDATE_SUCCESS;
         } catch ( final Exception e ) {
-            return PASSWORD_UPDATE_FAILURE;
+            return new ResponseEntity( gson.toJson( "Could not update password because of " + e.getMessage() ), HttpStatus.BAD_REQUEST );
         }
     }
 
     /**
      * API endpoint for resetting a User's password.
      *
+     * @param id    The id of the User's whose password to reset.
      * @param pForm The password form containing the password info.
      * @return Returns a ResponseEntity based on the result of the operation.
      */
     @PostMapping( BASE_PATH + "/password/{id}" )
     public ResponseEntity resetPassword( @PathVariable final String id, @RequestBody final PasswordChangeForm pForm ) {
         final User user = User.getByName( id );
+        if ( user == null )
+            return INCORRECT_USERNAME;
+        if ( user.getResetToken() == null || !user.getResetToken().equals( pForm.getPasswordToken() ) || System.currentTimeMillis() > user.getResetTimeout() )
+            return INVALID_RESET_TOKEN;
+        if ( invalidPassword( pForm.getNewPassword1() ) || invalidPassword( pForm.getNewPassword2() ) )
+            return INVALID_NEW_PASSWORD;
+        if ( !pForm.getNewPassword1().equals( pForm.getNewPassword2() ) )
+            return MISMATCHED_NEW_PASSWORDS;
+        user.setPassword( encoder.encode( pForm.getNewPassword1() ) );
+        user.setResetToken( null );
+        user.setResetTimeout( null );
+        try {
+            user.save();
+            return PASSWORD_UPDATE_SUCCESS;
+        } catch ( final Exception e ) {
+            return new ResponseEntity( gson.toJson( "Could not update password because of " + e.getMessage() ), HttpStatus.BAD_REQUEST );
+        }
     }
 
     /**
@@ -90,7 +108,7 @@ public class APIPasswordController extends APIController {
      * @param password The password to check.
      * @return Returns true if password is between 6 and 20 characters, otherwise false.
      */
-    private boolean validPassword( final String password ) {
-        return password.length() >= 6 && password.length() <= 20;
+    private boolean invalidPassword( final String password ) {
+        return password.length() < 6 || password.length() > 20;
     }
 }
