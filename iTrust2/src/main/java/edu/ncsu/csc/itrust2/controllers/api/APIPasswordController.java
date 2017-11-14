@@ -77,6 +77,10 @@ public class APIPasswordController extends APIController {
     private static final int            RESET_TOKEN_LENGTH         = 37;
 
     /**
+     * Duration for which a reset token is valid (1 hour = 3600s = 3600e3 ms)
+     */
+    private static final long           RESET_TOKEN_DURATION_MSEC  = 3600000;
+    /**
      * The password encoder / decoder.
      */
     private final BCryptPasswordEncoder encoder                    = new BCryptPasswordEncoder();
@@ -168,7 +172,7 @@ public class APIPasswordController extends APIController {
         String email = null;
 
         // First, verify the user exists
-        User u = User.getByName( userId );
+        final User u = User.getByName( userId );
         if ( u == null ) {
             return new ResponseEntity( gson.toJson( "User with username " + userId + " was not found" ),
                     HttpStatus.NOT_FOUND );
@@ -212,11 +216,14 @@ public class APIPasswordController extends APIController {
         try {
 
             // Create a request token - note we're not ensuring uniqueness, b/c
-            // what are the odds?
+            // what are the odds?.
             final String token = RandomStringUtils.randomAscii( RESET_TOKEN_LENGTH );
             u.setResetToken( token );
+
+            // Set the timestamp for when the token will expire (1 hour from
+            // issuance)
+            u.setResetTimeout( System.currentTimeMillis() + ( RESET_TOKEN_DURATION_MSEC ) );
             u.save();
-            u = User.getByName( userId );
 
             // Put it in an email and send
             final MimeMessage msg = new MimeMessage( session );
