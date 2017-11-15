@@ -13,9 +13,7 @@ import org.openqa.selenium.htmlunit.HtmlUnitDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class PasswordLockoutStepDefs {
     private static final int MILLIS_IN_MINUTE = 60000;
@@ -74,6 +72,7 @@ public class PasswordLockoutStepDefs {
     public void cannotLoginWithValidPassword() {
         login( "123456" );
         assertTrue( driver.getTitle().contains( "Login" ) );
+        HibernateDataGenerator.refreshDB();
     }
 
     @Then( "^I am successfully logged in$" )
@@ -87,6 +86,7 @@ public class PasswordLockoutStepDefs {
         User patient = User.getWhere( "username='patient'" ).get( 0 );
         assertTrue( patient.getNumFailAttempts() == 0 );
         assertNull( patient.getLockoutTimeout() );
+        HibernateDataGenerator.refreshDB();
     }
 
     @Then( "^My account is disabled$" )

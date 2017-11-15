@@ -2,24 +2,24 @@ package edu.ncsu.csc.itrust2.config;
 
 import edu.ncsu.csc.itrust2.models.persistent.Lockout;
 import edu.ncsu.csc.itrust2.models.persistent.User;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.*;
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
-public class CustomAuthenticationProvider extends DaoAuthenticationProvider {
+/**
+ * Provides Custom authentication for the iTrust2 login (to enable lockout and account disable).
+ *
+ * @author Galen Abell (gjabell)
+ */
+public class CustomAuthenticationProvider implements AuthenticationProvider {
     /**
      * The user is disabled in the system.
      */
@@ -54,7 +54,7 @@ public class CustomAuthenticationProvider extends DaoAuthenticationProvider {
         String username = authentication.getName().trim();
         String password = authentication.getCredentials().toString().trim();
 
-        User user = User.getByName( username );
+        User user = User.getWhere( "username='" + username + "'" ).get( 0 );
         if ( user == null ) throw new UsernameNotFoundException( BAD_CREDENTIALS_TEXT );
         // user exists in system
         if ( user.getEnabled() == USER_DISABLED ) throw new DisabledException( DISABLED_TEXT );
@@ -117,7 +117,7 @@ public class CustomAuthenticationProvider extends DaoAuthenticationProvider {
      * authentication is conducted at runtime the <code>ProviderManager</code>.
      * </p>
      *
-     * @param authentication
+     * @param authentication The type of Authentication to test for support.
      * @return <code>true</code> if the implementation can more closely evaluate the
      * <code>Authentication</code> class presented
      */
