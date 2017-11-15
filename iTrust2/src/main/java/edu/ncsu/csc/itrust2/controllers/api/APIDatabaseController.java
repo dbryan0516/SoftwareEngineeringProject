@@ -32,7 +32,7 @@ import edu.ncsu.csc.itrust2.utils.LoggerUtil;
 @SuppressWarnings ( { "unchecked", "rawtypes" } )
 public class APIDatabaseController extends APIController {
 
-    private static Gson GSON = new Gson();
+    private static final Gson GSON = new Gson();
 
     /**
      * Adds an ICD code to the database
