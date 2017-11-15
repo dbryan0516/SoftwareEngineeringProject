@@ -60,7 +60,11 @@ public class HibernateDataGenerator {
 
         DomainObjectCache.clearCaches();
 
-        // TODO we might need to add a delay here
+        try {
+            Thread.sleep( 2000 );
+        } catch ( InterruptedException e ) {
+            e.printStackTrace();
+        }
 
         final User hcp = new User( "hcp", "$2a$10$EblZqNptyYvcLm/VwDCVAuBjzZOI7khzdyGPBr08PpIi0na624b8.", Role.ROLE_HCP,
                 1 );

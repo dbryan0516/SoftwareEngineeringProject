@@ -11,6 +11,8 @@ import javax.persistence.Table;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 
+import edu.ncsu.csc.itrust2.utils.HibernateUtil;
+import org.hibernate.Session;
 import org.hibernate.validator.constraints.Length;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -141,6 +143,23 @@ public class User extends DomainObject<User> implements Serializable {
      */
     public static List<User> getByRole ( final Role role ) {
         return getWhere( "role = '" + role.toString() + "'" );
+    }
+
+    /**
+     * Saves the DomainObject into the database. If the object instance does not
+     * exist a new record will be created in the database. If the object already
+     * exists in the DB, then the existing record will be updated.
+     */
+    @Override
+    @SuppressWarnings( "unchecked" )
+    public void save() {
+        final Session session = HibernateUtil.getSessionFactory().openSession();
+        session.beginTransaction();
+        session.saveOrUpdate( this );
+        session.getTransaction().commit();
+        session.close();
+
+        getCache( this.getClass() ).put( this.getUsername(), this );
     }
 
     /** For Hibernate */
