@@ -83,7 +83,6 @@ public class UserController {
     }
 
     @GetMapping ( "/personnel/changePassword" )
-    @PreAuthorize( "hasRole('ROLE_HCP') or hasRole('ROLE_ADMIN')" )
     public String changePassword () {
         return "/personnel/changePassword";
     }
