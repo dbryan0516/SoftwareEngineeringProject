@@ -37,32 +37,32 @@ public class APIPasswordController extends APIController {
      * Username is incorrect
      */
     private static final ResponseEntity INCORRECT_USERNAME         = new ResponseEntity(
-            gson.toJson( "Username is incorrect" ), HttpStatus.NOT_FOUND );
+            GSON.toJson( "Username is incorrect" ), HttpStatus.NOT_FOUND );
     /**
      * Current password is incorrect
      */
     private static final ResponseEntity INCORRECT_CURRENT_PASSWORD = new ResponseEntity(
-            gson.toJson( "Current password is incorrect" ), HttpStatus.CONFLICT );
+            GSON.toJson( "Current password is incorrect" ), HttpStatus.CONFLICT );
     /**
      * User's reset token is invalid, too old, or doesn't match.
      */
     private static final ResponseEntity INVALID_RESET_TOKEN        = new ResponseEntity(
-            gson.toJson( "Reset token is invalid" ), HttpStatus.CONFLICT );
+            GSON.toJson( "Reset token is invalid" ), HttpStatus.CONFLICT );
     /**
      * New password(s) is invalid
      */
     private static final ResponseEntity INVALID_NEW_PASSWORD       = new ResponseEntity(
-            gson.toJson( "Password is invalid (must be between 6 and 20 characters)" ), HttpStatus.CONFLICT );
+            GSON.toJson( "Password is invalid (must be between 6 and 20 characters)" ), HttpStatus.CONFLICT );
     /**
      * New passwords don't match
      */
     private static final ResponseEntity MISMATCHED_NEW_PASSWORDS   = new ResponseEntity(
-            gson.toJson( "New passwords don't match" ), HttpStatus.CONFLICT );
+            GSON.toJson( "New passwords don't match" ), HttpStatus.CONFLICT );
     /**
      * Password updated successfully
      */
     private static final ResponseEntity PASSWORD_UPDATE_SUCCESS    = new ResponseEntity(
-            gson.toJson( "Password updated successfully" ), HttpStatus.OK );
+            GSON.toJson( "Password updated successfully" ), HttpStatus.OK );
 
     /** SMTP server through which password reset emails are sent */
     private static final String         GMAIL_SMTP_ADDRESS         = "smtp.gmail.com";
@@ -114,7 +114,7 @@ public class APIPasswordController extends APIController {
             return PASSWORD_UPDATE_SUCCESS;
         }
         catch ( final Exception e ) {
-            return new ResponseEntity( gson.toJson( "Could not update password because of " + e.getMessage() ),
+            return new ResponseEntity( GSON.toJson( "Could not update password because of " + e.getMessage() ),
                     HttpStatus.BAD_REQUEST );
         }
     }
@@ -152,7 +152,7 @@ public class APIPasswordController extends APIController {
             return PASSWORD_UPDATE_SUCCESS;
         }
         catch ( final Exception e ) {
-            return new ResponseEntity( gson.toJson( "Could not update password because of " + e.getMessage() ),
+            return new ResponseEntity( GSON.toJson( "Could not update password because of " + e.getMessage() ),
                     HttpStatus.BAD_REQUEST );
         }
     }
@@ -174,14 +174,14 @@ public class APIPasswordController extends APIController {
         // First, verify the user exists
         final User u = User.getByName( userId );
         if ( u == null ) {
-            return new ResponseEntity( gson.toJson( "User with username " + userId + " was not found" ),
+            return new ResponseEntity( GSON.toJson( "User with username " + userId + " was not found" ),
                     HttpStatus.NOT_FOUND );
         }
         else {
 
             // Verify their account is not disabled
             if ( u.getEnabled() != 1 ) {
-                return new ResponseEntity( gson.toJson( "User " + userId + " 's account is disabled" ),
+                return new ResponseEntity( GSON.toJson( "User " + userId + " 's account is disabled" ),
                         HttpStatus.BAD_REQUEST );
             }
 
@@ -202,7 +202,7 @@ public class APIPasswordController extends APIController {
         // Next, we must ensure that this particular User has an email
         // address on file.
         if ( email == null ) {
-            return new ResponseEntity( gson.toJson( "No email address found for user " + userId ),
+            return new ResponseEntity( GSON.toJson( "No email address found for user " + userId ),
                     HttpStatus.BAD_REQUEST );
         }
 
@@ -235,11 +235,11 @@ public class APIPasswordController extends APIController {
             Transport.send( msg, ITRUST2_EMAIL_ADDRESS, ITRUST2_EMAIL_PASSWORD );
         }
         catch ( final Exception e ) {
-            return new ResponseEntity( gson.toJson( "The request email could not be sent" ),
+            return new ResponseEntity( GSON.toJson( "The request email could not be sent" ),
                     HttpStatus.INTERNAL_SERVER_ERROR );
         }
 
-        return new ResponseEntity( gson.toJson( "Password reset request email sent" ), HttpStatus.OK );
+        return new ResponseEntity( GSON.toJson( "Password reset request email sent" ), HttpStatus.OK );
     }
 
     /**

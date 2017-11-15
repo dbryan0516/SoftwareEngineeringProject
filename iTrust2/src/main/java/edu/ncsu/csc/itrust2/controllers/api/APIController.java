@@ -31,5 +31,5 @@ public abstract class APIController {
     static final protected String BASE_PATH = "/api/v1/";
 
     /** Gson for encoding responses */
-    static final protected Gson gson = new Gson();
+    static final protected Gson GSON = new Gson();
 }
