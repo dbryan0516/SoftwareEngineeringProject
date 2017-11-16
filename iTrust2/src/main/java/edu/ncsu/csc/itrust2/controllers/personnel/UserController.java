@@ -82,6 +82,10 @@ public class UserController {
         }
     }
 
+    /**
+     * Returns the Change Password page.
+     * @return The URL for the Change Password page.
+     */
     @GetMapping ( "/personnel/changePassword" )
     public String changePassword () {
         return "/personnel/changePassword";
