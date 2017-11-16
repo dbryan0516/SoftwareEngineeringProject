@@ -1,19 +1,19 @@
 package edu.ncsu.csc.itrust2.config;
 
-import javax.sql.DataSource;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.DefaultAuthenticationEventPublisher;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.config.annotation.authentication.configurers.provisioning.JdbcUserDetailsManagerConfigurer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+
+import javax.sql.DataSource;
 
 /**
  * Class that manages which users are allowed to access the system and which
@@ -40,16 +40,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
      * @param auth
      *            AuthenticationManagerBuilder to use to configure the
      *            Authentication.
-     * @throws Exception
      */
     @Autowired
-    public void configureGlobal ( final AuthenticationManagerBuilder auth ) throws Exception {
-        final JdbcUserDetailsManagerConfigurer<AuthenticationManagerBuilder> dbManager = auth.jdbcAuthentication();
-        dbManager.dataSource( dataSource ).passwordEncoder( passwordEncoder() )
-                .usersByUsernameQuery( "select username,password,enabled from Users where username=?" )
-                .authoritiesByUsernameQuery( "select username,role from Users where username=?" );
-
+    public void configureGlobal ( final AuthenticationManagerBuilder auth ) {
         auth.authenticationEventPublisher( defaultAuthenticationEventPublisher() );
+        auth.authenticationProvider( authenticationProvider() );
     }
 
     /**
@@ -59,7 +54,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure ( final HttpSecurity http ) throws Exception {
 
-        final String[] patterns = new String[] { "/login*" };
+        // Spring doesn't seem like to trying to only use the /api/v1/password/*
+        // Regex to match all password API endpoints
+        final String[] patterns = new String[] { "/login*", "/forgotPassword*", "/api/v1/password/requestReset/*",
+                "/api/v1/password/{\\w+}" };
 
         http.authorizeRequests().antMatchers( patterns ).anonymous().anyRequest().authenticated().and().formLogin()
                 .loginPage( "/login" ).defaultSuccessUrl( "/" ).and().csrf()
@@ -102,5 +100,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Bean
     public DefaultAuthenticationEventPublisher defaultAuthenticationEventPublisher () {
         return new DefaultAuthenticationEventPublisher();
+    }
+
+    private AuthenticationProvider authenticationProvider() {
+        return new CustomAuthenticationProvider();
     }
 }

@@ -32,7 +32,7 @@ import edu.ncsu.csc.itrust2.utils.LoggerUtil;
 @SuppressWarnings ( { "unchecked", "rawtypes" } )
 public class APIDatabaseController extends APIController {
 
-    private static Gson gson = new Gson();
+    private static final Gson GSON = new Gson();
 
     /**
      * Adds an ICD code to the database
@@ -47,21 +47,21 @@ public class APIDatabaseController extends APIController {
         try {
             final ICD icd = new ICD( icdf );
             if ( null != ICD.getById( icd.getId() ) ) {
-                return new ResponseEntity( gson.toJson( "ICD with the id " + icd.getId() + " already exists" ),
+                return new ResponseEntity( GSON.toJson( "ICD with the id " + icd.getId() + " already exists" ),
                         HttpStatus.CONFLICT );
             }
             if ( null != ICD.getByCode( icd.getCode() ) ) {
-                return new ResponseEntity( gson.toJson( "ICD with the code " + icd.getCode() + " already exists" ),
+                return new ResponseEntity( GSON.toJson( "ICD with the code " + icd.getCode() + " already exists" ),
                         HttpStatus.CONFLICT );
             }
 
             icd.save();
             LoggerUtil.log( TransactionType.ICD_CREATE,
                     SecurityContextHolder.getContext().getAuthentication().getName() );
-            return new ResponseEntity( gson.toJson( icd ), HttpStatus.OK );
+            return new ResponseEntity( GSON.toJson( icd ), HttpStatus.OK );
         }
         catch ( final Exception e ) {
-            return new ResponseEntity( gson.toJson( e.getMessage() ), HttpStatus.BAD_REQUEST );
+            return new ResponseEntity( GSON.toJson( e.getMessage() ), HttpStatus.BAD_REQUEST );
         }
     }
 
@@ -81,28 +81,28 @@ public class APIDatabaseController extends APIController {
             final ICD icd = new ICD( icdf );
 
             if ( null != icd.getId() && !id.equals( icd.getId() ) ) {
-                return new ResponseEntity( gson.toJson( "The ID provided does not match the ID of the NDC provided" ),
+                return new ResponseEntity( GSON.toJson( "The ID provided does not match the ID of the NDC provided" ),
                         HttpStatus.CONFLICT );
             }
             final ICD dbICD = ICD.getById( id );
             if ( null == dbICD ) {
-                return new ResponseEntity( gson.toJson( "No ICD found for id " + id ), HttpStatus.NOT_FOUND );
+                return new ResponseEntity( GSON.toJson( "No ICD found for id " + id ), HttpStatus.NOT_FOUND );
             }
 
             // if the new icd code matches another icd code, don't update
             if ( ICD.getByCode( icd.getCode() ) != null
                     && !ICD.getByCode( icd.getCode() ).getId().equals( icd.getId() ) ) {
-                return new ResponseEntity( gson.toJson( "An ICD with code " + icd.getCode() + " already exists" ),
+                return new ResponseEntity( GSON.toJson( "An ICD with code " + icd.getCode() + " already exists" ),
                         HttpStatus.CONFLICT );
             }
 
             icd.save();
             LoggerUtil.log( TransactionType.ICD_UPDATE,
                     SecurityContextHolder.getContext().getAuthentication().getName() );
-            return new ResponseEntity( gson.toJson( icd ), HttpStatus.OK );
+            return new ResponseEntity( GSON.toJson( icd ), HttpStatus.OK );
         }
         catch ( final Exception e ) {
-            return new ResponseEntity( gson.toJson( e.getMessage() ), HttpStatus.BAD_REQUEST );
+            return new ResponseEntity( GSON.toJson( e.getMessage() ), HttpStatus.BAD_REQUEST );
         }
     }
 
@@ -119,21 +119,21 @@ public class APIDatabaseController extends APIController {
         try {
             final NDC ndc = new NDC( ndcf );
             if ( null != NDC.getById( ndc.getId() ) ) {
-                return new ResponseEntity( gson.toJson( "NDC with the id " + ndc.getId() + " already exists" ),
+                return new ResponseEntity( GSON.toJson( "NDC with the id " + ndc.getId() + " already exists" ),
                         HttpStatus.CONFLICT );
             }
             if ( null != NDC.getByCode( ndc.getCode() ) ) {
-                return new ResponseEntity( gson.toJson( "NDC with the code " + ndc.getCode() + " already exists" ),
+                return new ResponseEntity( GSON.toJson( "NDC with the code " + ndc.getCode() + " already exists" ),
                         HttpStatus.CONFLICT );
             }
 
             ndc.save();
             LoggerUtil.log( TransactionType.NDC_CREATE,
                     SecurityContextHolder.getContext().getAuthentication().getName() );
-            return new ResponseEntity( gson.toJson( ndc ), HttpStatus.OK );
+            return new ResponseEntity( GSON.toJson( ndc ), HttpStatus.OK );
         }
         catch ( final Exception e ) {
-            return new ResponseEntity( gson.toJson( e.getMessage() ), HttpStatus.BAD_REQUEST );
+            return new ResponseEntity( GSON.toJson( e.getMessage() ), HttpStatus.BAD_REQUEST );
         }
     }
 
@@ -153,28 +153,28 @@ public class APIDatabaseController extends APIController {
             final NDC ndc = new NDC( ndcf );
 
             if ( null != ndc.getId() && !id.equals( ndc.getId() ) ) {
-                return new ResponseEntity( gson.toJson( "The ID provided does not match the ID of the NDC provided" ),
+                return new ResponseEntity( GSON.toJson( "The ID provided does not match the ID of the NDC provided" ),
                         HttpStatus.CONFLICT );
             }
             final NDC dbNDC = NDC.getById( id );
             if ( null == dbNDC ) {
-                return new ResponseEntity( gson.toJson( "No NDC found for id " + id ), HttpStatus.NOT_FOUND );
+                return new ResponseEntity( GSON.toJson( "No NDC found for id " + id ), HttpStatus.NOT_FOUND );
             }
 
             // if the new icd code matches another icd code, don't update
             if ( NDC.getByCode( ndc.getCode() ) != null
                     && !NDC.getByCode( ndc.getCode() ).getId().equals( ndc.getId() ) ) {
-                return new ResponseEntity( gson.toJson( "An NDC with code " + ndc.getCode() + " already exists" ),
+                return new ResponseEntity( GSON.toJson( "An NDC with code " + ndc.getCode() + " already exists" ),
                         HttpStatus.CONFLICT );
             }
 
             ndc.save();
             LoggerUtil.log( TransactionType.NDC_UPDATE,
                     SecurityContextHolder.getContext().getAuthentication().getName() );
-            return new ResponseEntity( gson.toJson( ndc ), HttpStatus.OK );
+            return new ResponseEntity( GSON.toJson( ndc ), HttpStatus.OK );
         }
         catch ( final Exception e ) {
-            return new ResponseEntity( gson.toJson( e.getMessage() ), HttpStatus.BAD_REQUEST );
+            return new ResponseEntity( GSON.toJson( e.getMessage() ), HttpStatus.BAD_REQUEST );
         }
     }
 

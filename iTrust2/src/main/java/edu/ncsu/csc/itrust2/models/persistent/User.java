@@ -11,6 +11,8 @@ import javax.persistence.Table;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 
+import edu.ncsu.csc.itrust2.utils.HibernateUtil;
+import org.hibernate.Session;
 import org.hibernate.validator.constraints.Length;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -38,6 +40,11 @@ public class User extends DomainObject<User> implements Serializable {
      * The UID of the user
      */
     private static final long                      serialVersionUID = 1L;
+
+    /**
+     * The maximum number of login attempts for a user
+     */
+    public static final int MAX_LOGIN_ATTEMPTS = 3;
 
     /**
      * The cache representation of the user in the database
@@ -138,6 +145,23 @@ public class User extends DomainObject<User> implements Serializable {
         return getWhere( "role = '" + role.toString() + "'" );
     }
 
+    /**
+     * Saves the DomainObject into the database. If the object instance does not
+     * exist a new record will be created in the database. If the object already
+     * exists in the DB, then the existing record will be updated.
+     */
+    @Override
+    @SuppressWarnings( "unchecked" )
+    public void save() {
+        final Session session = HibernateUtil.getSessionFactory().openSession();
+        session.beginTransaction();
+        session.saveOrUpdate( this );
+        session.getTransaction().commit();
+        session.close();
+
+        getCache( this.getClass() ).put( this.getUsername(), this );
+    }
+
     /** For Hibernate */
     public User () {
     }
@@ -203,6 +227,26 @@ public class User extends DomainObject<User> implements Serializable {
      */
     @Enumerated ( EnumType.STRING )
     private Role    role;
+
+    /**
+     * The stored token for a user to reset their password with
+     */
+    private String resetToken;
+
+    /**
+     * The timeout value for the reset token (ie if currentTimeMillis is greater than this value, token is invalid).
+     */
+    private Long resetTimeout;
+
+    /**
+     * The number failed login attempts for a user
+     */
+    private int numFailAttempts;
+
+    /**
+     * The timeout for account lockout (ie if the currentTimeMillis is greater than this value, account is no longer locked).
+     */
+    private Long lockoutTimeout;
 
     /**
      * Get the username of this user
@@ -278,6 +322,70 @@ public class User extends DomainObject<User> implements Serializable {
      */
     public void setRole ( final Role role ) {
         this.role = role;
+    }
+
+    /**
+     * gets the reset token
+     * @return the token
+     */
+    public String getResetToken() {
+        return resetToken;
+    }
+
+    /**
+     * sets the reset token
+     * @param resetToken the token to set
+     */
+    public void setResetToken(String resetToken) {
+        this.resetToken = resetToken;
+    }
+
+    /**
+     * Gets the time that the user can log in after getting locked out
+     * @return the reset timeout
+     */
+    public Long getResetTimeout() {
+        return resetTimeout;
+    }
+
+    /**
+     * Sets the timeout value
+     * @param resetTimeout the timeout value
+     */
+    public void setResetTimeout(Long resetTimeout) {
+        this.resetTimeout = resetTimeout;
+    }
+
+    /**
+     * Gets the number of failed login attempts for a user
+     * @return the number of failed attempts
+     */
+    public int getNumFailAttempts() {
+        return numFailAttempts;
+    }
+
+    /**
+     * Sets the number of failed attempts for a User
+     * @param numFailAttempts the number of attempts to set
+     */
+    public void setNumFailAttempts(int numFailAttempts) {
+        this.numFailAttempts = numFailAttempts;
+    }
+
+    /**
+     * Gets the lockout timeout value.
+     * @return The lockout timeout.
+     */
+    public Long getLockoutTimeout() {
+        return lockoutTimeout;
+    }
+
+    /**
+     * Sets the lockout timeout value.
+     * @param lockoutTimeout The new lockout timeout.
+     */
+    public void setLockoutTimeout( Long lockoutTimeout ) {
+        this.lockoutTimeout = lockoutTimeout;
     }
 
     /**

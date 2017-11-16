@@ -14,6 +14,10 @@
 					.controller(
 							'viewOfficeVisitCtrl',
 							function($scope, $http) {
+
+								$scope.hasDiagnosis = false;
+								$scope.hasPrescription = false;
+
 								$scope.getTime = function getTime(date) {
 									var hour = date.hourOfDay;
 									var suffix;
@@ -73,6 +77,9 @@
 								$scope.populateVisit = function() {
 									var visitsLength = $scope.visits.length;
 									$scope.noVisitSelected = false;
+									$scope.hasDiagnosis = false;
+									$scope.hasPrescription = false;
+
 									for (var i = 0; i < visitsLength; i++) {
 										if ($scope.visits[i].id == $scope.selectedVisitID) {
 											$http({
@@ -93,10 +100,26 @@
 													.getDate($scope.visits[i].date);
 											$scope.selectedVisit.id = $scope.visits[i].id;
 											$scope.selectedVisit.metrics = $scope.visits[i].basicHealthMetrics;
-											$scope.selectedVisit.currentDiagnosis = $scope.visits[i].icd;
 											console
 													.log($scope.selectedVisit.metrics);
-                                            $scope.selectedVisit.currentPrescription = $scope.visits[i].ndcDescription;
+
+											if ($scope.visits [i].icd != undefined) {
+												$scope.hasDiagnosis = true;
+                                            	$scope.selectedVisit.currentDiagnosis = $scope.visits[i].icd;
+                                            }
+
+                                            /* Grab the prescription (if any) that goes with this office visit */
+                                            $http({
+												method : 'GET',
+												url : '/iTrust2/api/v1/prescriptions/patient/officevisit/' + $scope.selectedVisitID,
+											}).then(function(response) {
+                                            	console.log(response);
+                                            	if (typeof(response.data) === "object") {
+                                            		$scope.hasPrescription = true;
+                                            		$scope.selectedVisit.currentPrescription = response.data;
+                                            	}
+											});
+
 											$scope.three = false;
 											$scope.threeAndUp = false;
 											$scope.twelveAndUp = false;
@@ -258,33 +281,45 @@
 								{{selectedVisit.metrics.patientSmokingStatus}}</td>
 						</tr>
 					</table>
-					<h2>Diagnosis</h2>
-					<table>
-						<tr>
-							<td style="text-align: right; padding: 5px"><b>Description
-									(Code):</b></td>
-							<td ng-show="selectedVisit.currentDiagnosis == null">None</td>
-							<td ng-show="selectedVisit.currentDiagnosis != null">{{selectedVisit.currentDiagnosis.description}}
-								({{selectedVisit.currentDiagnosis.code}})</td>
-						</tr>
-						<tr>
-							<td style="text-align:right;padding:5px"><b>Prescription:</b></td>
-							<td ng-show="selectedVisit.prescription == null">None</td>
-							<td ng-show="selectedVisit.prescription != null">{{selectedVisit.currentPrescription.description}}</td>
-							</td>
-						</tr>
-
-					</table>
+					<div class="diagnosis" ng-show="hasDiagnosis">
+						<h2>Diagnosis</h2>
+						<p style="font-size:14px;">
+							Patient was diagnosed with <strong>{{selectedVisit.currentDiagnosis.description}} ({{selectedVisit.currentDiagnosis.code}})</strong>
+						</p>
+					</div>
+					<br />
+					<div class="prescriptions" ng-show="hasPrescription">
+						<h2>Prescriptions</h2>
+						<table>
+							<tr>
+								<th><strong>Medication prescribed during this office visit</strong></th>
+							</tr>
+							<tr>
+								<td>Medication</td>
+								<td>{{selectedVisit.currentPrescription.ndc.description}} ({{selectedVisit.currentPrescription.ndc.code}})</td>
+							</tr>
+			                <tr>
+			                    <td>Start Date</td>
+			                    <td>{{selectedVisit.currentPrescription.startDate}}</td>
+			                </tr>
+			                <tr>
+			                    <td>End Date</td>
+			                    <td>{{selectedVisit.currentPrescription.endDate}}</td>
+			                </tr>
+			                <tr>
+			                    <td>Dosage (mg)</td>
+			                    <td>{{selectedVisit.currentPrescription.dosage}}</td>
+			                </tr>
+			                <tr>
+			                    <td>Renewals</td>
+			                    <td>{{selectedVisit.currentPrescription.numRenewals}}</td>
+			                </tr>
+						</table>
+					</div>
 				</div>
 			</div>
 			<br />
-
-
 		</div>
-
-
-
-
 	</div>
 </body>
 </html>
