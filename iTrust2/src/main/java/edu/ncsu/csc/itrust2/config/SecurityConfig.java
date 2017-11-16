@@ -54,7 +54,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure ( final HttpSecurity http ) throws Exception {
 
-        final String[] patterns = new String[] { "/login*" };
+        // Spring doesn't seem like to trying to only use the /api/v1/password/*
+        // Regex to match all password API endpoints
+        final String[] patterns = new String[] { "/login*", "/forgotPassword*", "/api/v1/password/requestReset/*",
+                "/api/v1/password/*" };
 
         http.authorizeRequests().antMatchers( patterns ).anonymous().anyRequest().authenticated().and().formLogin()
                 .loginPage( "/login" ).defaultSuccessUrl( "/" ).and().csrf()
