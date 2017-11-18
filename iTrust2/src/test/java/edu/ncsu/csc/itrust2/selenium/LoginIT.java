@@ -15,7 +15,7 @@ public class LoginIT {
 
     private WebDriver           driver;
     private String              baseUrl;
-    private static final String HOME_URL = "https://localhost:8443/iTrust2/ROLE/index";
+    private static final String HOME_URL = "http://localhost:8080/iTrust2/ROLE/index";
 
     /**
      * Sets up the test

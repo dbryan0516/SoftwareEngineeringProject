@@ -22,7 +22,7 @@ import cucumber.api.java.en.When;
 public class AddUserStepDefs {
 
     private final WebDriver driver        = new HtmlUnitDriver( true );
-    private final String    baseUrl       = "https://localhost:8443/iTrust2";
+    private final String    baseUrl       = "http://localhost:8080/iTrust2";
     private final String    jenkins_uname = "jenkins" + ( new Random() ).nextInt();
 
     /**
