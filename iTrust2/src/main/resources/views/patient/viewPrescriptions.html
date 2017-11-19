@@ -15,13 +15,20 @@
                 function (response) {
                     var prescriptions = response.data;
                     prescriptions.forEach(function (p, index) {
-                        if (prescriptions[index].officeVisit != null) prescriptions[index].officeVisit.date = parseDate(p.officeVisit.date);
+                        if (prescriptions[index].visit != null) prescriptions[index].visit.date = makeDate(p.visit.date);
                         prescriptions[index].startDate = parseDate(p.startDate);
                         prescriptions[index].endDate = parseDate(p.endDate);
                     });
                     $scope.prescriptions = response.data;
                 }
             );
+
+            /**
+             * Returns a String representation of an office visit date in the form MM/DD/YYYY.
+             */
+            function makeDate(date) {
+                return "" + (date.month < 10 ? "0": "") + date.month + "/" + (date.dayOfMonth < 10 ? "0": "") + date.dayOfMonth + "/" + date.year;
+            }
 
             /**
              * Parses a JS Date object from the given patient date.
@@ -53,7 +60,7 @@
                 <tbody>
                 <tr ng-repeat="p in prescriptions">
                     <td name="{{ p.ndc.description }}">{{ p.ndc.description }}</td>
-                    <td>{{ p.officeVisit == null ? 'None' : p.officeVisit.date.toLocaleDateString() }}</td>
+                    <td>{{ p.visit == null ? 'None' : p.visit.date }}</td>
                     <td>{{ p.startDate.toLocaleDateString() }}</td>
                     <td>{{ p.endDate.toLocaleDateString() }}</td>
                     <td>{{ p.numRenewals }}</td>
