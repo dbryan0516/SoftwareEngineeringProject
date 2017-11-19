@@ -7,7 +7,7 @@
 
 	<div th:fragment="content">
 
-		<div th:replace="hcp-layout :: menu"></div>
+		<div th:replace="hcp-navbar :: menu"></div>
 
 		<span th:if="${appointments!=null and appointments.size() == 0}">No
 			appointment requests found.</span>

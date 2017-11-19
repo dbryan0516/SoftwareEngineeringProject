@@ -5,6 +5,7 @@
 <body th:include="layout :: body" th:with="content=~{::content}">
 
 	<div th:fragment="content">
+		<div th:replace="patient-navbar :: menu"></div>
 		<h1>Your appointment request was successfully deleted</h1>
 	</div>
 </body>
