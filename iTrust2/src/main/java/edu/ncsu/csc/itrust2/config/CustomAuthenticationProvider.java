@@ -57,7 +57,6 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
         User user;
         try {
             user = User.getWhere( "username='" + username + "'" ).get( 0 );
-            if ( user == null ) throw new IndexOutOfBoundsException();
         } catch (IndexOutOfBoundsException e) {
             throw new UsernameNotFoundException( BAD_CREDENTIALS_TEXT );
         }
