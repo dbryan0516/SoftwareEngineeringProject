@@ -6,6 +6,7 @@
 
 
 	<div th:fragment="content">
+		<div th:replace="patient-navbar :: menu"></div>
 		<h1>Request Medical Appointment</h1>
 		<form action="#" th:action="@{/patient/requestAppointment}"
 			th:object="${AppointmentRequestForm}" method="post">
