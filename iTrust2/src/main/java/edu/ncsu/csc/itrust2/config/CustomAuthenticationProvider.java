@@ -54,8 +54,13 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
         String username = authentication.getName().trim();
         String password = authentication.getCredentials().toString().trim();
 
-        User user = User.getWhere( "username='" + username + "'" ).get( 0 );
-        if ( user == null ) throw new UsernameNotFoundException( BAD_CREDENTIALS_TEXT );
+        User user;
+        try {
+            user = User.getWhere( "username='" + username + "'" ).get( 0 );
+            if ( user == null ) throw new IndexOutOfBoundsException();
+        } catch (IndexOutOfBoundsException e) {
+            throw new UsernameNotFoundException( BAD_CREDENTIALS_TEXT );
+        }
         // user exists in system
         if ( user.getEnabled() == USER_DISABLED ) throw new DisabledException( DISABLED_TEXT );
         // user is enabled
