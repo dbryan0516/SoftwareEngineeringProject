@@ -5,7 +5,6 @@ import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -126,9 +125,9 @@ public class APIPatientController extends APIController {
                 return new ResponseEntity( "No Patient found for id " + id, HttpStatus.NOT_FOUND );
             }
             patient.save();
-            if ( SecurityContextHolder.getContext().getAuthentication() != null ) {
-                LoggerUtil.log( TransactionType.HCP_EDIT_PATIENT_DEMOGRAPHICS,
-                        SecurityContextHolder.getContext().getAuthentication().getName(),
+            final User currentUser = getCurrentUser();
+            if ( currentUser != null ) {
+                LoggerUtil.log( TransactionType.HCP_EDIT_PATIENT_DEMOGRAPHICS, currentUser.getUsername(),
                         patient.getSelf().getUsername() );
             }
             return new ResponseEntity( patient, HttpStatus.OK );
