@@ -12,6 +12,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
@@ -54,6 +55,7 @@ public class APIHospitalTest {
      * @throws Exception
      */
     @Test
+    @WithMockUser ( roles = "HCP" )
     public void testGetNonExistentHospital () throws Exception {
         mvc.perform( get( "/api/v1/hospitals/-1" ) ).andExpect( status().isNotFound() );
     }
@@ -64,6 +66,7 @@ public class APIHospitalTest {
      * @throws Exception
      */
     @Test
+    @WithMockUser ( roles = { "HCP", "ADMIN" } )
     public void testHospitalAPI () throws Exception {
         mvc.perform( delete( "/api/v1/hospitals" ) );
         final Hospital hospital = new Hospital( "iTrust Test Hospital 2", "1 iTrust Test Street", "27607", "NC" );

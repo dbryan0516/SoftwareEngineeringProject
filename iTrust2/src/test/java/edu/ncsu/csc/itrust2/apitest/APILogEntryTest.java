@@ -9,6 +9,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
@@ -50,6 +51,7 @@ public class APILogEntryTest {
      * @throws Exception
      */
     @Test
+    @WithMockUser ( roles = "ADMIN" )
     public void testLogEntryAPI () throws Exception {
         // Ensure there is at least one log entry by viewing users
         mvc.perform( get( "/api/v1/users" ) ).andExpect( status().isOk() )

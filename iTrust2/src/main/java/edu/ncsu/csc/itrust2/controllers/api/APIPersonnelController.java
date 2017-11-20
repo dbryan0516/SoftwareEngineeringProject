@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -31,6 +32,7 @@ public class APIPersonnelController extends APIController {
      * @return list of personnel
      */
     @GetMapping ( BASE_PATH + "/personnel" )
+    @PreAuthorize ( "hasRole('ROLE_ADMIN')" )
     public List<Personnel> getPersonnel () {
         return Personnel.getPersonnel();
     }
@@ -44,6 +46,7 @@ public class APIPersonnelController extends APIController {
      * @return response
      */
     @GetMapping ( BASE_PATH + "/personnel/{id}" )
+    @PreAuthorize ( "hasRole('ROLE_ADMIN')" )
     public ResponseEntity getPersonnel ( @PathVariable ( "id" ) final String id ) {
         final Personnel personnel = Personnel.getByName( id );
         return null == personnel ? new ResponseEntity( "No personnel found for id " + id, HttpStatus.NOT_FOUND )
@@ -58,6 +61,7 @@ public class APIPersonnelController extends APIController {
      * @return response
      */
     @PostMapping ( BASE_PATH + "/personnel" )
+    @PreAuthorize ( "hasRole('ROLE_ADMIN')" )
     public ResponseEntity createPersonnel ( @RequestBody final PersonnelForm personnelF ) {
         final Personnel personnel = new Personnel( personnelF );
         if ( null != Personnel.getByName( personnel.getSelf() ) ) {
@@ -86,6 +90,7 @@ public class APIPersonnelController extends APIController {
      * @return response
      */
     @PutMapping ( BASE_PATH + "/personnel/{id}" )
+    @PreAuthorize ( "hasRole('ROLE_ADMIN')" )
     public ResponseEntity updatePersonnel ( @PathVariable final String id,
             @RequestBody final PersonnelForm personnelF ) {
         final Personnel personnel = new Personnel( personnelF );

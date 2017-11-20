@@ -12,6 +12,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
@@ -64,6 +65,7 @@ public class APIOfficeVisitTest {
      * @throws Exception
      */
     @Test
+    @WithMockUser ( roles = "HCP" )
     public void testGetNonExistentOfficeVisit () throws Exception {
         mvc.perform( get( "/api/v1/officevisits/-1" ) ).andExpect( status().isNotFound() );
     }
@@ -75,6 +77,7 @@ public class APIOfficeVisitTest {
      * @throws Exception
      */
     @Test
+    @WithMockUser ( roles = "HCP" )
     public void testDeleteNonExistentOfficeVisit () throws Exception {
         mvc.perform( delete( "/api/v1/officevisits/-1" ) ).andExpect( status().isNotFound() );
     }
@@ -86,6 +89,7 @@ public class APIOfficeVisitTest {
      * @throws Exception
      */
     @Test
+    @WithMockUser ( roles = { "HCP", "ADMIN" } )
     public void testPreScheduledOfficeVisit () throws Exception {
         final UserForm hcp = new UserForm( "hcp", "123456", Role.ROLE_HCP, 1 );
         mvc.perform( post( "/api/v1/users" ).contentType( MediaType.APPLICATION_JSON )
@@ -140,6 +144,7 @@ public class APIOfficeVisitTest {
      * @throws Exception
      */
     @Test
+    @WithMockUser ( roles = { "HCP", "ADMIN" } )
     public void testOfficeVisitAPI () throws Exception {
 
         /*

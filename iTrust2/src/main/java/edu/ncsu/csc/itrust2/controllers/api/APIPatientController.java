@@ -36,6 +36,7 @@ public class APIPatientController extends APIController {
      * @return list of patients
      */
     @GetMapping ( BASE_PATH + "/patients" )
+    @PreAuthorize ( "hasRole('ROLE_HCP')" )
     public List<Patient> getPatients () {
         return Patient.getPatients();
     }
@@ -67,6 +68,7 @@ public class APIPatientController extends APIController {
      * @return response
      */
     @GetMapping ( BASE_PATH + "/patients/{username}" )
+    @PreAuthorize ( "hasRole('ROLE_HCP')" )
     public ResponseEntity getPatient ( @PathVariable ( "username" ) final String username ) {
         final Patient patient = Patient.getPatient( username );
         return null == patient ? new ResponseEntity( "No Patient found for username " + username, HttpStatus.NOT_FOUND )
@@ -81,6 +83,7 @@ public class APIPatientController extends APIController {
      * @return response
      */
     @PostMapping ( BASE_PATH + "/patients" )
+    @PreAuthorize ( "hasRole('ROLE_HCP')" )
     public ResponseEntity createPatient ( @RequestBody final PatientForm patientF ) {
         try {
             final Patient patient = new Patient( patientF );
@@ -110,6 +113,7 @@ public class APIPatientController extends APIController {
      * @return response
      */
     @PutMapping ( BASE_PATH + "/patients/{id}" )
+    @PreAuthorize ( "hasRole('ROLE_HCP')" )
     public ResponseEntity updatePatient ( @PathVariable final String id, @RequestBody final PatientForm patientF ) {
         try {
             final Patient patient = new Patient( patientF );
