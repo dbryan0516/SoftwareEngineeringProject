@@ -245,12 +245,12 @@ public class APIOfficeVisitController extends APIController {
     public ResponseEntity viewOfficeVisitPatient ( @PathVariable final Long id,
             @RequestBody final OfficeVisitForm form ) {
 
-        // Determine if this "view" request comes from a logged-in user;
-        // otherwise doesn't log
-        // to prevent data integrity issues
+        // Ensure that the "view" of the OfficeVisit is from the Patient that
+        // goes with the Office Visit; prevents
+        // Bob from claiming to have viewed Alice's visit when he didn't
         final User self = getCurrentUser();
         final List<OfficeVisit> dbVisit = OfficeVisit
-                .getWhere( " id = " + id + " and patient_id = " + self.getUsername() );
+                .getWhere( " id = " + id + " AND patient_id = '" + self.getUsername() + "'" );
         if ( dbVisit.size() == 0 ) {
             return new ResponseEntity( "No visit found for name " + id, HttpStatus.NOT_FOUND );
         }
