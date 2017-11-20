@@ -244,8 +244,14 @@ public class APIOfficeVisitController extends APIController {
     @PreAuthorize ( "hasRole('ROLE_PATIENT')" )
     public ResponseEntity viewOfficeVisitPatient ( @PathVariable final Long id,
             @RequestBody final OfficeVisitForm form ) {
-        final OfficeVisit dbVisit = OfficeVisit.getById( id );
-        if ( null == dbVisit ) {
+
+        // Determine if this "view" request comes from a logged-in user;
+        // otherwise doesn't log
+        // to prevent data integrity issues
+        final User self = getCurrentUser();
+        final List<OfficeVisit> dbVisit = OfficeVisit
+                .getWhere( " id = " + id + " and patient_id = " + self.getUsername() );
+        if ( dbVisit.size() == 0 ) {
             return new ResponseEntity( "No visit found for name " + id, HttpStatus.NOT_FOUND );
         }
         LoggerUtil.log( TransactionType.OFFICE_VISIT_PATIENT_VIEW, form.getHcp(), form.getPatient(),
