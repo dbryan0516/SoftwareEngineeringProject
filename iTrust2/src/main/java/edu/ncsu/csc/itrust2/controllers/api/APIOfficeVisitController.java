@@ -5,7 +5,6 @@ import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -43,6 +42,7 @@ public class APIOfficeVisitController extends APIController {
      */
     @Deprecated
     @GetMapping ( BASE_PATH + "/officevisits" )
+    @PreAuthorize ( "hasRole('ROLE_HCP')" )
     public List<OfficeVisit> getOfficeVisits () {
         return OfficeVisit.getOfficeVisits();
     }
@@ -55,7 +55,7 @@ public class APIOfficeVisitController extends APIController {
     @GetMapping ( BASE_PATH + "/officevisits/myofficevisits" )
     @PreAuthorize ( "hasRole('ROLE_PATIENT')" )
     public List<OfficeVisit> getMyOfficeVisits () {
-        final User self = User.getByName( SecurityContextHolder.getContext().getAuthentication().getName() );
+        final User self = getCurrentUser();
         return OfficeVisit.getForPatient( self.getId() );
     }
 
@@ -67,6 +67,7 @@ public class APIOfficeVisitController extends APIController {
      * @return response
      */
     @GetMapping ( BASE_PATH + "/officevisits/{id}" )
+    @PreAuthorize ( "hasRole('ROLE_HCP')" )
     public ResponseEntity getOfficeVisit ( @PathVariable ( "id" ) final Long id ) {
         final OfficeVisit visit = OfficeVisit.getById( id );
         return null == visit ? new ResponseEntity( "No office visit found for id " + id, HttpStatus.NOT_FOUND )
@@ -78,6 +79,7 @@ public class APIOfficeVisitController extends APIController {
      * caution before calling it
      */
     @DeleteMapping ( BASE_PATH + "/officevisits" )
+    @PreAuthorize ( "hasRole('ROLE_HCP')" )
     public void deleteOfficeVisits () {
         OfficeVisit.deleteAll( OfficeVisit.class );
     }
@@ -90,6 +92,7 @@ public class APIOfficeVisitController extends APIController {
      * @return response
      */
     @PostMapping ( BASE_PATH + "/officevisits" )
+    @PreAuthorize ( "hasRole('ROLE_HCP')" )
     public ResponseEntity createOfficeVisit ( @RequestBody final OfficeVisitForm visitF ) {
         // keep track of the status of office visit just in case prescription
         // doesn't save correctly
@@ -140,6 +143,7 @@ public class APIOfficeVisitController extends APIController {
      * @return response
      */
     @DeleteMapping ( BASE_PATH + "/officevisits/{id}" )
+    @PreAuthorize ( "hasRole('ROLE_HCP')" )
     public ResponseEntity deleteOfficeVisit ( @PathVariable final Long id ) {
         final OfficeVisit visit = OfficeVisit.getById( id );
         if ( null == visit ) {
@@ -176,6 +180,7 @@ public class APIOfficeVisitController extends APIController {
      * @return response
      */
     @PutMapping ( BASE_PATH + "/officevisits/{id}" )
+    @PreAuthorize ( "hasRole('ROLE_HCP')" )
     public ResponseEntity updateOfficeVisit ( @PathVariable final Long id, @RequestBody final OfficeVisitForm form ) {
         try {
             final OfficeVisit visit = new OfficeVisit( form );
@@ -239,8 +244,14 @@ public class APIOfficeVisitController extends APIController {
     @PreAuthorize ( "hasRole('ROLE_PATIENT')" )
     public ResponseEntity viewOfficeVisitPatient ( @PathVariable final Long id,
             @RequestBody final OfficeVisitForm form ) {
-        final OfficeVisit dbVisit = OfficeVisit.getById( id );
-        if ( null == dbVisit ) {
+
+        // Ensure that the "view" of the OfficeVisit is from the Patient that
+        // goes with the Office Visit; prevents
+        // Bob from claiming to have viewed Alice's visit when he didn't
+        final User self = getCurrentUser();
+        final List<OfficeVisit> dbVisit = OfficeVisit
+                .getWhere( " id = " + id + " AND patient_id = '" + self.getUsername() + "'" );
+        if ( dbVisit.size() == 0 ) {
             return new ResponseEntity( "No visit found for name " + id, HttpStatus.NOT_FOUND );
         }
         LoggerUtil.log( TransactionType.OFFICE_VISIT_PATIENT_VIEW, form.getHcp(), form.getPatient(),

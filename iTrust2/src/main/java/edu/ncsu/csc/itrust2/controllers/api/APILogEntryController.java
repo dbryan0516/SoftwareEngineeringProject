@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
@@ -29,6 +30,7 @@ public class APILogEntryController extends APIController {
      * @return list of log entries
      */
     @GetMapping ( BASE_PATH + "/logentries" )
+    @PreAuthorize ( "hasRole('ROLE_ADMIN')" )
     public List<LogEntry> getLogEntries () {
         return LogEntry.getLogEntries();
     }
@@ -42,6 +44,7 @@ public class APILogEntryController extends APIController {
      * @return response
      */
     @GetMapping ( BASE_PATH + "/logentries/{id}" )
+    @PreAuthorize ( "hasRole('ROLE_ADMIN')" )
     public ResponseEntity getEntry ( @PathVariable ( "id" ) final Long id ) {
         final LogEntry entry = LogEntry.getById( id );
         return null == entry ? new ResponseEntity( "No log entry found for id " + id, HttpStatus.NOT_FOUND )

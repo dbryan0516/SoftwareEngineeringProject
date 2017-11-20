@@ -7,12 +7,12 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import edu.ncsu.csc.itrust2.utils.HibernateDataGenerator;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
@@ -30,6 +30,7 @@ import edu.ncsu.csc.itrust2.models.enums.Role;
 import edu.ncsu.csc.itrust2.models.enums.State;
 import edu.ncsu.csc.itrust2.models.persistent.Patient;
 import edu.ncsu.csc.itrust2.mvc.config.WebMvcConfiguration;
+import edu.ncsu.csc.itrust2.utils.HibernateDataGenerator;
 
 /**
  * Test for API functionality for interacting with Patients
@@ -63,6 +64,7 @@ public class APIPatientTest {
      * @throws Exception
      */
     @Test
+    @WithMockUser ( roles = "HCP" )
     public void testGetNonExistentPatient () throws Exception {
         mvc.perform( get( "/api/v1/patients/-1" ) ).andExpect( status().isNotFound() );
     }
@@ -73,6 +75,7 @@ public class APIPatientTest {
      * @throws Exception
      */
     @Test
+    @WithMockUser ( roles = { "HCP", "ADMIN" } )
     public void testPatientAPI () throws Exception {
         // Clear out all patients before running these tests.
         Patient.deleteAll( Patient.class );

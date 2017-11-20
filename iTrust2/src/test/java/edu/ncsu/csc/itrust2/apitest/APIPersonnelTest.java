@@ -12,6 +12,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
@@ -57,6 +58,7 @@ public class APIPersonnelTest {
      * @throws Exception
      */
     @Test
+    @WithMockUser ( roles = "ADMIN" )
     public void testGetNonExistentPersonnel () throws Exception {
         mvc.perform( get( "/api/v1/personnel/-1" ) ).andExpect( status().isNotFound() );
     }
@@ -67,6 +69,7 @@ public class APIPersonnelTest {
      * @throws Exception
      */
     @Test
+    @WithMockUser ( roles = "ADMIN" )
     public void testPersonnelAPI () throws Exception {
         mvc.perform( delete( "/api/v1/personnel" ) );
 

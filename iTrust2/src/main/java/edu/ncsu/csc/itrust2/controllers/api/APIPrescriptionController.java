@@ -172,7 +172,7 @@ public class APIPrescriptionController extends APIController {
     @GetMapping ( BASE_PATH + "/prescriptions/patient/myprescriptions" )
     @PreAuthorize ( "hasRole('ROLE_PATIENT')" )
     public List<Prescription> getMyPrescriptions () {
-        final User self = User.getByName( SecurityContextHolder.getContext().getAuthentication().getName() );
+        final User self = getCurrentUser();
         return Prescription.getForPatient( self.getId() );
     }
 
@@ -187,7 +187,7 @@ public class APIPrescriptionController extends APIController {
     @GetMapping ( BASE_PATH + "/prescriptions/patient/officevisit/{id}" )
     @PreAuthorize ( "hasRole('ROLE_PATIENT')" )
     public Prescription getPrescriptionForOfficeVisitByPatient ( @PathVariable ( "id" ) final String id ) {
-        final User self = User.getByName( SecurityContextHolder.getContext().getAuthentication().getName() );
+        final User self = getCurrentUser();
 
         // Use both patient id and office visit id as criteria to ensure no
         // patient can view the prescriptions of another
@@ -198,47 +198,4 @@ public class APIPrescriptionController extends APIController {
         }
         return null;
     }
-
-    // // delete method just in case
-    // /**
-    // * Deletes the Prescription with the id provided. This will remove all
-    // * traces from the system and cannot be reversed.
-    // *
-    // * @param id
-    // * The id of the Prescription to delete
-    // * @return response
-    // */
-    // @DeleteMapping ( BASE_PATH + "/prescriptions/{id}" )
-    // public ResponseEntity deleteOfficeVisitByID ( @PathVariable final Long id
-    // ) {
-    // final Prescription prescription = Prescription.getById( id );
-    // if ( null == prescription ) {
-    // return new ResponseEntity( "No prescription found for " + id,
-    // HttpStatus.NOT_FOUND );
-    // }
-    // try {
-    // prescription.delete();
-    // return new ResponseEntity( id, HttpStatus.OK );
-    // }
-    // catch ( final Exception e ) {
-    // return new ResponseEntity( "Could not delete " + id + " because of " +
-    // e.getMessage(),
-    // HttpStatus.BAD_REQUEST );
-    // }
-    //
-    // }
-    //
-    // /**
-    // * Deletes all the Prescriptions from the db. This will remove all traces
-    // * from the system and cannot be reversed.
-    // *
-    // * @param id
-    // * The id of the Prescription to delete
-    // * @return response
-    // */
-    // @DeleteMapping ( BASE_PATH + "/prescriptions" )
-    // public void deleteAllOfficeVisits () {
-    // Prescription.deleteAll( Prescription.class );
-    // }
-
 }

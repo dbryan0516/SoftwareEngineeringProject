@@ -12,6 +12,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
@@ -59,6 +60,7 @@ public class APIAppointmentRequestTest {
      * @throws Exception
      */
     @Test
+    @WithMockUser ( roles = "HCP" )
     public void testGetNonExistentAppointment () throws Exception {
         mvc.perform( get( "/api/v1/appointmentrequests/-1" ) ).andExpect( status().isNotFound() );
     }
@@ -68,6 +70,7 @@ public class APIAppointmentRequestTest {
      * status.
      */
     @Test
+    @WithMockUser ( roles = "HCP" )
     public void testDeleteNonExistentAppointment () throws Exception {
         mvc.perform( delete( "/api/v1/appointmentrequests/-1" ) ).andExpect( status().isNotFound() );
     }
@@ -79,6 +82,7 @@ public class APIAppointmentRequestTest {
      * @throws Exception
      */
     @Test
+    @WithMockUser ( roles = { "HCP", "ADMIN" } )
     public void testCreateBadAppointmentRequest () throws Exception {
         /*
          * Create a HCP and a Patient to use. If they already exist, this will
@@ -114,6 +118,7 @@ public class APIAppointmentRequestTest {
      * @throws Exception
      */
     @Test
+    @WithMockUser ( roles = { "HCP", "ADMIN" } )
     public void testAppointmentRequestAPI () throws Exception {
 
         /*

@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -34,6 +35,7 @@ public class APIHospitalController extends APIController {
      * @return list of hospitals
      */
     @GetMapping ( BASE_PATH + "/hospitals" )
+    @PreAuthorize ( "hasRole('ROLE_HCP') || hasRole('ROLE_ADMIN')" )
     public List<Hospital> getHospitals () {
         return Hospital.getHospitals();
     }
@@ -46,6 +48,7 @@ public class APIHospitalController extends APIController {
      * @return response
      */
     @GetMapping ( BASE_PATH + "/hospitals/{id}" )
+    @PreAuthorize ( "hasRole('ROLE_HCP')" )
     public ResponseEntity getHospital ( @PathVariable ( "id" ) final String id ) {
         final Hospital hospital = Hospital.getByName( id );
         if ( null != hospital ) {
@@ -63,6 +66,7 @@ public class APIHospitalController extends APIController {
      * @return response
      */
     @PostMapping ( BASE_PATH + "/hospitals" )
+    @PreAuthorize ( "hasRole('ROLE_ADMIN')" )
     public ResponseEntity createHospital ( @RequestBody final HospitalForm hospitalF ) {
         final Hospital hospital = new Hospital( hospitalF );
         if ( null != Hospital.getByName( hospital.getName() ) ) {
@@ -93,6 +97,7 @@ public class APIHospitalController extends APIController {
      * @return response
      */
     @PutMapping ( BASE_PATH + "/hospitals/{id}" )
+    @PreAuthorize ( "hasRole('ROLE_ADMIN')" )
     public ResponseEntity updateHospital ( @PathVariable final String id, @RequestBody final HospitalForm hospitalF ) {
         final Hospital hospital = new Hospital( hospitalF );
         final Hospital dbHospital = Hospital.getByName( id );
