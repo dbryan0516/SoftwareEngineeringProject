@@ -68,7 +68,7 @@ public class APIDatabaseTest {
      * @throws Exception
      *             failed test
      */
-    @WithMockUser(roles="ADMIN")
+    @WithMockUser ( roles = "ADMIN" )
     @Test
     public void testUpdateNonExistentICD () throws Exception {
         final ICDForm icdf = new ICDForm();
@@ -84,7 +84,7 @@ public class APIDatabaseTest {
      * @throws Exception
      *             failed test
      */
-    @WithMockUser(roles="ADMIN")
+    @WithMockUser ( roles = "ADMIN" )
     @Test
     public void testUpdateNonExistentNDC () throws Exception {
         final NDCForm ndcf = new NDCForm();
@@ -100,7 +100,7 @@ public class APIDatabaseTest {
      * @throws Exception
      *             failed test
      */
-    @WithMockUser(roles="ADMIN")
+    @WithMockUser ( roles = "ADMIN" )
     @Test
     public void testICD () throws Exception {
 
@@ -171,7 +171,7 @@ public class APIDatabaseTest {
      * @throws Exception
      *             failed test
      */
-    @WithMockUser(roles="ADMIN")
+    @WithMockUser ( roles = "ADMIN" )
     @Test
     public void testNDC () throws Exception {
 

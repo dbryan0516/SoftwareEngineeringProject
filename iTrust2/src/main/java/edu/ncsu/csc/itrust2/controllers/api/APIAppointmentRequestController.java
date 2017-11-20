@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,7 +21,9 @@ import edu.ncsu.csc.itrust2.utils.LoggerUtil;
 /**
  * Class that provides REST API endpoints for the AppointmentRequest model. In
  * all requests made to this controller, the {id} provided is a numeric ID that
- * is the primary key of the appointment request in question
+ * is the primary key of the appointment request in question.
+ *
+ * For HCP use only.
  *
  * @author Kai Presler-Marshall
  *
@@ -35,6 +38,7 @@ public class APIAppointmentRequestController extends APIController {
      * @return list of appointment requests
      */
     @GetMapping ( BASE_PATH + "/appointmentrequests" )
+    @PreAuthorize ( "hasRole('ROLE_HCP')" )
     public List<AppointmentRequest> getAppointmentRequests () {
         return AppointmentRequest.getAppointmentRequests();
     }
@@ -48,6 +52,7 @@ public class APIAppointmentRequestController extends APIController {
      *         HttpStatus.NOT_FOUND if no such AppointmentRequest could be found
      */
     @GetMapping ( BASE_PATH + "/appointmentrequests/{id}" )
+    @PreAuthorize ( "hasRole('ROLE_HCP')" )
     public ResponseEntity getAppointmentRequest ( @PathVariable ( "id" ) final Long id ) {
         final AppointmentRequest request = AppointmentRequest.getById( id );
         if ( null != request ) {
@@ -71,6 +76,7 @@ public class APIAppointmentRequestController extends APIController {
      *         provided
      */
     @PostMapping ( BASE_PATH + "/appointmentrequests" )
+    @PreAuthorize ( "hasRole('ROLE_HCP')" )
     public ResponseEntity createAppointmentRequest ( @RequestBody final AppointmentRequestForm requestF ) {
         try {
             final AppointmentRequest request = new AppointmentRequest( requestF );
@@ -100,6 +106,7 @@ public class APIAppointmentRequestController extends APIController {
      * @return response
      */
     @DeleteMapping ( BASE_PATH + "/appointmentrequests/{id}" )
+    @PreAuthorize ( "hasRole('ROLE_HCP')" )
     public ResponseEntity deleteAppointmentRequest ( @PathVariable final Long id ) {
         final AppointmentRequest request = AppointmentRequest.getById( id );
         if ( null == request ) {
@@ -132,6 +139,7 @@ public class APIAppointmentRequestController extends APIController {
      *         provided
      */
     @PutMapping ( BASE_PATH + "/appointmentrequests/{id}" )
+    @PreAuthorize ( "hasRole('ROLE_HCP')" )
     public ResponseEntity updateAppointmentRequest ( @PathVariable final Long id,
             @RequestBody final AppointmentRequestForm requestF ) {
 
@@ -165,6 +173,7 @@ public class APIAppointmentRequestController extends APIController {
      * @return reponse
      */
     @DeleteMapping ( BASE_PATH + "/appointmentrequests" )
+    @PreAuthorize ( "hasRole('ROLE_HCP')" )
     public ResponseEntity deleteAppointmentRequests () {
         try {
             AppointmentRequest.deleteAll( AppointmentRequest.class );

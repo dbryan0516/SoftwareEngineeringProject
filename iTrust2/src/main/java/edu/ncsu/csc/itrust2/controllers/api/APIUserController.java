@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -35,6 +36,7 @@ public class APIUserController extends APIController {
      * @return list of users
      */
     @GetMapping ( BASE_PATH + "/users" )
+    @PreAuthorize ( "hasRole('ROLE_ADMIN')" )
     public List<User> getUsers () {
         LoggerUtil.log( TransactionType.VIEW_USERS, "" );
         return User.getUsers();
@@ -48,6 +50,7 @@ public class APIUserController extends APIController {
      * @return reponse
      */
     @GetMapping ( BASE_PATH + "/users/{id}" )
+    @PreAuthorize ( "hasRole('ROLE_ADMIN')" )
     public ResponseEntity getUser ( @PathVariable ( "id" ) final String id ) {
         final User user = User.getByName( id );
         LoggerUtil.log( TransactionType.VIEW_USER, id );
@@ -64,6 +67,7 @@ public class APIUserController extends APIController {
      * @return response
      */
     @PostMapping ( BASE_PATH + "/users" )
+    @PreAuthorize ( "hasRole('ROLE_ADMIN')" )
     public ResponseEntity createUser ( @RequestBody final UserForm userF ) {
         final User user = new User( userF );
         if ( null != User.getByName( user.getUsername() ) ) {
@@ -94,6 +98,7 @@ public class APIUserController extends APIController {
      * @return response
      */
     @PutMapping ( BASE_PATH + "/users/{id}" )
+    @PreAuthorize ( "hasRole('ROLE_ADMIN')" )
     public ResponseEntity updateUser ( @PathVariable final String id, @RequestBody final UserForm userF ) {
         final User user = new User( userF );
         if ( null != user.getId() && !id.equals( user.getId() ) ) {

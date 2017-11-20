@@ -42,6 +42,7 @@ public class APIOfficeVisitController extends APIController {
      */
     @Deprecated
     @GetMapping ( BASE_PATH + "/officevisits" )
+    @PreAuthorize ( "hasRole('ROLE_HCP')" )
     public List<OfficeVisit> getOfficeVisits () {
         return OfficeVisit.getOfficeVisits();
     }
@@ -66,6 +67,7 @@ public class APIOfficeVisitController extends APIController {
      * @return response
      */
     @GetMapping ( BASE_PATH + "/officevisits/{id}" )
+    @PreAuthorize ( "hasRole('ROLE_HCP')" )
     public ResponseEntity getOfficeVisit ( @PathVariable ( "id" ) final Long id ) {
         final OfficeVisit visit = OfficeVisit.getById( id );
         return null == visit ? new ResponseEntity( "No office visit found for id " + id, HttpStatus.NOT_FOUND )
@@ -77,6 +79,7 @@ public class APIOfficeVisitController extends APIController {
      * caution before calling it
      */
     @DeleteMapping ( BASE_PATH + "/officevisits" )
+    @PreAuthorize ( "hasRole('ROLE_HCP')" )
     public void deleteOfficeVisits () {
         OfficeVisit.deleteAll( OfficeVisit.class );
     }
@@ -89,6 +92,7 @@ public class APIOfficeVisitController extends APIController {
      * @return response
      */
     @PostMapping ( BASE_PATH + "/officevisits" )
+    @PreAuthorize ( "hasRole('ROLE_HCP')" )
     public ResponseEntity createOfficeVisit ( @RequestBody final OfficeVisitForm visitF ) {
         // keep track of the status of office visit just in case prescription
         // doesn't save correctly
@@ -139,6 +143,7 @@ public class APIOfficeVisitController extends APIController {
      * @return response
      */
     @DeleteMapping ( BASE_PATH + "/officevisits/{id}" )
+    @PreAuthorize ( "hasRole('ROLE_HCP')" )
     public ResponseEntity deleteOfficeVisit ( @PathVariable final Long id ) {
         final OfficeVisit visit = OfficeVisit.getById( id );
         if ( null == visit ) {
@@ -175,6 +180,7 @@ public class APIOfficeVisitController extends APIController {
      * @return response
      */
     @PutMapping ( BASE_PATH + "/officevisits/{id}" )
+    @PreAuthorize ( "hasRole('ROLE_HCP')" )
     public ResponseEntity updateOfficeVisit ( @PathVariable final Long id, @RequestBody final OfficeVisitForm form ) {
         try {
             final OfficeVisit visit = new OfficeVisit( form );

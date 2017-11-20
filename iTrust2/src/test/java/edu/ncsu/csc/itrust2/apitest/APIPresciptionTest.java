@@ -74,7 +74,7 @@ public class APIPresciptionTest {
      * @throws Exception
      */
     @Test
-    @WithMockUser ( username = "hcp", roles = { "USER", "HCP" } )
+    @WithMockUser ( username = "hcp", roles = { "USER", "HCP", "ADMIN" } )
     public void testPrescriptionAPI () throws Exception {
         // create users
         final UserForm hcp = new UserForm( "hcp", "123456", Role.ROLE_HCP, 1 );
@@ -263,7 +263,7 @@ public class APIPresciptionTest {
      * @throws Exception
      */
     @Test
-    @WithMockUser ( username = "patient", roles = { "USER", "PATIENT" } )
+    @WithMockUser ( username = "patient", roles = { "USER", "PATIENT", "HCP" } )
     public void testPrescriptionWithOfficeVisitByPatient () throws Exception {
 
         /* Create an Office Visit for Patient "patient" with a Prescription */
