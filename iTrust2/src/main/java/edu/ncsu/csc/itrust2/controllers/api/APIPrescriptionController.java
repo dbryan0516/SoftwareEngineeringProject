@@ -172,7 +172,7 @@ public class APIPrescriptionController extends APIController {
     @GetMapping ( BASE_PATH + "/prescriptions/patient/myprescriptions" )
     @PreAuthorize ( "hasRole('ROLE_PATIENT')" )
     public List<Prescription> getMyPrescriptions () {
-        final User self = User.getByName( SecurityContextHolder.getContext().getAuthentication().getName() );
+        final User self = getCurrentUser();
         return Prescription.getForPatient( self.getId() );
     }
 
@@ -187,7 +187,7 @@ public class APIPrescriptionController extends APIController {
     @GetMapping ( BASE_PATH + "/prescriptions/patient/officevisit/{id}" )
     @PreAuthorize ( "hasRole('ROLE_PATIENT')" )
     public Prescription getPrescriptionForOfficeVisitByPatient ( @PathVariable ( "id" ) final String id ) {
-        final User self = User.getByName( SecurityContextHolder.getContext().getAuthentication().getName() );
+        final User self = getCurrentUser();
 
         // Use both patient id and office visit id as criteria to ensure no
         // patient can view the prescriptions of another

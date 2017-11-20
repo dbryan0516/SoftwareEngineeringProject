@@ -11,7 +11,6 @@ import javax.mail.internet.MimeMessage;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -95,7 +94,7 @@ public class APIPasswordController extends APIController {
     @PutMapping ( BASE_PATH + "/password" )
     public ResponseEntity changePassword ( @RequestBody final PasswordChangeForm pForm ) {
         // get the currently logged in User
-        final User user = User.getByName( SecurityContextHolder.getContext().getAuthentication().getName() );
+        final User user = getCurrentUser();
         if ( user == null ) {
             return INCORRECT_USERNAME;
         }

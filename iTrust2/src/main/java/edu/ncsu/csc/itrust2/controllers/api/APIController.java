@@ -1,6 +1,10 @@
 package edu.ncsu.csc.itrust2.controllers.api;
 
+import org.springframework.security.core.context.SecurityContextHolder;
+
 import com.google.gson.Gson;
+
+import edu.ncsu.csc.itrust2.models.persistent.User;
 
 /**
  * Base class for all of the API controllers for manipulating DomainObjects. Add
@@ -31,5 +35,14 @@ public abstract class APIController {
     static final protected String BASE_PATH = "/api/v1/";
 
     /** Gson for encoding responses */
-    static final protected Gson GSON = new Gson();
+    static final protected Gson   GSON      = new Gson();
+
+    /**
+     * Returns the currently logged in User.
+     * 
+     * @return The User of the currently ogged in user
+     */
+    public static User getCurrentUser () {
+        return User.getByName( SecurityContextHolder.getContext().getAuthentication().getName() );
+    }
 }
