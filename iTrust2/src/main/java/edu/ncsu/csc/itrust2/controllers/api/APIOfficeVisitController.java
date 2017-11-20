@@ -5,7 +5,6 @@ import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -55,7 +54,7 @@ public class APIOfficeVisitController extends APIController {
     @GetMapping ( BASE_PATH + "/officevisits/myofficevisits" )
     @PreAuthorize ( "hasRole('ROLE_PATIENT')" )
     public List<OfficeVisit> getMyOfficeVisits () {
-        final User self = User.getByName( SecurityContextHolder.getContext().getAuthentication().getName() );
+        final User self = getCurrentUser();
         return OfficeVisit.getForPatient( self.getId() );
     }
 

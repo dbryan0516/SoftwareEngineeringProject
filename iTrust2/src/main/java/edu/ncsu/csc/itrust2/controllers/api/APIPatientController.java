@@ -2,8 +2,6 @@ package edu.ncsu.csc.itrust2.controllers.api;
 
 import java.util.List;
 
-import edu.ncsu.csc.itrust2.models.enums.TransactionType;
-import edu.ncsu.csc.itrust2.utils.LoggerUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -16,8 +14,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import edu.ncsu.csc.itrust2.forms.hcp_patient.PatientForm;
+import edu.ncsu.csc.itrust2.models.enums.TransactionType;
 import edu.ncsu.csc.itrust2.models.persistent.Patient;
 import edu.ncsu.csc.itrust2.models.persistent.User;
+import edu.ncsu.csc.itrust2.utils.LoggerUtil;
 
 /**
  * Controller responsible for providing various REST API endpoints for the
@@ -50,7 +50,7 @@ public class APIPatientController extends APIController {
     @GetMapping ( BASE_PATH + "/patient" )
     @PreAuthorize ( "hasRole('ROLE_PATIENT')" )
     public ResponseEntity getPatient () {
-        final User self = User.getByName( SecurityContextHolder.getContext().getAuthentication().getName() );
+        final User self = getCurrentUser();
         final Patient patient = Patient.getPatient( self );
         return null == patient
                 ? new ResponseEntity( "Could not find a patient entry for you, " + self.getUsername(),
@@ -123,8 +123,9 @@ public class APIPatientController extends APIController {
             }
             patient.save();
             if ( SecurityContextHolder.getContext().getAuthentication() != null ) {
-                LoggerUtil.log(TransactionType.HCP_EDIT_PATIENT_DEMOGRAPHICS,
-                        SecurityContextHolder.getContext().getAuthentication().getName(), patient.getSelf().getUsername());
+                LoggerUtil.log( TransactionType.HCP_EDIT_PATIENT_DEMOGRAPHICS,
+                        SecurityContextHolder.getContext().getAuthentication().getName(),
+                        patient.getSelf().getUsername() );
             }
             return new ResponseEntity( patient, HttpStatus.OK );
         }
