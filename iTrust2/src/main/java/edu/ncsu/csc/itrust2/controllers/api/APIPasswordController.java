@@ -20,9 +20,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import edu.ncsu.csc.itrust2.forms.user.PasswordChangeForm;
+import edu.ncsu.csc.itrust2.models.enums.TransactionType;
 import edu.ncsu.csc.itrust2.models.persistent.Patient;
 import edu.ncsu.csc.itrust2.models.persistent.Personnel;
 import edu.ncsu.csc.itrust2.models.persistent.User;
+import edu.ncsu.csc.itrust2.utils.LoggerUtil;
 
 /**
  * API controller for changing or resetting a User's password.
@@ -148,6 +150,7 @@ public class APIPasswordController extends APIController {
         user.setResetTimeout( null );
         try {
             user.save();
+            LoggerUtil.log( TransactionType.CHANGE_PASSWORD, id );
             return PASSWORD_UPDATE_SUCCESS;
         }
         catch ( final Exception e ) {
@@ -232,6 +235,7 @@ public class APIPasswordController extends APIController {
             msg.setSentDate( new Date() );
             msg.setText( "Username: " + userId + "\n" + "Password Reset Token: " + token );
             Transport.send( msg, ITRUST2_EMAIL_ADDRESS, ITRUST2_EMAIL_PASSWORD );
+            LoggerUtil.log( TransactionType.RESET_PASSWORD, userId );
         }
         catch ( final Exception e ) {
             return new ResponseEntity( GSON.toJson( "The request email could not be sent" ),

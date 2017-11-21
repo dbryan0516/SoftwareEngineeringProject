@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -122,6 +123,10 @@ public class APIOfficeVisitController extends APIController {
                 pform.setOfficeVisit( visit.getId().toString() );
                 final Prescription prescription = new Prescription( pform );
                 prescription.save();
+                final String hcp = SecurityContextHolder.getContext().getAuthentication().getName();
+                final String patient = prescription.getPatient().getUsername();
+                LoggerUtil.log( TransactionType.PRESCRIPTION_CREATE, hcp, patient,
+                        hcp + " created a prescription for " + patient );
             }
             return new ResponseEntity( visit, HttpStatus.OK );
         }
