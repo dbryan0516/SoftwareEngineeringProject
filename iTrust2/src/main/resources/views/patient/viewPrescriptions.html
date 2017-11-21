@@ -28,7 +28,8 @@
              * Returns a String representation of an office visit date in the form MM/DD/YYYY.
              */
             function makeDate(date) {
-                return "" + (date.month < 10 ? "0": "") + date.month + "/" + (date.dayOfMonth < 10 ? "0": "") + date.dayOfMonth + "/" + date.year;
+            	var month = date.month + 1;
+                return "" + (month < 10 ? "0": "") + month + "/" + (date.dayOfMonth < 10 ? "0": "") + date.dayOfMonth + "/" + date.year;
             }
 
             /**
