@@ -40,14 +40,13 @@ public class PatientController {
 
     /**
      * Returns the form page for a patient to view their prescriptions.
-     * 
+     *
      * @return Page to display to the user.
      */
     @GetMapping ( "/patient/viewPrescriptions" )
     @PreAuthorize ( "hasRole('ROLE_PATIENT')" )
     public String viewPrescriptions () {
-        final String patient = SecurityContextHolder.getContext().getAuthentication().getName();
-        LoggerUtil.log( TransactionType.PRESCRIPTION_VIEW_PAT, patient, patient + " viewed their prescriptions " );
+
         return "/patient/viewPrescriptions";
     }
 
