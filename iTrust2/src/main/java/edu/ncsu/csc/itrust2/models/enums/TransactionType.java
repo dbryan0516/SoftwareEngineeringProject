@@ -26,7 +26,14 @@ public enum TransactionType {
      * User logged out
      */
     LOGOUT ( 3, "Logged Out", true ),
-
+    /**
+     * User logged out
+     */
+    LOCKOUT_TEMP ( 4, "Locked out temporarily", true ),
+    /**
+     * User logged out
+     */
+    LOCKOUT_PERM ( 5, "Locked out permanently", true ),
     /**
      * New User created
      */
@@ -47,7 +54,14 @@ public enum TransactionType {
      * User changed/updated
      */
     UPDATE_USER ( 104, "User updated", false ),
-
+    /**
+     * User changed/updated
+     */
+    CHANGE_PASSWORD ( 105, "Password changed", true ),
+    /**
+     * User changed/updated
+     */
+    RESET_PASSWORD ( 106, "Password Reset", true ),
     /**
      * User viewed their demographics
      */

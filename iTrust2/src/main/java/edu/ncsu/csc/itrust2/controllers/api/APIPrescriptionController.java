@@ -41,6 +41,8 @@ public class APIPrescriptionController extends APIController {
     @GetMapping ( BASE_PATH + "/prescriptions/hcp/{id}" )
     @PreAuthorize ( "hasRole('ROLE_HCP')" )
     public List<Prescription> getPrescriptionsByPatient ( @PathVariable ( "id" ) final String id ) {
+        final String hcp = SecurityContextHolder.getContext().getAuthentication().getName();
+        LoggerUtil.log( TransactionType.PRESCRIPTION_VIEW_HCP, hcp, id, hcp + " viewed their prescriptions for " + id );
         return Prescription.getForPatient( id );
     }
 
@@ -173,6 +175,8 @@ public class APIPrescriptionController extends APIController {
     @PreAuthorize ( "hasRole('ROLE_PATIENT')" )
     public List<Prescription> getMyPrescriptions () {
         final User self = getCurrentUser();
+        LoggerUtil.log( TransactionType.PRESCRIPTION_VIEW_PAT, self.getUsername(),
+                self + " viewed their prescriptions" );
         return Prescription.getForPatient( self.getId() );
     }
 

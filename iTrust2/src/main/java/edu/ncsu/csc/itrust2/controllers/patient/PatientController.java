@@ -34,17 +34,19 @@ public class PatientController {
      */
     @GetMapping ( "/patient/viewOfficeVisits" )
     @PreAuthorize ( "hasRole('ROLE_PATIENT')" )
-    public String viewOfficeVisits() {
+    public String viewOfficeVisits () {
         return "/patient/viewOfficeVisits";
     }
 
     /**
      * Returns the form page for a patient to view their prescriptions.
+     *
      * @return Page to display to the user.
      */
     @GetMapping ( "/patient/viewPrescriptions" )
-    @PreAuthorize( "hasRole('ROLE_PATIENT')" )
-    public String viewPrescriptions() {
+    @PreAuthorize ( "hasRole('ROLE_PATIENT')" )
+    public String viewPrescriptions () {
+
         return "/patient/viewPrescriptions";
     }
 
@@ -55,7 +57,7 @@ public class PatientController {
      */
     @RequestMapping ( value = "patient/index" )
     @PreAuthorize ( "hasRole('ROLE_PATIENT')" )
-    public String index() {
+    public String index () {
         return edu.ncsu.csc.itrust2.models.enums.Role.ROLE_PATIENT.getLanding();
     }
 
