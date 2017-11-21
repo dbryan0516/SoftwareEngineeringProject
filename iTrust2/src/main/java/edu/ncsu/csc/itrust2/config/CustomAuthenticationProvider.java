@@ -4,7 +4,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
@@ -47,7 +46,6 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
 
     /**
      * Performs authentication with the same contract as
-     * {@link AuthenticationManager#authenticate(Authentication)} .
      *
      * @param authentication
      *            the authentication request object.
